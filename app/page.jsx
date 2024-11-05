@@ -8,14 +8,14 @@ import SectionPub from "@/components/home/SectionPub";
 import SectionPartner from "@/components/home/SectionPartner";
 import SectionAbout from "@/components/home/SectionAbout";
 import SectionCount from "@/components/home/SectionCount";
-export default function Home() {
+export default async function Home() {
   return (
     <>
       {/* premiere section */}
       <section className="max-w-[1300px] mx-auto px-5">
         <div className="bg-fourthColor rounded-xl grid grid-cols-2 gap-4 items-center mb-12 overflow-hidden h-[600px] border w-full ">
           {/* ********left content********* */}
-          <div className="w-full p-10">
+          <div className="w-full p-10" data-aos="fade-right">
             <p className="text-[16px] leading-8 text-secondaryColor font-light mb-2">
               Order Restaurant food, takeaway and groceries.
             </p>
@@ -44,18 +44,20 @@ export default function Home() {
           </div>
 
           {/* ******** right content ********* */}
-          <div className="relative w-full h-full ">
+          <div className="relative w-full h-full " data-aos="fade-left">
             <Image
               className="absolute -left-[150px] bottom-0 z-10 h-[500px] w-[400px] object-cover"
               src={pizzaImage}
               width={"100%"}
               height={"100%"}
+              alt={"image"}
             />
             <Image
               className="absolute left-[80px] bottom-0 z-[1] w-[300px] h-[400px] rounded-md object-cover"
               src={homeEatImage}
               width={"100%"}
               height={"100%"}
+              alt={'image'}
             />
             <div className="w-[80%] absolute bottom-0 right-0 h-[97%] bg-primaryColor rounded-l-full pt-10 flex flex-col ">
               {/* **************** 1 ***************** */}
