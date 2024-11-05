@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --whiteColor: #fff;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  background: var(--whiteColor);
+  font-family: "poppins", sans-serif;
+}
+
+.link-animation {
+  @apply relative z-10  font-[400] text-[15px] border transition-all duration-200 border-transparent capitalize py-2 px-4 rounded-full overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:h-0 before:z-[-1] before:w-full before:bg-primaryColor before:transition-all before:duration-300 hover:before:bg-primaryColor hover:before:h-full hover:text-white;
+}
+
+/*****************$ home section start ***************** */
+.text-stroke-white {
+  -webkit-text-stroke: 1px white; /* Contour blanc de 1px */
+  color: transparent; /* Rend le chiffre transparent */
+}
+
+@layer utilities {
+  .bg-custom-gradient {
+    background: linear-gradient(
+      245.7deg,
+      rgba(255, 255, 255, 0) 0.94%,
+      rgba(3, 8, 31, 0.19) 51.68%,
+      rgba(3, 8, 31, 0.89) 87.9%
+    );
+  }
+  .bg-white-grdient {
+    background: linear-gradient(180deg, #eeeeee 0%, #e0e1dc 100%);
+  }
+}
+
+/*****************$ home section end ***************** */
+/*****************$ restaurants section starts ***************** */
+.swiper-pagination {
+  position: static !important;
+  margin-top: 20px;
+}
+.swiper-pagination-bullet-active {
+  background: #f28a3c !important;
+}
+
+/*****************$ restaurants section end ***************** */
