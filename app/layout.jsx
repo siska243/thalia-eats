@@ -1,7 +1,7 @@
 import "./globals.css";
 import Footer from "@/components/commons/Footer";
 import Header from "@/components/commons/Header";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import AosInit from "@/components/commons/AosInit";
 
 export const metadata = {
@@ -10,14 +10,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
-
   return (
     <html lang="en">
       <body>
         <AosInit />
         <Header />
-        <main className="min-h-screen">{children}</main>
+        <main className="h-full">{children}</main>
         <Footer />
         <Analytics />
       </body>

@@ -39,10 +39,10 @@ export default function SectionPopularResto() {
   return (
     <section className="my-12 max-w-[1300px] mx-auto px-5">
       <div>
-        <p className="text-2xl font-semibold text-secondaryColor mb-12">
+        <p className="text-base  lg:text-lg xl:text-2xl font-semibold text-secondaryColor mb-6 md:mb-12">
           Popular Restaurants
         </p>
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {restoData.map(({ imageSrc, title, resto }, index) => {
             return (
               <CardPopularResto key={index} imageSrc={imageSrc} title={title} />

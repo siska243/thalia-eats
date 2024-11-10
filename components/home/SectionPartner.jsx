@@ -19,9 +19,9 @@ export default function SectionPartner() {
     },
   ];
   return (
-    <section className="my-16 max-w-[1300px] mx-auto px-5">
+    <section className="my-8 md:my-16 max-w-[1300px] mx-auto px-5">
       <div className="w-full bg-white rounded-xl">
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
           {partnerData.map(
             ({ imageSrc, title, secondTitle, topTitle, btnLink }, index) => {
               return (

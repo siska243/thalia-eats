@@ -21,21 +21,23 @@ export default function SectionAbout() {
   ];
   return (
     <section className="max-w-[1300px] mx-auto px-5 bg-[#f4f4f4] rounded-xl shadow-md">
-      <div className="py-20 px-14">
-        <div className="flex items-center justify-between">
-          <p className=" text-xl font-semibold">Know more about us!</p>
+      <div className="py-10 lg:py-20 lg:px-14">
+        <div className="flex items-center justify-between lg:flex-row flex-col gap-4 lg:gap-0">
+          <p className="text-base  md:text-lg xl:text-2xl font-semibold text-secondaryColor">
+            Know more about us!
+          </p>
           {/* bouton */}
-          <div className="flex gap-4">
-            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-6 border border-transparent rounded-full text-base">
+          <div className="flex gap-2 lg:gap-4 flex-wrap md:flex-nowrap">
+            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-4 lg:px-6 border border-transparent rounded-full text-base">
               Frequent Questions
             </button>
-            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-6 border border-transparent rounded-full">
+            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-4 lg:px-6border border-transparent rounded-full">
               Who we are?
             </button>
-            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-6 border border-transparent rounded-full">
+            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-4 lg:px-6 border border-transparent rounded-full">
               Partner Program
             </button>
-            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-6 border border-transparent rounded-full">
+            <button className="transition-all duration-300 hover:border-primaryColor hover:font-medium text-black font-normal py-2 px-4 lg:px-6border border-transparent rounded-full">
               Help & Support
             </button>
           </div>
@@ -43,11 +45,11 @@ export default function SectionAbout() {
 
         {/* ********* about contents *************** */}
 
-        <div className="bg-white p-10 mt-10 rounded-lg shadow-xl">
+        <div className="bg-white p-4 lg:p-10 mt-5 lg:mt-10 rounded-lg shadow-xl">
           {/* frequents questions starts */}
-          <div className="flex gap-4 justify-between">
+          <div className="flex lg:flex-row flex-col gap-4 justify-between">
             {/* ** left colonne *** */}
-            <div className="flex flex-col w-[30%] gap-3">
+            <div className="flex flex-col w-full lg:w-[30%] gap-3">
               <button className="text-sm transition-all duration-300 hover:border-primaryColor hover:bg-primaryColor hover:font-medium text-black font-normal py-3 px-6 border border-transparent rounded-full text-center">
                 How does ThaliaEats work?
               </button>
@@ -65,16 +67,16 @@ export default function SectionAbout() {
               </button>
             </div>
             {/* ** right colonne *** */}
-            <div className="flex gap-3 w-[60%]">
+            <div className="flex gap-3 w-full lg:w-[60%]">
               <div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 sm:flex-row flex-col">
                   {about.map(({ title, content }, index) => {
                     return (
                       <CardAbout key={index} title={title} content={content} />
                     );
                   })}
                 </div>
-                <p className="text-center mt-6 text-base font-normal">
+                <p className="text-center mt-3 md:mt-6 text-sm md:text-base font-normal">
                   Order.UK simplifies the food ordering process. Browse through
                   our diverse menu, select your favorite dishes, and proceed to
                   checkout. Your delicious meal will be on its way to your

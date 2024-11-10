@@ -2,33 +2,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MdAccountCircle } from "react-icons/md";
+import { HiMiniBars3CenterLeft } from "react-icons/hi2";
+import { IoMdClose } from "react-icons/io";
+import { useState } from "react";
 
 export default function NavBar() {
-  const links = [
-    {
-      path: "/",
-      name: "Home",
-    },
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-    {
-      path: "/restaurants",
-      name: "Restaurants",
-    },
-    // {
-    //   path: "/track-order",
-    //   name: "track order",
-    // },
-    {
-      path: "/ordering",
-      name: "Ordering",
-    },
+  const links = [
+    { path: "/", name: "Home" },
+    { path: "/restaurants", name: "Restaurants" },
+    { path: "/ordering", name: "Ordering" },
   ];
+
   const pathname = usePathname();
+
   return (
-    <nav className="flex items-center gap-6">
-      <ul className="flex gap-6">
-        {links.map(({ path, name }, index) => {
-          return (
+    <>
+      {/* Menu pour grand écran */}
+      <nav className="hidden md:flex items-center gap-6">
+        <ul className="flex gap-6">
+          {links.map(({ path, name }, index) => (
             <Link
               key={index}
               href={path}
@@ -39,18 +34,73 @@ export default function NavBar() {
             >
               {name}
             </Link>
-          );
-        })}
-      </ul>
-      <Link
-        href="login"
-        className="py-3 px-6  rounded-full bg-secondaryColor border border-secondaryColor"
+          ))}
+        </ul>
+        <Link
+          href="login"
+          className="py-3 px-6 rounded-full bg-secondaryColor border border-secondaryColor"
+        >
+          <button className="flex gap-2 items-center">
+            <MdAccountCircle className="text-primaryColor text-xl" />
+            <span className="text-thirdColor">Login/SignUp</span>
+          </button>
+        </Link>
+      </nav>
+
+      {/* Bouton mobile */}
+      <button
+        className="md:hidden border p-3 rounded-xl bg-secondaryColor text-primaryColor"
+        onClick={toggleMenu}
       >
-        <button className="flex gap-2 items-center">
-          <MdAccountCircle className="text-primaryColor text-xl" />
-          <span className="text-thirdColor">Login/SignUp</span>
+        <HiMiniBars3CenterLeft
+          className={`text-xl ${isMenuOpen ? "opacity-0" : "opacity-100"}`}
+        />
+      </button>
+
+      {/* Menu mobile */}
+      <div
+        className={`fixed top-0 right-0 w-full h-screen  z-[9999] transform transition-transform duration-500 ease-in-out ${
+          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        } bg-secondaryColor/80 backdrop-blur-md `}
+      >
+        {/* Bouton de fermeture dans le menu mobile */}
+        <button
+          className="absolute top-10 right-10 text-primaryColor text-2xl"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <IoMdClose />
         </button>
-      </Link>
-    </nav>
+
+        {/* Liens du menu mobile */}
+        <ul className="flex flex-col items-center gap-6 mt-20">
+          {links.map(({ path, name }, index) => (
+            <Link
+              key={index}
+              href={path}
+              className={`link-animation  text-2xl text-white py-2 px-6 block ${
+                path === pathname && "before:bg-primaryColor  before:h-full"
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {name}
+            </Link>
+          ))}
+        </ul>
+
+        {/* Bouton Login/SignUp dans le menu mobile */}
+        <div className="flex justify-center mt-8">
+          <Link
+            href="/login"
+            className="py-3 px-6 rounded-full bg-white border border-white"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <button className="flex gap-2 items-center">
+              <MdAccountCircle className="text-secondaryColor text-xl" />
+              <span className="text-secondaryColor">Login/SignUp</span>
+            </button>
+          </Link>
+        </div>
+      </div>
+    </>
   );
 }
