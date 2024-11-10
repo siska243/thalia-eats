@@ -14,7 +14,7 @@ export default async function Home() {
   return (
     <>
       {/* hero section */}
-      <section className="max-w-[1300px] mx-auto px-5">
+      <section className="max-w-[1300px] mx-auto px-3 md:px-5 ">
         <div className="bg-fourthColor rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-8 md:mb-12 overflow-hidden h-[400px] md:h-[600px] border w-full ">
           {/* ********left content********* */}
           <div className="w-full p-5 xl:p-10" data-aos="fade-right">

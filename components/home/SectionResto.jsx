@@ -34,7 +34,7 @@ export default function SectionResto() {
     },
   ];
   return (
-    <section className="mt-12 max-w-[1300px] mx-auto px-5">
+    <section className="mt-6 lg:mt-12 max-w-[1300px] mx-auto px-3 md:px-5">
       <div>
         <p className="text-base  lg:text-lg xl:text-2xl font-semibold text-secondaryColor mb-6 md:mb-12">
           Order.uk Popular Categories 🤩

@@ -37,7 +37,7 @@ export default function SectionPopularResto() {
     },
   ];
   return (
-    <section className="my-12 max-w-[1300px] mx-auto px-5">
+    <section className="my-6 lg:my-12 max-w-[1300px] mx-auto px-3 md:px-5">
       <div>
         <p className="text-base  lg:text-lg xl:text-2xl font-semibold text-secondaryColor mb-6 md:mb-12">
           Popular Restaurants

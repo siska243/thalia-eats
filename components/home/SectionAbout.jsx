@@ -20,7 +20,7 @@ export default function SectionAbout() {
     },
   ];
   return (
-    <section className="max-w-[1300px] mx-auto px-5 bg-[#f4f4f4] rounded-xl shadow-md">
+    <section className="max-w-[1300px] mx-auto px-3 md:px-5 bg-[#f4f4f4] rounded-xl shadow-md">
       <div className="py-10 lg:py-20 lg:px-14">
         <div className="flex items-center justify-between lg:flex-row flex-col gap-4 lg:gap-0">
           <p className="text-base  md:text-lg xl:text-2xl font-semibold text-secondaryColor">

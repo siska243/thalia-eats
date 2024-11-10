@@ -42,8 +42,10 @@ export default function SectionAll() {
   ];
   return (
     <div>
-      <h5 className="text-primaryColor text-2xl font-bold mb-5">Burgers</h5>
-      <div className="grid grid-cols-3 gap-5">
+      <h5 className="text-primaryColor text-xl md:text-2xl font-bold mb-5">
+        Burgers
+      </h5>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {dealsData.map(({ imageSrc, title, other, content }, index) => {
           return (
             <CardAll

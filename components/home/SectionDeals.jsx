@@ -19,10 +19,10 @@ export default function SectionDeals() {
     },
   ];
   return (
-    <section className=" max-w-[1300px] mx-auto px-5">
+    <section className=" max-w-[1300px] mx-auto px-3 md:px-5">
       <div className="w-full bg-white rounded-xl">
         {/* top exclusive deals */}
-        <div className="flex items-center justify-between mb-12 gap-4 md:gap-0 md:flex-row flex-col">
+        <div className="flex items-center justify-between mb-8 md:mb-12 gap-4 md:gap-0 md:flex-row flex-col">
           <div>
             <p className="text-base  lg:text-lg xl:text-2xl font-semibold text-secondaryColor">
               Up to -40% 🎊 Order.uk exclusive deals

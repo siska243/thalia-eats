@@ -29,7 +29,7 @@ export default function restaurants() {
       </section>
       {/* ********************** */}
       <section className="bg-primaryColor">
-        <div className="max-w-[1300px] mx-auto px-5 flex items-center justify-between py-3 md:py-5 gap-2 md:gap-3 overflow-auto lg:overflow-hidden">
+        <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center justify-between py-3 md:py-5 gap-2 md:gap-3 overflow-auto lg:overflow-hidden">
           {/*         */}
           <button className="transition-all duration-300 text-white bg-black py-2 md:px-6 px-4 rounded-full text-sm border border-transparent flex-shrink-0">
             Offers
@@ -64,7 +64,7 @@ export default function restaurants() {
       {/* ********************* */}
       <SectionOffers />
       {/* ********************** */}
-      <section className="max-w-[1300px] mx-auto px-5 pb-12">
+      <section className="max-w-[1300px] mx-auto px-3 md:px-5 pb-12">
         <div className="flex flex-col gap-12">
           <SectionAll />
           <SectionAll />

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function SectionPub() {
   return (
-    <section className="mt-24 max-w-[1300px] mx-auto px-5 ">
+    <section className="mt-8 md:mt-16 lg:mt-24 max-w-[1300px] mx-auto px-3 md:px-5 ">
       <div className="bg-white-grdient shadow-xl rounded-lg flex flex-col xl:flex-row items-center relative xl:h-[500px] xl:justify-end pt-20 gap-4 xl:gap-0">
         {/* image visible sur grands écrans */}
         <Image

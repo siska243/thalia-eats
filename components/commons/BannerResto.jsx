@@ -6,7 +6,7 @@ import clock from "@/public/assets/images/clock.png";
 
 export default function BannerResto() {
   return (
-    <section className="max-w-[1300px] mx-auto px-5 mb-16">
+    <section className="max-w-[1300px] mx-auto px-3 md:px-5 mb-16">
       <div className="w-full lg:h-[450px] rounded-xl relative bg-secondaryColor/90 md:p-16 p-10">
         {/* background image */}
         <Image
