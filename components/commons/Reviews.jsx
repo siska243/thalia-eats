@@ -60,11 +60,21 @@ export default function Reviews() {
         {/* Slider */}
         <Swiper
           modules={[Navigation, Pagination]} // Modules de navigation et pagination
-          spaceBetween={20} // Espace entre les slides
-          slidesPerView={3} // Nombre de slides visibles
+          spaceBetween={10} // Espace entre les slides
+          slidesPerView={1} // Nombre de slides visibles
           navigation={{
             prevEl: ".button-prev",
             nextEl: ".button-next",
+          }}
+          breakpoints={{
+            640: {
+              slidesPerView: 2, // 2 slides visibles sur les écrans moyens
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 3, // 3 slides visibles sur les écrans larges
+              spaceBetween: 30,
+            },
           }}
           pagination={{ clickable: true }} // Pagination cliquable
         >

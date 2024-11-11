@@ -4,13 +4,15 @@ import { FaClock } from "react-icons/fa6";
 
 export default function ContactInfo() {
   return (
-    <div className="w-full bg-[#fbfbfb] shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex overflow-hidden rounded-xl">
-      <div className="px-10 py-20 w-[70%] flex">
+    <div className="w-full bg-[#fbfbfb] shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex overflow-hidden rounded-xl md:flex-row flex-col">
+      <div className="px-5 lg:px-8 py-5 md:py-10 xl:py-20  md:w-[70%] flex gap-10 md:gap-5 md:flex-row flex-col">
         {/* left */}
-        <div className="w-1/2 flex-shrink-0">
-          <h6 className="flex gap-4 items-center mb-8">
+        <div className="md:w-1/2 ">
+          <h6 className="flex gap-4 items-center mb-4 md:mb-8">
             <TbTruckDelivery className="text-3xl" />
-            <span className="font-bold text-xl">Delivery information</span>
+            <span className="font-bold text-base lg:text-lg xl:text-xl">
+              Delivery information
+            </span>
           </h6>
           <div className="flex flex-col gap-4">
             <p className="text-sm font-medium">
@@ -64,10 +66,12 @@ export default function ContactInfo() {
           </div>
         </div>
         {/* center */}
-        <div className="w-1/2 flex-shrink-0">
-          <h6 className="flex gap-4 items-center mb-8">
+        <div className="md:w-1/2">
+          <h6 className="flex gap-4 items-center mb-4 md:mb-8">
             <RiPassValidFill className="text-3xl" />
-            <span className="font-bold text-xl">Contact information</span>
+            <span className="font-bold text-base lg:text-lg xl:text-xl">
+              Contact information
+            </span>
           </h6>
           <div className="flex flex-col gap-4">
             <p className="text-sm font-light leading-7">
@@ -84,10 +88,12 @@ export default function ContactInfo() {
         </div>
       </div>
       {/* right */}
-      <div className="w-[30%] bg-secondaryColor px-10 py-20 text-white">
-        <h6 className="flex gap-4 items-center mb-8">
-          <FaClock className="text-3xl" />
-          <span className="font-bold text-xl">Delivery information</span>
+      <div className="md:w-[30%] bg-secondaryColor px-5 lg:px-8 py-5 md:py-10 xl:py-20 text-white">
+        <h6 className="flex gap-4 items-center mb-4 md:mb-8">
+          <FaClock className="text-3xl " />
+          <span className="font-bold text-base lg:text-lg xl:text-xl">
+            Delivery information
+          </span>
         </h6>
         <div className="flex flex-col gap-4">
           <p className="text-sm font-medium">

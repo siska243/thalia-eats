@@ -64,7 +64,7 @@ export default function restaurants() {
       {/* ********************* */}
       <SectionOffers />
       {/* ********************** */}
-      <section className="max-w-[1300px] mx-auto px-3 md:px-5 pb-12">
+      <section className="max-w-[1300px] mx-auto px-3 md:px-5 pb-6 md:pb-12">
         <div className="flex flex-col gap-12">
           <SectionAll />
           <SectionAll />

@@ -6,8 +6,8 @@ import SectionPopularResto from "../home/SectionPopularResto";
 
 export default function BeforeFooterContent() {
   return (
-    <section className="py-12">
-      <div className="max-w-[1300px] mx-auto px-5">
+    <section className="py-4 md:py-12">
+      <div className="max-w-[1300px] mx-auto px-3 md:px-5">
         <ContactInfo />
         <Map />
       </div>
