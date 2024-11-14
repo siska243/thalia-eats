@@ -67,6 +67,7 @@ export default function MainContent() {
           </button>
         </form>
       </div>
+
       {/* card menu selectionné */}
       <div className="flex flex-col gap-8">
         {plats.map((plat, index) => {

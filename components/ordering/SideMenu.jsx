@@ -36,7 +36,7 @@ export default function SideMenu() {
     },
   ];
   return (
-    <div className="py-5 border rounded-lg border-[#BCBCBC] bg-[#FBFBFB] overflow-hidden">
+    <div className="py-5 border rounded-lg border-[#BCBCBC] bg-[#FBFBFB] overflow-hidden ">
       <div className="flex gap-3 pl-5">
         <Image src={cookImg} width={30} height={20} />
         <h3 className="text-2xl font-semibold text-black">Menu</h3>

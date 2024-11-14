@@ -5,15 +5,15 @@ export default function CardPlat({ plat }) {
   return (
     <div className="shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-5 rounded-xl">
       {/* top section */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-4 md:gap-0 md:flex-row flex-col-reverse">
         {/* left content */}
-        <div className="flex flex-col gap-5 w-[50%]">
+        <div className="flex flex-col gap-5 w-full md:w-[50%] text-center md:text-left">
           <h3 className="text-balck font-semibold text-xl">{plat.name}</h3>
           <p className="text-gray-800 text-sm leading-6">{plat.contenu}</p>
         </div>
 
         {/* right content */}
-        <div className="w-[150px] h-[150px]">
+        <div className="w-[100px] h-[100px] md:w-[150px] md:h-[150px]">
           <Image
             src={plat.image}
             alt={plat.name}
