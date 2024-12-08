@@ -1,19 +1,20 @@
 import React from "react";
 import CardPartner from "./CardPartner";
+import partnerImg from "@/public/assets/images/partner.png";
 
 export default function SectionPartner() {
   const partnerData = [
     {
-      imageSrc: "@/assets/images/food.png", // Les chemins réels de tes images
-      title: "Partner with us",
-      secondTitle: "Signup as a business",
-      topTitle: "Earn more with lower fees",
+      imageSrc: partnerImg, // Les chemins réels de tes images
+      title: "Devenez notre partenaire",
+      secondTitle: "Inscrivez-vous en tant qu'entreprise",
+      topTitle: "Gagnez plus avec des frais réduits",
       btnLink: "/",
     },
     {
-      imageSrc: "@/assets/images/food.png", // Les chemins réels de tes images
-      title: "Ride with us",
-      secondTitle: "Signup as a rider",
+      imageSrc: partnerImg, // Les chemins réels de tes images
+      title: "Roulez avec nous",
+      secondTitle: "Inscrivez-vous en tant que livreur",
       topTitle: "Avail exclusive perks",
       btnLink: "/",
     },

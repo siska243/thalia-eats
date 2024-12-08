@@ -1,5 +1,5 @@
 import Image from "next/image";
-import food from "@/public/assets/images/food.png";
+
 import Link from "next/link";
 
 export default function CardDeals({ imageSrc, title, percent }) {
@@ -10,7 +10,7 @@ export default function CardDeals({ imageSrc, title, percent }) {
     >
       <Image
         className="w-full h-full"
-        src={food}
+        src={imageSrc}
         alt={title}
         width={500}
         height={500}

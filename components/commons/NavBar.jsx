@@ -5,15 +5,19 @@ import { MdAccountCircle } from "react-icons/md";
 import { HiMiniBars3CenterLeft } from "react-icons/hi2";
 import { IoMdClose } from "react-icons/io";
 import { useState } from "react";
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
+import Account from "../account/Account";
 
 export default function NavBar() {
+  const { user } = useGetCurrentUser();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const links = [
-    { path: "/", name: "Home" },
-    { path: "/restaurants", name: "Restaurants" },
-    { path: "/ordering", name: "Ordering" },
+    { path: "/", name: "Accueil" },
+    { path: "/restaurant", name: "Restaurant" },
+    { path: "/ordering", name: "Commande" },
   ];
 
   const pathname = usePathname();
@@ -21,32 +25,36 @@ export default function NavBar() {
   return (
     <>
       {/* Menu pour grand écran */}
-      <nav className="hidden md:flex items-center gap-6">
+      <nav className="hidden md:flex items-center md:gap-4 lg:gap-6">
         <ul className="flex gap-6">
           {links.map(({ path, name }, index) => (
             <Link
               key={index}
               href={path}
-              className={`link-animation text-secondaryColor ${
-                path === pathname &&
+              className={`link-animation text-secondaryColor ${path === pathname &&
                 "before:bg-primaryColor text-white before:h-full"
-              }`}
+                }`}
             >
               {name}
             </Link>
           ))}
         </ul>
-        <Link
-          href="login"
-          className="py-3 px-6 rounded-full bg-secondaryColor border border-secondaryColor"
-        >
-          <button className="flex gap-2 items-center">
-            <MdAccountCircle className="text-primaryColor text-xl" />
-            <span className="text-thirdColor">Login/SignUp</span>
-          </button>
-        </Link>
+        {!user ? (
+          <Link
+            href="/login"
+            className="py-3 px-6 rounded-full bg-secondaryColor border border-secondaryColor"
+          >
+            {/* bouton login and sign up */}
+            <button className="flex gap-2 items-center">
+              <MdAccountCircle className="text-primaryColor text-xl" />
+              <span className="text-thirdColor">Login/SignUp</span>
+            </button>
+          </Link>
+        ) : (
+          <Account account={user} isMobile={false} />
+        )}
       </nav>
-
+      {/* *************************$ */}
       {/* Bouton mobile */}
       <button
         className="md:hidden border p-3 rounded-xl bg-secondaryColor text-primaryColor"
@@ -57,11 +65,11 @@ export default function NavBar() {
         />
       </button>
 
+      {/* ***************** */}
       {/* Menu mobile */}
       <div
-        className={`fixed top-0 right-0 w-full h-screen  z-[9999] transform transition-transform duration-500 ease-in-out ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        } bg-secondaryColor/80 backdrop-blur-md `}
+        className={`fixed top-0 right-0 w-full h-screen  z-[9999] transform transition-transform duration-500 ease-in-out ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+          } bg-secondaryColor/80 backdrop-blur-md `}
       >
         {/* Bouton de fermeture dans le menu mobile */}
         <button
@@ -70,16 +78,15 @@ export default function NavBar() {
         >
           <IoMdClose />
         </button>
-
+        {/* ********************* */}
         {/* Liens du menu mobile */}
         <ul className="flex flex-col items-center gap-6 mt-20">
           {links.map(({ path, name }, index) => (
             <Link
               key={index}
               href={path}
-              className={`link-animation  text-2xl text-white py-2 px-6 block ${
-                path === pathname && "before:bg-primaryColor  before:h-full"
-              }`}
+              className={`link-animation  text-2xl text-white py-2 px-6 block ${path === pathname && "before:bg-primaryColor  before:h-full"
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {name}
@@ -88,18 +95,20 @@ export default function NavBar() {
         </ul>
 
         {/* Bouton Login/SignUp dans le menu mobile */}
-        <div className="flex justify-center mt-8">
+        {!user ? (
           <Link
             href="/login"
-            className="py-3 px-6 rounded-full bg-white border border-white"
-            onClick={() => setIsMenuOpen(false)}
+            className="py-3 px-6 rounded-full bg-secondaryColor border border-secondaryColor"
           >
+            {/* bouton login and sign up */}
             <button className="flex gap-2 items-center">
-              <MdAccountCircle className="text-secondaryColor text-xl" />
-              <span className="text-secondaryColor">Login/SignUp</span>
+              <MdAccountCircle className="text-primaryColor text-xl" />
+              <span className="text-thirdColor">Login/SignUp</span>
             </button>
           </Link>
-        </div>
+        ) : (
+          <Account account={user} isMobile={true} />
+        )}
       </div>
     </>
   );

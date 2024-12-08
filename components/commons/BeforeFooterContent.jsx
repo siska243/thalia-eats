@@ -4,14 +4,17 @@ import Map from "./Map";
 import Reviews from "./Reviews";
 import SectionPopularResto from "../home/SectionPopularResto";
 
-export default function BeforeFooterContent() {
+export default function BeforeFooterContent({ restaurant }) {
+
+  const data = restaurant;
   return (
     <section className="py-4 md:py-12">
       <div className="max-w-[1300px] mx-auto px-3 md:px-5">
-        <ContactInfo />
-        <Map />
+        {/* <ContactInfo /> */}
+        <Map data={data == undefined ? [] : data} />
       </div>
-      <Reviews />
+      {/* reviews */}
+      {/* <Reviews /> */}
       <SectionPopularResto />
     </section>
   );

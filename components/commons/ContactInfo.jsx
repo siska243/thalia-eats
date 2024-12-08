@@ -4,7 +4,7 @@ import { FaClock } from "react-icons/fa6";
 
 export default function ContactInfo() {
   return (
-    <div className="w-full bg-[#fbfbfb] shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex overflow-hidden rounded-xl md:flex-row flex-col gap-3 lg:justify-between flex-wrap lg:flex-nowrap">
+    <div className="w-full bg-[#fbfbfb] box-shadow-custom flex overflow-hidden rounded-xl md:flex-row flex-col gap-3 lg:justify-between flex-wrap lg:flex-nowrap">
       {/* left */}
       <div className="px-5 md:pl-10 xl:py-20 py-10 md:w-[48%] lg:w-[35%] xl:w-[33%] border-b md:border-b-0">
         <h6 className="flex gap-4 items-center mb-8">

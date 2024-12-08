@@ -2,13 +2,12 @@ import Link from "next/link";
 import appleImg from "@/public/assets/images/apple-logo.jpg";
 import googleImg from "@/public/assets/images/google-logo.png";
 import Image from "next/image";
-import { IoIosArrowDroprightCircle } from "react-icons/io";
 
 export default function Footer() {
   return (
     <footer className="bg-[#D9D9D9] w-full">
       <section className="max-w-[1300px] mx-auto px-5 py-16 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
-        {/* colonne 1 */}
+        {/* Colonne 1 */}
         <div className="xl:col-span-2">
           <Link
             href="/"
@@ -21,109 +20,72 @@ export default function Footer() {
               href="/"
               className="w-[120px] h-[40px] rounded-md overflow-hidden"
             >
-              <Image src={appleImg} className="h-full" />
+              <Image src={appleImg} className="h-full" alt="logo AppStore" />
             </Link>
             <Link
               href="/"
               className="w-[120px] h-[40px] rounded-md overflow-hidden"
             >
-              <Image src={googleImg} className="h-full" />
+              <Image
+                src={googleImg}
+                className="h-full"
+                alt="logo Google PlayStore"
+              />
             </Link>
           </div>
           <p className="font-normal text-base text-black max-w-[300px] mt-4">
-            Company # 490039-445, Registered with House of companies.
+            Entreprise # 490039-445, Enregistrée auprès de la Chambre des
+            entreprises.
           </p>
         </div>
-        {/* colonne 2 */}
 
-        <div className="xl:col-span-2">
-          <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
-            Get Exclusive Deals in your Inbox
-          </h5>
-          {/* formulaire visible sur grand écran*/}
-          <form className=" w-full relative mb-4 xl:block hidden">
-            <input
-              className="p-3 outline-none rounded-full w-[300px] focus:border-primaryColor placeholder:text-sm text-base text-gray-300 bg-gray-400/40 shadow-xl placeholder:text-black"
-              type="text"
-              placeholder="e.g. EC4R 3TE"
-            />
-            <button
-              className="bg-primaryColor border-2 border-primaryColor text-white rounded-full p-3 right-10 w-[200px] absolute top-0"
-              type="submit"
-            >
-              Search
-            </button>
-          </form>
-          {/* formulaire visible sur mobile */}
-          <form className="relative xl:hidden w-full max-w-[300px] flex justify-center items-center mb-4">
-            <input
-              className="p-3 outline-none border-2 rounded-full w-full  focus:border-primaryColor placeholder:text-sm text-[15px] text-gray-500 pr-16 "
-              type="text"
-              placeholder="e.g. EC4R 3TE"
-            />
-            <button
-              className=" border-primaryColor bg-primaryColor text-white rounded-full p-4 absolute bottom-0 right-0"
-              type="submit"
-            >
-              <IoIosArrowDroprightCircle />
-            </button>
-          </form>
-          {/* ************* */}
-          <p className="text-sm font-light">
-            we wont spam, read our email policy
-          </p>
-        </div>
-        {/* colonee 3 */}
+        {/* Colonne 2 */}
         <div className="">
           <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
-            Legal Pages
+            Pages légales
           </h5>
           <div className="flex flex-col gap-3">
             <Link href="/" className="text-sm font-normal underline">
-              Terms and conditions
+              Conditions d'utilisation
             </Link>
             <Link href="/" className="text-sm font-normal underline">
-              Privacy
+              Confidentialité
             </Link>
             <Link href="/" className="text-sm font-normal underline">
               Cookies
             </Link>
             <Link href="/" className="text-sm font-normal underline">
-              Modern Slavery Statemen
+              Déclaration sur l'esclavage moderne
             </Link>
           </div>
         </div>
-        {/* colonne 4 */}
+
+        {/* Colonne 3 */}
         <div className="">
           <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
-            Legal Pages
+            Contact
           </h5>
           <div className="flex flex-col gap-3">
-            <Link href="/" className="text-sm font-normal underline">
-              Terms and conditions
+            <Link href="/contact" className="text-sm font-normal underline">
+              Contactez-nous
             </Link>
-            <Link href="/" className="text-sm font-normal underline">
-              Privacy
-            </Link>
-            <Link href="/" className="text-sm font-normal underline">
-              Cookies
-            </Link>
-            <Link href="/" className="text-sm font-normal underline">
-              Modern Slavery Statemen
+            <Link href="/faq" className="text-sm font-normal underline">
+              Foire aux questions
             </Link>
           </div>
         </div>
       </section>
-      {/* *************************** s */}
+
+      {/* Section du bas */}
       <section className="bg-secondaryColor ">
         <div className="py-5 max-w-[1300px] mx-auto flex items-center justify-between text-white px-5 sm:flex-row flex-col gap-4 sm:gap-0">
           <p className="text-sm sm:text-base">
-            Order.uk Copyright 2024, All Rights Reserved.
+            ThaliaEats Copyright 2024, Tous droits réservés.
           </p>
           <div className="flex gap-10 font-light text-sm">
-            <p>Privacy Policy</p>
-            <p>Terms </p>
-            <p>Pricing</p>
+            <Link href="/privacy-policy">Politique de confidentialité</Link>
+            <Link href="/terms">Conditions</Link>
+            <Link href="/pricing">Tarification</Link>
           </div>
         </div>
       </section>

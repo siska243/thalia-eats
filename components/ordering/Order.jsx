@@ -1,7 +1,7 @@
 import { FaClock } from "react-icons/fa6";
 import CommandeList from "./CommandeList";
 
-export default function Order() {
+export default function Order({ ordering, removeProduct }) {
   return (
     <section>
       {/* top */}
@@ -13,7 +13,7 @@ export default function Order() {
       </div>
 
       {/* commande list */}
-      <CommandeList />
+      <CommandeList ordering={ordering == undefined ? [] : ordering} removeProduct={removeProduct} />
     </section>
   );
 }

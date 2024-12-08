@@ -28,14 +28,16 @@ body {
   -webkit-text-stroke: 1px white; /* Contour blanc de 1px */
   color: transparent; /* Rend le chiffre transparent */
 }
+.box-shadow-custom {
+  @apply rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+}
 
 @layer utilities {
   .bg-custom-gradient {
     background: linear-gradient(
-      245.7deg,
       rgba(255, 255, 255, 0) 0.94%,
-      rgba(3, 8, 31, 0.19) 51.68%,
-      rgba(3, 8, 31, 0.89) 87.9%
+      #03081f74,
+      #03081f
     );
   }
   .bg-white-grdient {
@@ -54,3 +56,6 @@ body {
 }
 
 /*****************$ restaurants section end ***************** */
+
+/* switcg bouton  */
+/* Switch container styles */

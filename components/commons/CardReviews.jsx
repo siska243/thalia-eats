@@ -5,7 +5,7 @@ import { CiClock1 } from "react-icons/ci";
 
 export default function CardReviews({ img, name, country, text, date }) {
   return (
-    <div className="bg-white p-5 rounded-md">
+    <div className="bg-white box-shadow-custom p-5 rounded-md">
       <div className="flex justify-between">
         {/* left */}
         <div className="flex gap-3">
@@ -14,6 +14,7 @@ export default function CardReviews({ img, name, country, text, date }) {
             width={30}
             height={30}
             className="object-cover rounded-full w-[50px] h-[50px]"
+            alt={name}
           />
           <div className="border-l-2 border-l-primaryColor pl-3">
             <h5 className="text-black font-semibold text-base">{name}</h5>

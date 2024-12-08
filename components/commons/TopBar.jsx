@@ -2,11 +2,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaLocationDot } from "react-icons/fa6";
-import { FaShoppingBag, FaCloudDownloadAlt } from "react-icons/fa";
+import { FaShoppingBag } from "react-icons/fa";
+import { MdLocalShipping } from "react-icons/md";
 import Panier from "../popups/Panier";
+import useCreateOrdering from "@/hooks/useCreateOrdering";
 
 export default function TopBar() {
   const [showPanier, setShowPanier] = useState(false);
+  const { ordering } = useCreateOrdering()
   // Empêche le défilement lorsque le popup est visible
   useEffect(() => {
     if (showPanier) {
@@ -29,8 +32,8 @@ export default function TopBar() {
         <div className="flex gap-3 items-center">
           <div>🌟</div>
           <p className="font-[400] text-secondaryColor text-xs md:text-sm">
-            Get 5% Off your first order,
-            <span className="text-primaryColor">Promo: ORDER5</span>
+            Commander en toute securité,
+            <span className="text-primaryColor"> Thalia-Eats</span>
           </p>
         </div>
         {/* ************************* */}
@@ -40,32 +43,35 @@ export default function TopBar() {
               <p className="text-xl">
                 <FaLocationDot />
               </p>
-              <p className="font-[400] text-secondaryColor text-sm">
+              <p className="font-[400] hidden md:block text-secondaryColor text-sm">
                 Regent Street, A4, A4201, London
               </p>
             </div>
-            <p className="font-[400] text-primaryColor text-sm underline">
+            {/* ****** */}
+            {/* <p className="font-[400] text-primaryColor text-sm underline">
               <Link href="/">Change Location</Link>
-            </p>
+            </p> */}
           </div>
           {/* ********************* panier partie */}
-          <div className="bg-[#3C8744] sm:rounded-xl sm:rounded-t-none flex">
+          <div className="bg-[#3C8744] sm:rounded-xl sm:rounded-t-none flex items-center">
+            {/* le panier */}
             <button
-              className="p-2 md:p-4 text-white text-base md:text-xl"
+              className="p-4 text-white text-xl md:text-3xl relative"
               onClick={toggleShowPanier}
             >
               <FaShoppingBag />
+              <p className="absolute top-[5px] right-0 bg-primaryColor h-5 w-5 p-2 text-xs rounded-full flex items-center justify-center"> <span>{ordering.length} </span></p>
             </button>
             {/* <p className="p-4 text-white border-l text-sm border-gray-300/65">
               23 Items
             </p> */}
-            <p className="p-2 md:p-4 text-white border-l text-xs md:text-sm border-gray-300/65">
+            <p className="hidden md:block p-4 text-white border-l text-xs md:text-sm border-gray-300/65">
               GBP 79.89
             </p>
 
-            <p className="hidden sm:block p-2 md:p-4 text-white text-xl border-l border-gray-300/65">
-              <FaCloudDownloadAlt />
-            </p>
+            <Link href="/tracking" className=" p-4 text-white text-3xl border-l border-gray-300/65">
+              <MdLocalShipping />
+            </Link>
           </div>
         </div>
       </div>
