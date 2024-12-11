@@ -3,8 +3,6 @@ import useCreateOrdering from "@/hooks/useCreateOrdering";
 import { calcul_price } from "@/helpers/calculePrice"
 
 export default function Total({ currentOrder }) {
-  console.log(currentOrder);
-
 
   const { ordering } = useCreateOrdering();
   return (
@@ -18,23 +16,43 @@ export default function Total({ currentOrder }) {
           <span>{ordering[0]?.product?.currency.code} {calcul_price(ordering)}</span>
         </p>
         {/* afficher le prix de livraison et de service */}
-        {
-          currentOrder &&
-          (<>
+        {/* {
+          currentOrder && currentOrder.length > 0
+            (<>
+              <p className="flex items-center justify-between">
+                <span className="text-lg font-semibold text-secondaryColor">
+                  Prix Service:
+                </span>
+                <span>{currentOrder?.products[0]?.currency?.code} {currentOrder?.price_service}</span>
+              </p>
+              <p className="flex items-center justify-between">
+                <span className="text-lg font-semibold text-secondaryColor">
+                  Prix Livraison:
+                </span>
+                <span>{currentOrder?.products[0]?.currency?.code} {currentOrder.price_delivery}</span>
+              </p>
+            </>)
+        } */}
+        {currentOrder && Array.isArray(currentOrder.products) && currentOrder.products.length > 0 && (
+          <>
             <p className="flex items-center justify-between">
               <span className="text-lg font-semibold text-secondaryColor">
                 Prix Service:
               </span>
-              <span>{currentOrder?.products[0]?.currency?.code} {currentOrder?.price_service}</span>
+              <span>
+                {currentOrder.products[0]?.currency?.code} {currentOrder.price_service}
+              </span>
             </p>
             <p className="flex items-center justify-between">
               <span className="text-lg font-semibold text-secondaryColor">
                 Prix Livraison:
               </span>
-              <span>{currentOrder?.products[0]?.currency?.code} {currentOrder.price_delivery}</span>
+              <span>
+                {currentOrder.products[0]?.currency?.code} {currentOrder.price_delivery}
+              </span>
             </p>
-          </>)
-        }
+          </>
+        )}
 
       </div>
     </div>

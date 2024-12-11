@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 
 export default function CommandeList({ ordering, removeProduct }) {
 
-  const currentOrder = useSelector((state) => state.cart?.currentOrder);
+  const { currentOrder } = useSelector((state) => state.cart);
 
   return (
     <div className="border border-gray-300 mt-4 overflow-hidden bg-[#f9f9f9] rounded-xl">
@@ -33,7 +33,7 @@ export default function CommandeList({ ordering, removeProduct }) {
           <Total currentOrder={currentOrder == undefined ? [] : currentOrder} />
           {/* afficher les prix uniquement quand la commande current existe */}
           {
-            currentOrder && currentOrder.length > 0 && (
+            currentOrder && (
               <>
                 <TotalPay currentOrder={currentOrder} />
                 <Checkout />

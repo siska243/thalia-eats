@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 export default function Checkout() {
   const { ordering } = useCreateOrdering();
   const { data } = useDefaultData()
-  const { currentOrder } = useSelector((state) => state.cart?.currentOrder);
+  const { currentOrder } = useSelector((state) => state.cart);
   const {
     service_price,
     livraison_price,
@@ -26,9 +26,6 @@ export default function Checkout() {
   const handlerCheckPayement = async () => {
 
     if (currentOrder) {
-      console.log(currentOrder);
-      return
-
       // ****************************************
       const pricing = {
         frais_livraison: livraison_price,
@@ -41,6 +38,7 @@ export default function Checkout() {
         cancel_url,
         pricing,
       }
+      console.log(data);
 
       try {
         const response = await FetchData.sendData(Route.valide_commande, data)

@@ -24,13 +24,12 @@ export default function MainContent() {
   }
   // les données de currentOrdering
   const { data: currentCommande, isLoading: currentLoading, isError, isFetched } = useReferentialData({ url: Route.current_commande, queryKey: 'current-commande' })
-  console.log("la commande courant", currentCommande);
 
   // au chargement on recupère les données de la commande courante
+
   useEffect(() => {
     if (currentCommande) {
       dispatch(setCurrentOrder(currentCommande));
-      console.log(currentCommande);
       return
 
     }
