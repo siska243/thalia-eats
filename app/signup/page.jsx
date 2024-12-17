@@ -1,7 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import Image from "next/image";
-import foodsImg from "@/public/assets/images/foodsImg.png";
 import Link from "next/link";
 import { FetchData } from "@/helpers/FetchData";
 import { Route } from "@/helpers/Route";

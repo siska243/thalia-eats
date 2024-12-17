@@ -1,3 +1,4 @@
+"use client"
 import logo from "@/public/assets/logo-thalia.png";
 import Image from "next/image";
 export default function Loader() {
@@ -11,6 +12,7 @@ export default function Loader() {
                     className="w-24 h-24 animate-spin-slow"
                     height={600}
                     width={600}
+                    loading={'lazy'}
                 />
             </div>
         </div>

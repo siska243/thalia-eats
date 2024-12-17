@@ -1,3 +1,4 @@
+"use client"
 import { FetchData } from '@/helpers/FetchData'
 import { Route } from '@/helpers/Route'
 import { requestPermission } from '@/hooks/useNotification'
@@ -12,9 +13,12 @@ export default function NotificationProvider() {
             console.log(response)
         }
     }
-    useEffect(() => {
 
-        handlerToken()
+    useEffect(() => {
+        if(localStorage !== undefined){
+            handlerToken()
+        }
+
     }, [])
     return (
         <div></div>

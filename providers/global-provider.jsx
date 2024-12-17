@@ -4,8 +4,11 @@ import ReduxProvider from './redux-provider'
 import { ReactQueryProvider } from './query-provider'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import NotificationProvider from "./notification-provider"
+import dynamic from "next/dynamic";
 
+const NotificationProvider = dynamic(() => import('./notification-provider'), {
+    ssr: false,
+});
 export default function GlobalProvider({ children }) {
     return (
         <ReduxProvider>

@@ -1,4 +1,5 @@
 // Importez Firebase SDK pour les notifications
+"use client"
 importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-messaging-compat.js');
 
