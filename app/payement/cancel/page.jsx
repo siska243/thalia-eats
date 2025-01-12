@@ -32,11 +32,11 @@ export default function CancelPage() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center h-screen pt-[150px] bg-gray-50 px-4 sm:px-6 lg:px-8">
             <div className="bg-white box-shadow-custom rounded-lg p-6 sm:p-8 lg:p-10 max-w-xl w-full text-center">
-                <div className="flex justify-center mb-6">
+                <div className="flex justify-center mb-4 md:mb-6">
                     {/* SVG pour annulation */}
-                    <MdCancel className="w-16 h-16 text-yellow-500" />
+                    <MdCancel className="w-12 h-12 md:w-16 md:h-16 text-yellow-500" />
                 </div>
                 <h1 className="text-xl sm:text-2xl font-bold text-yellow-600 mb-4">
                     Commande annulée !

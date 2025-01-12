@@ -33,11 +33,11 @@ export default function SuccessPage() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="flex items-center justify-center  h-screen pt-[150px] bg-gray-50 px-4 sm:px-6 lg:px-8">
             <div className="bg-white box-shadow-custom rounded-lg p-8 max-w-md text-center">
-                <div className="flex justify-center mb-4 ">
+                <div className="flex justify-center mb-4 md:mb-6 ">
                     {/* Icone de succès */}
-                    <MdCheckCircle className="w-16 h-16 text-green-500" />
+                    <MdCheckCircle className="w-12 h-12 md:w-16 md:h-16 text-green-500" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Paiement réussi !</h2>
                 <p className="text-gray-600 mb-6">

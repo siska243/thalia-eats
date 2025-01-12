@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Route } from "@/helpers/Route";
 import useReferentialData from "@/hooks/useQueryTanStack";
-import { FetchData } from '@/helpers/FetchData';
 
 export default function LivraisonInfo({ getFormData = (data) => { } }) {
     const { data, isLoading, isError, isFetched } = useReferentialData({ url: Route.default, queryKey: 'dafault' })

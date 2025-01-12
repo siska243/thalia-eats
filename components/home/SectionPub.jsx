@@ -28,8 +28,9 @@ export default function SectionPub() {
           <div className="px-10 xl:px-0">
             <div className="py-4 xl:px-8 relative bg-secondaryColor xl:w-[700px] rounded-full z-[2] ml-auto w-full">
               <p className="text-base md:text-2xl font-semibold text-center xl:text-right text-primaryColor">
-                <span className="underline">Personnalisé  </span>{" "}
-                <span className="text-white">& Instantané</span>
+                {/* <span className="underline">Personnalisé  </span>{" "}
+                <span className="text-white">& Instantané</span> */}
+                Devenez client premium
               </p>
             </div>
           </div>

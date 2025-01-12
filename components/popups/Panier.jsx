@@ -14,7 +14,7 @@ export default function Panier({ toggleShowPanier }) {
       {
         ordering && ordering.length > 0 ?
           <>
-            <div className="py-4 px-6 h-[300px] lg:h-[400px] overflow-y-auto">
+            <div className="py-4 px-6 h-[300px] overflow-y-auto">
               {/* panier items */}
               <p className="mb-5 text-sm text-gray-500">
                 Les plats dans votre Panier

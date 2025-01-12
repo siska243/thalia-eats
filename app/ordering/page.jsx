@@ -8,12 +8,14 @@ import SideMenu from "@/components/ordering/SideMenu";
 import MainContent from "@/components/ordering/MainContent";
 import Order from "@/components/ordering/Order";
 import cookImg from "@/public/assets/images/cook.png";
-import Link from "next/link";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
 import Loader from "@/components/Loader/Loader";
+import Link from "next/link";
+import { useSelector } from "react-redux";
 
 export default function page() {
   const { ordering, removeProduct } = useCreateOrdering()
+  const { currentOrder } = useSelector((state) => state.cart);
   const [infoResto, setInfoResto] = useState([])
   const [loading, setLoading] = useState(true);
   const menu = [
@@ -48,7 +50,6 @@ export default function page() {
       name: "Sauces",
     },
   ];
-
   const loadData = () => {
     try {
       setLoading(true)
@@ -70,15 +71,27 @@ export default function page() {
   }, [ordering]);
 
 
-
   if (loading) {
     return <Loader />;
+  }
+  if (ordering.length == 0 && !currentOrder) {
+    return (
+      <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center justify-center min-h-screen flex-col gap-5">
+        <p className="text-center text-primaryColor text-lg font-semibold">
+          Vous n'avez effetué aucune commande pour le moment...
+        </p>
+        <Link href="/restaurant" className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg">
+          Commandez dès maintenant
+        </Link>
+
+      </div>
+    )
   }
   return (
     <div className="pt-[220px] md:pt-[230px]">
       {/* banner resto section */}
 
-      <BannerResto restaurant={infoResto || []} />;
+      <BannerResto restaurant={infoResto == undefined ? [] : infoResto} />;
       {/* <section className="mb-10">
         <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 items-center justify-between sm:flex-row">
           <p className="text-base lg:text-lg font-semibold">
@@ -134,7 +147,7 @@ export default function page() {
       </section>
 
       {/* beforefootercontent section */}
-      <BeforeFooterContent />
+      <BeforeFooterContent infoResto={infoResto || []} />
     </div>
   );
 }

@@ -45,10 +45,10 @@ export default function SectionResto({ data, isLoading, isError }) {
   const shuffledProducts = allProducts.sort(() => 0.5 - Math.random());
   return (
     <section className="mt-6 lg:mt-12 max-w-[1300px] mx-auto px-3 md:px-5">
-      <div>
-        <p className="text-base  lg:text-lg xl:text-2xl font-semibold text-secondaryColor mb-6 md:mb-12">
+      <div className="border-b pb-10">
+        <h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-secondaryColor text-center lg:text-left mb-10">
           Les categories populaires 🤩
-        </p>
+        </h2>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* {RestoCat.map((cat, index) => {
             return <CardCategory key={index} cat={cat} />;

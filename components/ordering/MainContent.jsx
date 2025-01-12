@@ -44,7 +44,6 @@ export default function MainContent() {
   // fonction pour recuperer les données de la commande du l'utilisateur
   const getFormData = async (FormData) => {
 
-
     const livraisonPrix = price_delivrery(calcul_price(ordering), townData.delivrery_price, FormData.town)
 
     const frais_livraison = livraisonPrix ? livraisonPrix.frais_livraison : 0;
@@ -68,10 +67,7 @@ export default function MainContent() {
         street: FormData.street,
         number_street: FormData.numberStreet
       }
-
-
     }
-
     if (ordering) {
       const response = await FetchData.sendData(Route.send_commande, commande)
 

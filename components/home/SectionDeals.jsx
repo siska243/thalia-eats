@@ -1,80 +1,113 @@
-import Restaurants from "@/components/restaurants/Restaurants";
-import food from "@/public/assets/images/food.png";
 import CardResto from "./CardResto";
 import { useState, useEffect } from "react";
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 export default function SectionDeals({ data, isLoading }) {
-  const [sub_categories, setSubCategories] = useState([]);
+
+  const [subCategories, setSubCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
+
   const findSubCategoryByCategory = (category) => {
-    let search = null;
-    if (category) {
-      search = category;
-    } else {
-      if (data && data?.data[0].slug) {
-        search = data.data[0].slug;
-      }
-    }
+    let search = category || data?.data[0]?.slug;
+    const categories = data?.data?.find((item) => item.slug === search);
 
-    const categories = data.data.find((item) => item.slug === search);
-
-    setSubCategories(
-      categories?.sub_category_product ? categories?.sub_category_product : []
-    );
-    setActiveCategory(search); // Mettre à jour la catégorie active
+    setSubCategories(categories?.sub_category_product || []);
+    setActiveCategory(search);
   };
-  // Charger la première catégorie au montage
+
   useEffect(() => {
-    if (data?.data && data.data.length > 0) {
-      findSubCategoryByCategory(data.data[0].slug); // Charger la première catégorie
+    if (data?.data?.length > 0) {
+      findSubCategoryByCategory(data.data[0].slug);
     }
   }, [data]);
 
   return (
-    <section className=" max-w-[1300px] mx-auto px-3 md:px-5 ">
-      <div className="w-full bg-white border-b pb-10">
-        {/* top exclusive deals */}
-        <div className="flex items-center justify-between mb-8 md:mb-12 gap-4 md:gap-0 md:flex-row flex-col">
-          <div>
-            <p className="text-base  lg:text-lg xl:text-2xl font-semibold text-secondaryColor">
-              🎊 Découvrez nos catégories de plats
-            </p>
+    <section className="max-w-[1300px] mx-auto px-4 md:px-6 lg:px-8 py-6">
+      <div className="bg-white border-b pb-10">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-center  mb-8 md:mb-12 gap-3">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-secondaryColor text-center lg:text-left flex-shrink-0 border-b pb-5 sm:border-b-0 sm:pb-0">
+            🎊 Découvrez nos catégories de plats
+          </h2>
+          <div className="flex gap-4">
+            <button className="bg-primaryColor p-3 rounded-full text-white button-prev">
+              <FaArrowLeft className="text-sm" />
+            </button>
+            <button className="bg-primaryColor p-3 rounded-full text-white button-next">
+              <FaArrowRight className="text-sm" />
+            </button>
           </div>
-          <div className="flex gap-2 lg:gap-6 flex-wrap sm:flex-nowrap">
-            {data?.data?.map((categorie, index) => {
-              return (
-                <button
-                  key={index}
-                  className={`transition-all duration-300 py-2 px-4 lg:px-6 border-2 rounded-full ${activeCategory === categorie.slug
-                    ? "border-primaryColor text-primaryColor"
-                    : "border-transparent text-secondaryColor hover:border-primaryColor hover:text-primaryColor"
-                    }`}
-                  onClick={() => findSubCategoryByCategory(categorie.slug)}
-                >
-                  {categorie.title}
-                </button>
-              );
-            })}
-          </div>
+
+
         </div>
-        {/* afficher tous les restaurants */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {sub_categories.length > 0 ? (
-            sub_categories.map(({ picture, title, product }, index) => {
-              return (
-                <CardResto
-                  key={index}
-                  picture={picture}
-                  title={title}
-                  product={product}
-                />
-              );
-            })
+        <Swiper
+          className="w-full"
+          modules={[Navigation, Pagination]} // Modules de navigation et pagination
+          spaceBetween={10} // Espace entre les slides
+          slidesPerView={3} // Nombre de slides visibles
+          navigation={{
+            prevEl: ".button-prev",
+            nextEl: ".button-next",
+          }}
+          breakpoints={{
+            480: {
+              slidesPerView: 6,
+              spaceBetween: 10,
+            },
+            640: {
+              slidesPerView: 7,
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 8,
+              spaceBetween: 20,
+            },
+          }}
+        >
+          {data?.data?.map((categorie, index) => (
+            <SwiperSlide className="w-full" key={index}>
+              <button
+                key={index}
+                className={`text-sm md:text-base py-2 px-4 lg:px-6 border-2 rounded-full transition-all duration-300 w-full block text-center ${activeCategory === categorie.slug
+                  ? "border-primaryColor text-primaryColor"
+                  : "border-gray-200 text-gray-600 hover:border-primaryColor hover:text-primaryColor"
+                  }`}
+                onClick={() => findSubCategoryByCategory(categorie.slug)}
+              >
+                {categorie.title}
+              </button>
+            </SwiperSlide>
+
+          ))}
+        </Swiper>
+
+        {/* Restaurant Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-10">
+          {isLoading ? (
+            <div className="col-span-full text-center">
+              <p className="text-secondaryColor">Chargement des catégories...</p>
+            </div>
+          ) : subCategories.length > 0 ? (
+            subCategories.map(({ picture, title, product }, index) => (
+              <CardResto
+                key={index}
+                picture={picture}
+                title={title}
+                product={product}
+              />
+            ))
           ) : (
-            <div className="bg-primaryColor p-5 text-white box-shadow-custom rounded-xl text-sm">Cette catégorie ne contient pas encore des produits ❌</div>
+            <div className="col-span-full bg-primaryColor text-white p-5 rounded-xl text-center text-sm md:text-md">
+              Cette catégorie ne contient pas encore de produits ❌
+            </div>
           )}
         </div>
-        {/* <Restaurants /> */}
       </div>
     </section>
   );

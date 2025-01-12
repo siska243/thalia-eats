@@ -3,12 +3,14 @@ import appleImg from "@/public/assets/images/apple-logo.jpg";
 import googleImg from "@/public/assets/images/google-logo.png";
 import Image from "next/image";
 
+import { MdOutlineMailOutline, MdOutlineWhatsapp } from "react-icons/md";
+
 export default function Footer() {
   return (
     <footer className="bg-[#D9D9D9] w-full">
-      <section className="max-w-[1300px] mx-auto px-5 py-16 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
+      <section className="max-w-[1300px] mx-auto px-5 py-16 grid md:grid-cols-2 lg:grid-cols-3  gap-5">
         {/* Colonne 1 */}
-        <div className="xl:col-span-2">
+        <div className="">
           <Link
             href="/"
             className="text-secondaryColor text-2xl md:text-4xl font-bold"
@@ -51,12 +53,6 @@ export default function Footer() {
             <Link href="/" className="text-sm font-normal underline">
               Confidentialité
             </Link>
-            <Link href="/" className="text-sm font-normal underline">
-              Cookies
-            </Link>
-            <Link href="/" className="text-sm font-normal underline">
-              Déclaration sur l'esclavage moderne
-            </Link>
           </div>
         </div>
 
@@ -66,27 +62,33 @@ export default function Footer() {
             Contact
           </h5>
           <div className="flex flex-col gap-3">
-            <Link href="/contact" className="text-sm font-normal underline">
-              Contactez-nous
-            </Link>
-            <Link href="/faq" className="text-sm font-normal underline">
-              Foire aux questions
-            </Link>
+            <div className="flex gap-2 items-center">
+              <span className="text-xl">
+                <MdOutlineMailOutline />
+              </span>
+              <Link href="mailto:thaliaeat.original@gmail.com" className="text-sm font-normal underline">
+                thaliaeat.original@gmail.com
+              </Link>
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="text-xl">
+                <MdOutlineWhatsapp />
+              </span>
+              <Link href="tel:+33627758753 " className="text-sm font-normal underline">
+                +33 6 27 75 87 53
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* Section du bas */}
       <section className="bg-secondaryColor ">
-        <div className="py-5 max-w-[1300px] mx-auto flex items-center justify-between text-white px-5 sm:flex-row flex-col gap-4 sm:gap-0">
-          <p className="text-sm sm:text-base">
+        <div className="py-5 max-w-[1300px] mx-auto px-5">
+          <p className="text-xs text-center text-gray-300">
             ThaliaEats Copyright 2024, Tous droits réservés.
           </p>
-          <div className="flex gap-10 font-light text-sm">
-            <Link href="/privacy-policy">Politique de confidentialité</Link>
-            <Link href="/terms">Conditions</Link>
-            <Link href="/pricing">Tarification</Link>
-          </div>
         </div>
       </section>
     </footer>

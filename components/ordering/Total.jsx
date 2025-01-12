@@ -10,10 +10,10 @@ export default function Total({ currentOrder }) {
       <div className="p-5 flex gap-3 flex-col">
         {/* affichr le prix */}
         <p className="flex items-center justify-between">
-          <span className="text-lg font-semibold text-secondaryColor">
-            Total:
+          <span className="text-base font-semibold text-secondaryColor">
+            Total :
           </span>
-          <span>{ordering[0]?.product?.currency.code} {calcul_price(ordering)}</span>
+          <span>{calcul_price(ordering)} {ordering[0]?.product?.currency.code} </span>
         </p>
         {/* afficher le prix de livraison et de service */}
         {/* {
@@ -36,19 +36,19 @@ export default function Total({ currentOrder }) {
         {currentOrder && Array.isArray(currentOrder.products) && currentOrder.products.length > 0 && (
           <>
             <p className="flex items-center justify-between">
-              <span className="text-lg font-semibold text-secondaryColor">
-                Prix Service:
+              <span className="text-base font-semibold text-secondaryColor">
+                Prix Service :
               </span>
               <span>
-                {currentOrder.products[0]?.currency?.code} {currentOrder.price_service}
+                {currentOrder.price_service} {currentOrder.products[0]?.currency?.code}
               </span>
             </p>
             <p className="flex items-center justify-between">
-              <span className="text-lg font-semibold text-secondaryColor">
-                Prix Livraison:
+              <span className="text-base font-semibold text-secondaryColor">
+                Prix Livraison :
               </span>
               <span>
-                {currentOrder.products[0]?.currency?.code} {currentOrder.price_delivery}
+                {currentOrder.price_delivery} {currentOrder.products[0]?.currency?.code}
               </span>
             </p>
           </>

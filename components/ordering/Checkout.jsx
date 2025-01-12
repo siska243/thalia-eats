@@ -6,6 +6,9 @@ import useCreateOrdering from "@/hooks/useCreateOrdering";
 import useDefaultData from "@/hooks/useCommandeData";
 import { price_delivrery, calcul_price } from "@/helpers/calculePrice";
 import { useEffect, useState } from "react";
+import Spinner from "@/components/Loader/Spinner";
+import Notify from "@/components/toastify/Notify";
+
 
 export default function Checkout() {
   const { ordering } = useCreateOrdering();
@@ -16,6 +19,8 @@ export default function Checkout() {
     livraison_price,
     currency,
   } = useSelector(state => state.cart?.pricings)
+
+  const [loading, setLoading] = useState(false);
 
 
   const success_url = "http://localhost:3000/payement/success"
@@ -41,32 +46,42 @@ export default function Checkout() {
       console.log(data);
 
       try {
+        setLoading(true);
         const response = await FetchData.sendData(Route.valide_commande, data)
-        console.log(response);
         if (response.name == "AxiosError") {
-
+          const { response: { data: { message } } } = response;
+          Notify(message, "error");
         }
         else {
-          window.location.href = response.url
+          Notify("Valider votre commande", "info");
+          window.location.href = response.data.url
         }
 
       } catch (e) {
         console.log(e);
+      }
+      finally {
+        setLoading(false);
       }
     }
   }
   return (
     <div>
       <div className="p-5">
-        <button className={`p-4 flex items-center justify-center gap-4 w-full rounded-xl text-white ${currentOrder
-          ? 'bg-green-700 cursor-pointer'
-          : 'bg-gray-400 cursor-not-allowed'
-          }`}
-          disabled={!currentOrder} onClick={handlerCheckPayement}>
-          <span>
-            <FaCircleArrowRight />
-          </span>
-          <span className="text-lg font-medium">Checkout!</span>
+        <button className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer "
+          onClick={handlerCheckPayement} disabled={loading}>
+
+          {
+            loading ? (<Spinner />) : (
+              <>
+                <span>
+                  <FaCircleArrowRight />
+                </span>
+                <span className="text-lg font-medium">Checkout!</span>
+              </>
+            )
+          }
+
         </button>
       </div>
     </div>

@@ -1,13 +1,14 @@
-import { IoBagCheck } from "react-icons/io5";
-import CardList from "./CardList";
-import Total from "./Total";
-import TotalPay from "./TotalPay";
-import Checkout from "./Checkout";
 import { useSelector } from "react-redux";
+import CurrentOrderDisplay from '@/components/ordering/CurrentOrderDisplay'
+import OrderingDisplay from '@/components/ordering/OrderingDisplay'
+import { IoBagCheck } from "react-icons/io5";
+import { useEffect } from "react";
+import Loader from "../Loader/Loader";
 
 export default function CommandeList({ ordering, removeProduct }) {
-
   const { currentOrder } = useSelector((state) => state.cart);
+
+  console.log("ccurrentOrder", currentOrder);
 
   return (
     <div className="border border-gray-300 mt-4 overflow-hidden bg-[#f9f9f9] rounded-xl">
@@ -16,31 +17,18 @@ export default function CommandeList({ ordering, removeProduct }) {
         <span className="text-4xl text-white">
           <IoBagCheck />
         </span>
-        <h5 className="text-2xl text-white font-semibold">Mon Panier</h5>
+        <h5 className="text-2xl text-white font-semibold">
+          {
+            !currentOrder?.products ? "Mon Panier" : "Ma commande"
+          }
+        </h5>
       </div>
 
       {/* Contenu du panier */}
-      {ordering && ordering.length > 0 ? (
-        <>
-          {/* Liste des produits */}
-          <div>
-            {ordering.map((product, index) => (
-              <CardList key={index} products={product} removeProduct={removeProduct} />
-            ))}
-          </div>
-
-          {/* Composants Totaux */}
-          <Total currentOrder={currentOrder == undefined ? [] : currentOrder} />
-          {/* afficher les prix uniquement quand la commande current existe */}
-          {
-            currentOrder && (
-              <>
-                <TotalPay currentOrder={currentOrder} />
-                <Checkout />
-              </>
-            )
-          }
-        </>
+      {currentOrder?.products?.length > 0 ? (
+        <CurrentOrderDisplay currentOrder={currentOrder} />
+      ) : ordering?.length > 0 ? (
+        <OrderingDisplay ordering={ordering} removeProduct={removeProduct} />
       ) : (
         <p className="p-4 text-gray-600">Votre panier est vide</p>
       )}

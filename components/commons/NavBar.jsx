@@ -97,8 +97,9 @@ export default function NavBar() {
         {/* Bouton Login/SignUp dans le menu mobile */}
         {!user ? (
           <Link
+            onClick={() => setIsMenuOpen(false)}
             href="/login"
-            className="py-3 px-6 rounded-full bg-secondaryColor border border-secondaryColor"
+            className="py-4 px-6 rounded-full bg-secondaryColor border border-secondaryColor  flex justify-center items-center mt-5 md:px-5 mx-auto  max-w-[60%]"
           >
             {/* bouton login and sign up */}
             <button className="flex gap-2 items-center">

@@ -1,10 +1,18 @@
 import { MdDeleteForever } from "react-icons/md";
-import Total from "./Total";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
+import { useSelector } from "react-redux";
 
 export default function CardList({ products }) {
   const { product, quantity } = products
   const { ordering, removeProduct, handleAddProduct } = useCreateOrdering()
+  const { currentOrder } = useSelector((state) => state.cart);
+
+  // la condition pour afficher le bouton de suppression de la commande avant validation
+  const isCurrentOrderEmpty =
+    !currentOrder || // null ou undefined
+    Object.keys(currentOrder).length === 0 || // Objet vide
+    !Array.isArray(currentOrder.products) || // Pas un tableau
+    currentOrder.products.length === 0; // Tableau vide
 
   return (
     <div className="py-5 px-4 border-b border-gray-300">
@@ -34,9 +42,15 @@ export default function CardList({ products }) {
 
         {/* bouton suppresion */}
 
-        <button className="flex-shrink-0 text-gray-500 hover:text-red-600" onClick={() => removeProduct(product, quantity)}>
-          <MdDeleteForever className="text-3xl " />
-        </button>
+        {/* bouton suppression */}
+        {isCurrentOrderEmpty && (
+          <button
+            className="flex-shrink-0 text-gray-500 hover:text-red-600"
+            onClick={() => removeProduct(product, quantity)}
+          >
+            <MdDeleteForever className="text-3xl" />
+          </button>
+        )}
       </div>
     </div>
   );

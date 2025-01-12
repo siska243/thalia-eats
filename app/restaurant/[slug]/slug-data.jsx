@@ -54,23 +54,15 @@ export default function SlugData({ slug, restaurant }) {
   return (
     <div className="pt-[220px] md:pt-[230px]">
       <BannerResto
-        restaurant={restaurant == undefined ? [] : restaurant}
+        restaurant={restaurant.data == undefined ? [] : restaurant.data}
       />
       <section className="mb-6 md:mb-10">
-        <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 items-center justify-between sm:flex-row">
-          <p className="text-base lg:text-lg font-semibold">
-            Toutes les offres de {restaurant?.data?.name}
+        <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 sm:flex-row">
+          <p className="text-center md:text-left text-xl md:text-2xl font-semibold text-secondaryColor">
+            Toutes les offres de <span className="text-primaryColor">
+              {restaurant?.data?.name}
+            </span>
           </p>
-          {/* <form className="flex  items-center gap-4 rounded-full border border-secondaryColor py-2 px-4 md:py-3 md:px-6">
-            <Image src={searchLogo} width={20} alt="search logo" />
-            <input
-              className="border-none outline-none"
-              type="search"
-              name=""
-              id=""
-              placeholder="Search from menu..."
-            />
-          </form> */}
         </div>
       </section>
       {/* ********************** */}
@@ -80,20 +72,22 @@ export default function SlugData({ slug, restaurant }) {
           <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center py-3 md:py-5 gap-2 md:gap-3 overflow-auto lg:overflow-hidden">
             {/*  categorie restaurant       */}
 
-            {category_restaurant?.data?.map((cat) => {
+            {category_restaurant?.data?.map((cat, index) => {
               return (
-                <button
-                  key={cat.uid}
-                  className={`transition-all duration-300  py-2 md:px-6 px-4 rounded-full text-sm border border-transparent flex-shrink-0 ${activeCategory == cat.slug ? "text-white bg-black" : " bg-white text-black"}`}
-                  onClick={() => findSubCategoryAndProductsByCategory(cat.slug)}
-                >
-                  {cat.title}
-                </button>
+                <>
+                  <button
+                    key={index}
+                    className={`transition-all duration-300  py-2 md:px-6 px-4 rounded-full text-sm md:text-base border border-transparent flex-shrink-0 ${activeCategory == cat.slug ? "text-white bg-black" : " bg-white text-black"}`}
+                    onClick={() => findSubCategoryAndProductsByCategory(cat.slug)}
+                  >
+                    {cat.title}
+                  </button>
+                </>
               );
             })}
           </div>
-        </section>) : (<div>
-          <p>Les plats pour ce restaurant ne sont pas encore disponible</p>
+        </section>) : (<div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center overflow-auto lg:overflow-hidden">
+          <p className="bg-primaryColor p-4 rounded-lg shadow-lg text-white ">Les plats pour ce restaurant ne sont pas encore disponible</p>
         </div>)
       }
 

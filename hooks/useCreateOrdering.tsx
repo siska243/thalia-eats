@@ -8,10 +8,10 @@ export default function useCreateOrdering(){
 
 const dispatch=useDispatch()
 const {orders}=useSelector((state:any)=>state.cart)
-const Msg = ({ closeToast, toastProps,title,link }:any) => {
+const Msg = ({ closeToast, toastProps,title }:any) => {
     return <div>
    {title}
-    <button>Retry</button>
+    {/* <button>Retry</button> */}
     <button onClick={closeToast}>Close</button>
   </div>
 }

@@ -8,6 +8,7 @@ import { Route } from "@/helpers/Route";
 import useReferentialData from "@/hooks/useQueryTanStack";
 import BannerRestaurantPage from "@/components/restaurants/BannerRestaurantPage";
 import Loader from "@/components/Loader/Loader"
+import SectionAbout from "@/components/home/SectionAbout";
 
 
 export default function restaurant() {
@@ -22,11 +23,11 @@ export default function restaurant() {
 
 
   return (
-
-    <div className="pt-[220px] md:pt-[230px]">
-      <BannerRestaurantPage />
-      {/* <BannerResto restaurant={data.data == undefined ? [] : data.data} /> */}
-      {/* <section className="mb-10">
+    <>
+      <div className="pt-[220px] md:pt-[230px]">
+        <BannerRestaurantPage />
+        {/* <BannerResto restaurant={data.data == undefined ? [] : data.data} /> */}
+        {/* <section className="mb-10">
         <div className="max-w-[1300px] mx-auto px-5 flex items-center justify-between">
           <p className="text-lg font-semibold">
             All Offers from McDonald’s East London
@@ -43,12 +44,14 @@ export default function restaurant() {
           </div>
         </div>
       </section> */}
-      {/* ********************* */}
-      <Restaurants data={data == undefined ? [] : data} isLoading={isLoading} />
-      {/* ********************** */}
+        {/* ********************* */}
+        <Restaurants data={data == undefined ? [] : data} isLoading={isLoading} />
+        {/* ********************** */}
 
-      {/* before footer content */}
-      {/* <BeforeFooterContent /> */}
-    </div>
+        {/* before footer content */}
+        {/* <BeforeFooterContent /> */}
+      </div>
+      <SectionAbout />
+    </>
   );
 }

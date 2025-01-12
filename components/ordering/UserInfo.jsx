@@ -12,7 +12,6 @@ export default function UserInfo({ handlerNewAdresse, isNewAdresse }) {
     const currentOrder = useSelector((state) => state.cart?.currentOrder);
     const { ordering } = useCreateOrdering()
     const hasCurrentOrder = Array.isArray(currentOrder) && currentOrder.length > 0;
-
     return (
         <>
             {hasCurrentOrder ? (
@@ -34,7 +33,12 @@ export default function UserInfo({ handlerNewAdresse, isNewAdresse }) {
                             <ListInfoUser title={user?.user?.full_name} Icon={MdAccountCircle} />
                             <ListInfoUser title={user?.user?.email} Icon={MdEmail} />
                             <ListInfoUser title={user?.user?.phone} Icon={MdPhoneAndroid} />
-                            <ListInfoUser title={user?.user?.principal_adresse} Icon={MdLocationPin} />
+                            {
+                                user.user.principal_adresse && (
+                                    <ListInfoUser title={`${user?.user?.principal_adresse}, N°${user?.user?.number_street}, C/${user?.user?.town_id?.title}`} Icon={MdLocationPin} />
+                                )
+                            }
+
                             {/* s'assurer qu'il y a bel et bien une commande dans le panier */}
 
 

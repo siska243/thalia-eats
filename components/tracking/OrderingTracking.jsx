@@ -2,7 +2,9 @@
 import React, { useState } from "react";
 
 
-export default function OrderingTracking() {
+export default function OrderingTracking({ data }) {
+    console.log("Data from OrderingTracking", data);
+
 
     const orders = [
         { id: "CMD12345", amount: "45€", date: "07/12/2024 12:30", status: 2 },

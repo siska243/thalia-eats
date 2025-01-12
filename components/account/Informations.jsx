@@ -6,7 +6,7 @@ export default function Information() {
   const { user } = useGetCurrentUser();
   return (
 
-    <div className="p-5 lg:p-10" >
+    <div className="p-4 lg:p-10" >
       {
         user && user.user ? (
           <>

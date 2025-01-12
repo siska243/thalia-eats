@@ -16,6 +16,7 @@ export default function Settings({ isSettingOpen, isMobile }) {
 
         if (response.status == "success") {
           console.log(response);
+          window.location.href = '/';
         } else {
           console.log("oups");
 
@@ -47,9 +48,7 @@ export default function Settings({ isSettingOpen, isMobile }) {
 
         className="text-sm text-white bg-red-500 p-3 rounded-full text-center"
       >
-        {
-          loading ? "chargement" : "Déconnexion"
-        }
+        Déconnexion
 
       </button>
     </div>)
@@ -60,7 +59,7 @@ export default function Settings({ isSettingOpen, isMobile }) {
       className={`absolute transition-all duration-300 ${isSettingOpen
         ? "top-full opacity-100 visible"
         : "top-[-100%] opacity-0 invisible"
-        } mt-3 rounded-lg p-5 shadow-md flex flex-col w-full z-[9999999] bg-white gap-3 overflow-hidden`}
+        } mt-3 rounded-lg p-5 shadow-md flex flex-col w-full z-[999] bg-white gap-3 overflow-hidden`}
     >
       <Link
         href="/reglages"
