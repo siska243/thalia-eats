@@ -9,6 +9,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 export default function UpdatePassword() {
    const [password, setPassword] = useState("");
    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+   const [current_password, setCurrentPassword] = useState("");
    const [showPassword, setShowPassword] = useState(false);
    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
    const [loading, setLoading] = useState(false);
@@ -29,7 +30,7 @@ export default function UpdatePassword() {
 
       try {
          setLoading(true);
-         const formData = { password };
+         const formData = { password,confirm_password:passwordConfirmation,current_password };
          const response = await FetchData.sendData(Route.update_password, formData);
 
          if (response.name === "AxiosError") {
@@ -39,6 +40,7 @@ export default function UpdatePassword() {
             Notify("Mot de passe mis à jour avec succès !", "success");
             setPassword("");
             setPasswordConfirmation("");
+            setCurrentPassword("");
          }
       } catch (error) {
          Notify("Une erreur inattendue s'est produite", "error");
@@ -57,6 +59,28 @@ export default function UpdatePassword() {
                className="w-full h-full space-y-6"
                onSubmit={handleUpdatePassword}
             >
+
+               {/* Nouveau mot de passe */}
+               <div className="flex flex-col relative">
+                  <label htmlFor="current-password" className="text-secondaryColor mb-2">
+                     Mot de passe
+                  </label>
+                  <input
+                      type={showPassword ? "text" : "password"}
+                      id="current-password"
+                      className="py-2 px-4 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondaryColor focus:outline-none placeholder:text-sm pr-16"
+                      placeholder="Votre mot de passe"
+                      value={current_password}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                  />
+                  <span
+                      className="absolute right-3 top-11 text-2xl text-gray-400 cursor-pointer no-select"
+                      onClick={() => setShowPassword(!showPassword)}
+                  >
+                     {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+               </div>
                {/* Nouveau mot de passe */}
                <div className="flex flex-col relative">
                   <label htmlFor="password" className="text-secondaryColor mb-2">

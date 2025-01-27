@@ -28,17 +28,17 @@ export default function UpdateAdresse() {
          const formData = {
             town,
             street,
-            numberStreet,
-            reference
+            number_street:numberStreet,
+            principal_adresse:reference
          }
          const response = await FetchData.sendData(Route.update_adresse, formData);
-         if (response.name == "AxiosError") {
-            console.log(response);
+         if (response.name === "AxiosError") {
+
             const { response: { data: { message, error } } } = response;
             Notify(error, "error");
 
          } else {
-            console.log(response);
+
             Notify("Adresse mise à jour !", "success");
          }
       } catch (error) {

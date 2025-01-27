@@ -50,7 +50,8 @@ export const getToken=async ()=>{
         const hasToken = cookieStore.has('token_thalia_eats')
 
         if(hasToken){
-            return await decode_data(cookieStore?.get('token_thalia_eats').value)
+          return  await decode_data(cookieStore?.get('token_thalia_eats')?.value)
+
         }
 
         return null
@@ -72,7 +73,7 @@ export const setToken=async(token:string)=>{
 
     setTimeout(async ()=>{
         await currentUser()
-    },1000)
+    },100)
 
 }
 

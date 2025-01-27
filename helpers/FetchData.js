@@ -1,14 +1,9 @@
 
 import axios, { AxiosError } from "axios";
-import { getToken as token } from "@/server/manageToken";
+import { getToken } from "@/server/manageToken";
 class FetchData {
     BASE_URL = () => process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" :'http://127.0.0.1:8000/api';
     //BASE_URL = () => "https://admin.rdvmonde.com/api/v1";
-
-    async getToken() {
-        return await token();
-    }
-
 
     instance = (contentType) => {
         const http = axios.create({
@@ -23,8 +18,9 @@ class FetchData {
 
         http.interceptors.request.use(
             async (config) => {
-                const token = await new FetchData().getToken()
+                const token = await getToken()
 
+                console.log(token);
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }

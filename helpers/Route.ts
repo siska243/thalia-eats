@@ -1,7 +1,7 @@
 class Route{
     static user="user"
     static me=`${this.user}/account`
-    static login="login"
+    static login="auth/login"
     static register="register"
     static list_restaurant="list-restaurant";
     static slug_restaurant=(slug:string):string=>`${this.list_restaurant}/${slug}`
@@ -12,7 +12,7 @@ class Route{
     static produits_a_la_une="default/preview"
     static send_expo_token=`${this.user}/update/expo/token`
   
-    static logout = "logout"
+    static logout = "auth/logout"
     // mise à jour des informations de l'utilisateur
     static update_adresse =`${this.me}/update/adresse`
     static update_password =`${this.me}/update/password`
