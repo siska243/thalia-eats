@@ -13,6 +13,9 @@ module.exports = {
         thirdColor: "#ededed",
         fourthColor: "#FAFAFA",
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite', // Rotation plus lente
+      },
     },
   },
   plugins: [],

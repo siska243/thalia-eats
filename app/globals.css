@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lobster&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,7 +20,16 @@
 body {
   background: var(--whiteColor);
   font-family: "poppins", sans-serif;
+  font-family: "Raleway", serif;
 }
+/* h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Lobster", serif;
+} */
 
 .link-animation {
   @apply relative z-10  font-[400] text-[15px] border transition-all duration-200 border-transparent capitalize py-2 px-4 rounded-full overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:h-0 before:z-[-1] before:w-full before:bg-primaryColor before:transition-all before:duration-300 hover:before:bg-primaryColor hover:before:h-full hover:text-white;
@@ -28,14 +40,43 @@ body {
   -webkit-text-stroke: 1px white; /* Contour blanc de 1px */
   color: transparent; /* Rend le chiffre transparent */
 }
+.box-shadow-custom {
+  @apply rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+}
 
 @layer utilities {
+  /* Personnalisation de la scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin; /* Pour Firefox */
+  }
+
+  .scrollbar-thumb {
+    scrollbar-color: #f28a3c #f3f4f6; /* Pour Firefox */
+  }
+
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 12px; /* Largeur de la scrollbar */
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #f3f4f6; /* Couleur de fond de la piste */
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #f28a3c; /* Couleur de la barre */
+    border-radius: 9999px; /* Arrondi */
+    border: 3px solid #f3f4f6; /* Espacement avec la piste */
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background-color: #e3732c; /* Couleur de la barre au survol */
+  }
+  /* ************************ */
   .bg-custom-gradient {
     background: linear-gradient(
-      245.7deg,
       rgba(255, 255, 255, 0) 0.94%,
-      rgba(3, 8, 31, 0.19) 51.68%,
-      rgba(3, 8, 31, 0.89) 87.9%
+      #03081f74,
+      #03081f
     );
   }
   .bg-white-grdient {
@@ -54,3 +95,11 @@ body {
 }
 
 /*****************$ restaurants section end ***************** */
+
+.no-select {
+  user-select: none;
+}
+.swiper-button-disabled {
+  background-color: #d3d3d3; /* Couleur grise pour les boutons désactivés */
+  cursor: not-allowed; /* Curseur en forme de main barrée */
+}

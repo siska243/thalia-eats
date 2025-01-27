@@ -1,26 +1,26 @@
 import Image from "next/image";
 import mapImg from "@/public/assets/images/map.png";
 
-export default function Map() {
+export default function Map({ data, infoResto }) {
   return (
-    <section className="mt-16 rounded-xl shadow-xl overflow-hidden w-full h-[500px] relative">
-      <Image src={mapImg} className="h-full w-full object-cover" />
-      <div className="absolute w-[250px] rounded-xl left-10 bottom-10 bg-secondaryColor/95 py-10 px-5">
+    <section className="rounded-xl box-shadow-custom overflow-hidden w-full h-[500px] relative bg-red-700">
+      <Image src={mapImg} className="h-full w-full object-cover" alt="map" />
+      <div className="absolute w-[95%] md:w-[300px] rounded-xl left-3 bottom-5 md:left-10 md:bottom-10 bg-secondaryColor/95 py-10 px-5">
         <div className="mb-5">
-          <h3 className="text-white text-xl font-semibold">McDonald’s</h3>
-          <h4 className="text-primaryColor text-sm">South London</h4>
+          <h3 className="text-white text-xl font-semibold">{data?.data?.name || infoResto?.name}</h3>
+          <h4 className="text-primaryColor text-sm"> {data?.data?.adresse || infoResto?.adresse}</h4>
         </div>
-        <p className="text-sm leading-5 text-gray-200 font-light mb-4">
-          Tooley St, London Bridge, London SE1 2TF,United Kingdom
+        <p className="text-sm leading-5 text-gray-200 font-light mb-4 sm:w-[70%] w-full md:w-full">
+          {data?.data?.reference || infoResto?.reference}
         </p>
-        <div className="mb-3">
-          <p className="text-white text-sm">Phone number</p>
-          <p className="text-primaryColor text-sm font-light">+934443-43</p>
-        </div>
+        {/* <div className="mb-3">
+          <p className="text-white text-sm">WhatsApp</p>
+          <p className="text-primaryColor text-sm font-light">{data?.data?.whatsapp || infoResto?.whatsapp}</p>
+        </div> */}
         <div>
-          <p className="text-white text-sm">Website</p>
+          <p className="text-white text-sm">Site Web</p>
           <p className="text-primaryColor text-sm font-light">
-            <a href="http://thaliaeats.com/">http://thaliaeats.com</a>
+            <a href={data?.data?.website || infoResto?.website || "http://thaliaeats.com"}> {data?.data?.website || infoResto?.website || "Thaliaeats.com"}</a>
           </p>
         </div>
       </div>

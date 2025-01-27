@@ -1,14 +1,24 @@
 import Image from "next/image";
-import restoImage from "@/public/assets/images/resto.png";
+
 import Link from "next/link";
 
-export default function CardResto({ imageSrc, title, resto }) {
+export default function CardResto({ picture, title, product }) {
   return (
-    <Link href="/" className="overflow-hidden rounded-xl shadow-xl w-full">
-      <Image src={restoImage} width={300} height={100} />
-      <div className="p-3 bg-thirdColor">
-        <p className="text-secondaryColor text-lg font-semibold">{title}</p>
-        <p className="text-sm text-primaryColor font-light">{resto}</p>
+    <Link
+      href={`/restaurant/${product[0] ? product[0].restaurant.slug : "#"}`}
+      className="overflow-hidden rounded-xl box-shadow-custom w-full h-full bg-white"
+    >
+      <Image
+        src={picture}
+        width={300}
+        height={100}
+        alt={title}
+        className="w-full h-[150px] object-cover"
+      />
+      <div className="p-4">
+        <p className="text-primaryColor text-sm font-semibold uppercase text-center">
+          {title}
+        </p>
       </div>
     </Link>
   );

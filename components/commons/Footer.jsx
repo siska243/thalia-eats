@@ -3,104 +3,92 @@ import appleImg from "@/public/assets/images/apple-logo.jpg";
 import googleImg from "@/public/assets/images/google-logo.png";
 import Image from "next/image";
 
+import { MdOutlineMailOutline, MdOutlineWhatsapp } from "react-icons/md";
+
 export default function Footer() {
   return (
     <footer className="bg-[#D9D9D9] w-full">
-      <section className="max-w-[1300px] mx-auto px-5 py-16 grid grid-cols-3 gap-5">
-        {/* colonne 1 */}
-        <div>
-          <Link href="/" className="text-secondaryColor text-4xl font-bold">
+      <section className="max-w-[1300px] mx-auto px-5 py-16 grid md:grid-cols-2 lg:grid-cols-3  gap-5">
+        {/* Colonne 1 */}
+        <div className="">
+          <Link
+            href="/"
+            className="text-secondaryColor text-2xl md:text-4xl font-bold"
+          >
             ThaliaEats
           </Link>
-          <div className="flex gap-1 mt-4">
+          <div className="flex gap-1 mt-4 flex-wrap sm:flex-nowrap">
             <Link
               href="/"
               className="w-[120px] h-[40px] rounded-md overflow-hidden"
             >
-              <Image src={appleImg} className="h-full" />
+              <Image src={appleImg} className="h-full" alt="logo AppStore" />
             </Link>
             <Link
               href="/"
               className="w-[120px] h-[40px] rounded-md overflow-hidden"
             >
-              <Image src={googleImg} className="h-full" />
+              <Image
+                src={googleImg}
+                className="h-full"
+                alt="logo Google PlayStore"
+              />
             </Link>
           </div>
           <p className="font-normal text-base text-black max-w-[300px] mt-4">
-            Company # 490039-445, Registered with House of companies.
+            Entreprise # 490039-445, Enregistrée auprès de la Chambre des
+            entreprises.
           </p>
         </div>
-        {/* colonne 2 */}
 
-        <div className="w-full">
-          <h5 className="mb-8 text-base font-semibold">
-            Get Exclusive Deals in your Inbox
+        {/* Colonne 2 */}
+        <div className="">
+          <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
+            Pages légales
           </h5>
-          {/* formulaire */}
-          <form className=" w-full relative mb-4">
-            <input
-              className="p-3 outline-none rounded-full w-[300px] focus:border-primaryColor placeholder:text-sm text-base text-gray-300 bg-gray-400/40 shadow-xl placeholder:text-black"
-              type="text"
-              placeholder="e.g. EC4R 3TE"
-            />
-            <button
-              className="bg-primaryColor border-2 border-primaryColor text-white rounded-full p-3 right-10 w-[200px] absolute top-0"
-              type="submit"
-            >
-              Search
-            </button>
-          </form>
-          <p className="text-sm font-light">
-            we wont spam, read our email policy
-          </p>
-        </div>
-        <div className="w-full flex gap-10">
-          <div>
-            <h5 className="mb-8 text-base font-semibold">Legal Pages</h5>
-            <div className="flex flex-col gap-3">
-              <Link href="/" className="text-sm font-normal underline">
-                Terms and conditions
-              </Link>
-              <Link href="/" className="text-sm font-normal underline">
-                Privacy
-              </Link>
-              <Link href="/" className="text-sm font-normal underline">
-                Cookies
-              </Link>
-              <Link href="/" className="text-sm font-normal underline">
-                Modern Slavery Statemen
-              </Link>
-            </div>
+          <div className="flex flex-col gap-3">
+            <Link href="/" className="text-sm font-normal underline">
+              Conditions d'utilisation
+            </Link>
+            <Link href="/" className="text-sm font-normal underline">
+              Confidentialité
+            </Link>
           </div>
-          {/* **********************$ */}
-          <div>
-            <h5 className="mb-8 text-base font-semibold">Legal Pages</h5>
-            <div className="flex flex-col gap-3">
-              <Link href="/" className="text-sm font-normal underline">
-                Terms and conditions
-              </Link>
-              <Link href="/" className="text-sm font-normal underline">
-                Privacy
-              </Link>
-              <Link href="/" className="text-sm font-normal underline">
-                Cookies
-              </Link>
-              <Link href="/" className="text-sm font-normal underline">
-                Modern Slavery Statemen
+        </div>
+
+        {/* Colonne 3 */}
+        <div className="">
+          <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
+            Contact
+          </h5>
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-2 items-center">
+              <span className="text-xl">
+                <MdOutlineMailOutline />
+              </span>
+              <Link href="mailto:thaliaeat.original@gmail.com" className="text-sm font-normal underline">
+                thaliaeat.original@gmail.com
               </Link>
             </div>
+            <div className="flex gap-2 items-center">
+              <span className="text-xl">
+                <MdOutlineWhatsapp />
+              </span>
+              <Link href="tel:+33627758753 " className="text-sm font-normal underline">
+                +33 6 27 75 87 53
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
-      {/* *************************** s */}
+
+      {/* Section du bas */}
       <section className="bg-secondaryColor ">
-        <div className="py-5 max-w-[1300px] mx-auto flex items-center justify-between text-white">
-          <p>Order.uk Copyright 2024, All Rights Reserved.</p>
-          <div className="flex gap-10 font-light text-sm">
-            <p>Privacy Policy</p>
-            <p>Terms </p>
-            <p>Pricing</p>
-          </div>
+        <div className="py-5 max-w-[1300px] mx-auto px-5">
+          <p className="text-xs text-center text-gray-300">
+            ThaliaEats Copyright 2024, Tous droits réservés.
+          </p>
         </div>
       </section>
     </footer>

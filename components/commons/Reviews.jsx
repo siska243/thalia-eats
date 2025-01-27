@@ -42,12 +42,14 @@ export default function Reviews() {
     },
   ];
   return (
-    <section className="bg-[#D9D9D9] mt-12 py-20">
-      <div className="max-w-[1300px] mx-auto px-5">
+    <section className="bg-[#D9D9D9] mt-8 lg:mt-12 py-10 lg:py-20">
+      <div className="max-w-[1300px] mx-auto px-3 md:px-5">
         {/* Head */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-black">Customer Reviews</h3>
-          <div className="flex gap-4">
+        <div className="flex items-center justify-between mb-6 md:flex-row flex-col">
+          <h3 className="text-xl lg:text-2xl font-bold text-black">
+            Customer Reviews
+          </h3>
+          <div className="md:flex gap-4 hidden">
             <button className="bg-primaryColor p-4 rounded-full text-secondaryColor button-prev">
               <FaArrowLeft className="text-sm" />
             </button>
@@ -60,11 +62,21 @@ export default function Reviews() {
         {/* Slider */}
         <Swiper
           modules={[Navigation, Pagination]} // Modules de navigation et pagination
-          spaceBetween={20} // Espace entre les slides
-          slidesPerView={3} // Nombre de slides visibles
+          spaceBetween={10} // Espace entre les slides
+          slidesPerView={1} // Nombre de slides visibles
           navigation={{
             prevEl: ".button-prev",
             nextEl: ".button-next",
+          }}
+          breakpoints={{
+            640: {
+              slidesPerView: 2, // 2 slides visibles sur les écrans moyens
+              spaceBetween: 20,
+            },
+            1024: {
+              slidesPerView: 3, // 3 slides visibles sur les écrans larges
+              spaceBetween: 30,
+            },
           }}
           pagination={{ clickable: true }} // Pagination cliquable
         >

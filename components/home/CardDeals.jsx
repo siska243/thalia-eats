@@ -1,5 +1,5 @@
 import Image from "next/image";
-import food from "@/public/assets/images/food.png";
+
 import Link from "next/link";
 
 export default function CardDeals({ imageSrc, title, percent }) {
@@ -8,7 +8,13 @@ export default function CardDeals({ imageSrc, title, percent }) {
       href="/"
       className="relative w-full overflow-hidden rounded-xl shadow-xl"
     >
-      <Image className="" src={food} alt={title} width={500} height={500} />
+      <Image
+        className="w-full h-full"
+        src={imageSrc}
+        alt={title}
+        width={500}
+        height={500}
+      />
       <div className="absolute top-0 right-0 w-full h-full bg-custom-gradient">
         <span className="absolute top-0 right-4 bg-black p-3 text-white rounded-b-lg text-sm">
           {percent}

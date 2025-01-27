@@ -1,14 +1,87 @@
 import { FaCircleArrowRight } from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import { Route } from '@/helpers/Route'
+import { FetchData } from "@/helpers/FetchData";
+import useCreateOrdering from "@/hooks/useCreateOrdering";
+import useDefaultData from "@/hooks/useCommandeData";
+import { price_delivrery, calcul_price } from "@/helpers/calculePrice";
+import { useEffect, useState } from "react";
+import Spinner from "@/components/Loader/Spinner";
+import Notify from "@/components/toastify/Notify";
+
 
 export default function Checkout() {
+  const { ordering } = useCreateOrdering();
+  const { data } = useDefaultData()
+  const { currentOrder } = useSelector((state) => state.cart);
+  const {
+    service_price,
+    livraison_price,
+    currency,
+  } = useSelector(state => state.cart?.pricings)
+
+  const [loading, setLoading] = useState(false);
+
+
+  const success_url = "http://localhost:3000/payement/success"
+  const error_url = "http://localhost:3000/payement/error"
+  const cancel_url = "http://localhost:3000/payement/cancel"
+
+  // fonction pour checker payement
+  const handlerCheckPayement = async () => {
+
+    if (currentOrder) {
+      // ****************************************
+      const pricing = {
+        frais_livraison: livraison_price,
+        service_price,
+        currency: currency ? currency : currentOrder?.products[0]?.currency
+      }
+      const data = {
+        success_url,
+        error_url,
+        cancel_url,
+        pricing,
+      }
+      console.log(data);
+
+      try {
+        setLoading(true);
+        const response = await FetchData.sendData(Route.valide_commande, data)
+        if (response.name == "AxiosError") {
+          const { response: { data: { message } } } = response;
+          Notify(message, "error");
+        }
+        else {
+          Notify("Valider votre commande", "info");
+          window.location.href = response.data.url
+        }
+
+      } catch (e) {
+        console.log(e);
+      }
+      finally {
+        setLoading(false);
+      }
+    }
+  }
   return (
     <div>
       <div className="p-5">
-        <button className="p-4 flex items-center justify-center gap-4 w-full bg-green-700 rounded-xl text-white ">
-          <span>
-            <FaCircleArrowRight />
-          </span>
-          <span className="text-lg font-medium">Checkout!</span>
+        <button className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer "
+          onClick={handlerCheckPayement} disabled={loading}>
+
+          {
+            loading ? (<Spinner />) : (
+              <>
+                <span>
+                  <FaCircleArrowRight />
+                </span>
+                <span className="text-lg font-medium">Checkout!</span>
+              </>
+            )
+          }
+
         </button>
       </div>
     </div>

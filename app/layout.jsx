@@ -1,8 +1,10 @@
 import "./globals.css";
 import Footer from "@/components/commons/Footer";
 import Header from "@/components/commons/Header";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import AosInit from "@/components/commons/AosInit";
+import GlobalProvider from "@/providers/global-provider";
+import RegisterServiceWorker from "@/services/worker/firebase-worker"
 
 export const metadata = {
   title: "Thaalia Eats",
@@ -10,16 +12,17 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
-
   return (
     <html lang="en">
-      <body>
-        <AosInit />
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
-        <Analytics />
+      <body className="scrollbar-thin scrollbar-thumb scrollbar-custom overflow-y-scroll">
+        <RegisterServiceWorker />
+        <GlobalProvider>
+          <AosInit />
+          <Header />
+          <main className="min-h-screen bg-white">{children}</main>
+          <Footer />
+          <Analytics />
+        </GlobalProvider>
       </body>
     </html>
   );

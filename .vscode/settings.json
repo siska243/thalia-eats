@@ -1,0 +1,8 @@
+{
+    "eslint.codeActionsOnSave.rules": null,
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:prettier/recommended"
+    ]
+}
