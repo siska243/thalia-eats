@@ -18,38 +18,7 @@ export default function page() {
   const { currentOrder } = useSelector((state) => state.cart);
   const [infoResto, setInfoResto] = useState([])
   const [loading, setLoading] = useState(true);
-  const menu = [
-    {
-      name: "pizzas",
-    },
-    {
-      name: "Garlic Bread",
-    },
-    {
-      name: "Calzone",
-    },
-    {
-      name: "Kebabas",
-    },
-    {
-      name: "Salads",
-    },
-    {
-      name: "Cold drinks",
-    },
-    {
-      name: "Happy Meal",
-    },
-    {
-      name: "Desserts",
-    },
-    {
-      name: "Hot drinks",
-    },
-    {
-      name: "Sauces",
-    },
-  ];
+
   const loadData = () => {
     try {
       setLoading(true)

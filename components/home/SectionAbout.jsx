@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { Collapse } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";

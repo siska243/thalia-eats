@@ -16,16 +16,7 @@ const nextConfig = {
         FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
         FIREBASE_MESSAGING_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_APP_ID,
         FIREBASE_MESSAGING_VAPID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_VAPID
-    },
-    async redirects() {
-        return [
-            {
-                source: "/_not-found",
-                destination: "/404",
-                permanent: false,
-            },
-        ];
-    },
+    }
 
 };
 

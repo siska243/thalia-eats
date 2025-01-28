@@ -1,11 +1,13 @@
+
 import React from "react";
-import SlugData from "./slug-data";
+
 import { FetchData } from "@/helpers/FetchData";
 import { Route } from "@/helpers/Route";
+import dynamic from "next/dynamic";
 
 const fetchData = async (slug) => {
   const response = await FetchData.getData(Route.slug_restaurant(slug))
-  if (response.name == "AxiosError") {
+  if (response.name === "AxiosError") {
     return {
       data: null
     }
@@ -14,6 +16,12 @@ const fetchData = async (slug) => {
     data: response
   }
 }
+
+
+
+const SlugData = dynamic(() => import("./slug-data"), {
+  loading: () => <p>Loading...</p>,
+})
 export default async function restaurants({ params }) {
   const { slug } = await params;
   const { data } = await fetchData(slug)

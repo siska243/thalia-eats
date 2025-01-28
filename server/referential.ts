@@ -1,8 +1,7 @@
 "use server"
-import {FetchData} from "@/helpers/FetchData";
+
 import {btoa} from "node:buffer";
-import {Routes} from "@/helpers/Routes";
-import {cookies} from "next/headers";
+
 
 export const encode_data = async (string: string) => {
     try {

@@ -1,7 +1,5 @@
 "use client";
 import BannerResto from "@/components/commons/BannerResto";
-import searchLogo from "@/public/assets/images/search.png";
-import Image from "next/image";
 import SectionOffers from "@/components/restaurantDetails/SectionOffers";
 import SectionAll from "@/components/restaurantDetails/SectionAll";
 import BeforeFooterContent from "@/components/commons/BeforeFooterContent";
