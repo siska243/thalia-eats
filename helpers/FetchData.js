@@ -1,4 +1,3 @@
-"use client"
 import axios, { AxiosError } from "axios";
 import { getToken } from "@/server/manageToken";
 class FetchData {
