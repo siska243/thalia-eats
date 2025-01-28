@@ -1,3 +1,4 @@
+"use client"
 import logo from "@/public/assets/logo-thalia.png";
 import Image from "next/image";
 export default function Loader() {

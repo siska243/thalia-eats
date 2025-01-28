@@ -7,8 +7,8 @@ const AosInit=()=>{
 
     useEffect(() => {
         AOS.init({
-            duration: 1000, // Durée de l'animation en millisecondes
-            once: true,     // L'animation ne se produit qu'une seule fois
+            duration: 1000,
+            once: true,
         });
     }, []);
 
