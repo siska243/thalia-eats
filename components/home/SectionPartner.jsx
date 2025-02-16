@@ -1,18 +1,21 @@
 import React from "react";
 import CardPartner from "./CardPartner";
 import partnerImg from "@/public/assets/images/partner.png";
+import thalia1 from "@/public/assets/thalia1.jpg";
+import thalia2 from "@/public/assets/thalia2.jpg";
+// import thalia2 from "@/public/assets/images/thalia2.jpeg";
 
 export default function SectionPartner() {
   const partnerData = [
     {
-      imageSrc: partnerImg, // Les chemins réels de tes images
+      imageSrc: thalia1, // Les chemins réels de tes images
       title: "Devenez notre partenaire",
       secondTitle: "Inscrivez-vous en tant qu'entreprise",
       topTitle: "Gagnez plus avec des frais réduits",
       btnLink: "/",
     },
     {
-      imageSrc: partnerImg, // Les chemins réels de tes images
+      imageSrc: thalia2, // Les chemins réels de tes images
       title: "Roulez avec nous",
       secondTitle: "Inscrivez-vous en tant que livreur",
       topTitle: "Avail exclusive perks",
