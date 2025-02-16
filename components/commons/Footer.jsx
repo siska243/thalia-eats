@@ -66,7 +66,7 @@ export default function Footer() {
               <span className="text-xl">
                 <MdOutlineMailOutline />
               </span>
-              <Link href="mailto:thaliaeat.original@gmail.com" className="text-sm font-normal underline">
+              <Link href="mailto:thaliaeat.original@gmail.com" className="text-base font-[500] underline">
                 thaliaeat.original@gmail.com
               </Link>
             </div>
@@ -74,7 +74,7 @@ export default function Footer() {
               <span className="text-xl">
                 <MdOutlineWhatsapp />
               </span>
-              <Link href="tel:+33627758753 " className="text-sm font-normal underline">
+              <Link href="https://wa.me/33627758753" className="text-base font-[500] underline">
                 +33 6 27 75 87 53
               </Link>
             </div>
