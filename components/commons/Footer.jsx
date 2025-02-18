@@ -35,10 +35,10 @@ export default function Footer() {
               />
             </Link>
           </div>
-          <p className="font-normal text-base text-black max-w-[300px] mt-4">
+          {/* <p className="font-normal text-base text-black max-w-[300px] mt-4">
             Entreprise # 490039-445, Enregistrée auprès de la Chambre des
             entreprises.
-          </p>
+          </p> */}
         </div>
 
         {/* Colonne 2 */}

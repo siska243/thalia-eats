@@ -1,37 +1,7 @@
 
 import CardAll from "../restaurantDetails/CardAll";
 export default function SectionResto({ data, isLoading, isError }) {
-  // const RestoCat = [
-  //   {
-  //     title: "Titre 1",
-  //     resto: "21 restaurants",
-  //   },
-  //   {
 
-  //     title: "Titre 2",
-  //     resto: "21 restaurants",
-  //   },
-  //   {
-
-  //     title: "Titre 3",
-  //     resto: "90 restaurants",
-  //   },
-  //   {
-
-  //     title: "Titre 4",
-  //     resto: "10 restaurants",
-  //   },
-  //   {
-
-  //     title: "Titre 5",
-  //     resto: "6 restaurants",
-  //   },
-  //   {
-
-  //     title: "Titre 6",
-  //     resto: "30 restaurants",
-  //   },
-  // ];
   if (isLoading) return <div>Chargement...</div>;
   if (isError || !data?.data) return <div>Une erreur est survenue</div>;
   // Étape 1 : Extraire tous les produits
