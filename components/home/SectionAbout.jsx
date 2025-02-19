@@ -103,7 +103,7 @@ export default function SectionAbout() {
     ),
     support: (
       <p className="text-sm  text-secondaryColor leading-8">
-        Besoin d'assistance ? Notre équipe de support est là pour vous aider. Contactez-nous pour toute question concernant vos commandes, paiements ou autres demandes.
+        Besoin d'assistance ? Notre équipe de support est là pour vous aider. Contactez-nous sur <a href="mailto:thaliaeat.original@gmail.com" className="text-primaryColor font-semibold">thaliaeat.original@gmail.com</a> et sur whatsApp <a target="_blank" className="text-primaryColor font-semibold" href="https://wa.me/33627758753">+33 6 27 75 87 53</a>.
       </p>
     ),
   };
