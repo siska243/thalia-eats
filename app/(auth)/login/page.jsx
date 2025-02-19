@@ -53,34 +53,28 @@ export default function page() {
     }
   };
   return (
-    <div className="min-h-screen h-full pt-[220px] md:pt-[230px]  flex items-center justify-center"
-      style={{
-        backgroundImage: `linear-gradient(rgba(3, 8, 31, 0.92), rgba(3, 8, 31, 0.92)), url(${logo.src})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}>
-      <section className="max-w-[1300px] mx-auto px-4 md:px-5  h-full w-full flex justify-center items-center mb-10 py-5">
-        <div className="max-w-[600px] h-full w-full grid overflow-hidden rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] relative">
-          {/* forlulaire d'inscription */}
-          <div className="  bg-white ">
+    <div className="min-h-screen bg-[#F3F4F6] h-full pt-[220px] md:pt-[230px]  flex items-center justify-center"
+     >
+      <section className="w-full max-w-lg mx-auto px-5  h-full flex justify-center items-center mb-10 py-5">
+          {/* formulaire d'inscription */}
+          <div className=" bg-white rounded-2xl shadow-xl overflow-hidden w-full">
             <form
-              className="w-full h-full space-y-6 md:p-10 p-4"
+              className="w-full h-full space-y-6 md:p-10 px-4 py-6 sm:p-6"
               onSubmit={handlerSubmit}
             >
-              <h2 className="text-xl md:text-2xl font-semibold text-center text-gray-800 mb-8">
+              <h2 className="text-xl md:text-3xl font-semibold text-center text-gray-900 mb-8">
                 Connexion
               </h2>
 
               <div className="flex flex-col">
-                <label htmlFor="email" className="text-gray-600 mb-2">
+                <label htmlFor="email" className="text-gray-700 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   id="email"
-                  className="py-2 px-4 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondaryColor focus:outline-none"
-                  placeholder="Entrez votre email"
+                  className="py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
+                  placeholder="exemple@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -88,23 +82,25 @@ export default function page() {
               </div>
 
               <div className="flex flex-col relative">
-                <label htmlFor="password" className="text-gray-600 mb-2">
+                <label htmlFor="password" className="text-gray-700 mb-2">
                   Mot de passe
                 </label>
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
                   required
-                  className="py-2 px-4 sm:py-3  rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondaryColor focus:outline-none"
-                  placeholder="Entrez votre mot de passe"
+                  className="py-2 px-4 sm:py-3  rounded-lg border-2 border-gray-300 focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor focus:outline-none"
+                  placeholder="••••••••"
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <span
-                  className="absolute right-3 top-11 text-2xl text-gray-400 cursor-pointer no-select"
+                <button
+                  type="button"
+                  aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+                  className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
+                </button>
               </div>
 
               <button
@@ -128,17 +124,6 @@ export default function page() {
               </p>
             </form>
           </div>
-
-          {/* image de fonr */}
-          {/* <div className="hidden sm:block h-full relative">
-            <Image
-              src={foodsImg}
-              alt="image food"
-              className="w-full h-full object-cover z-[–1]"
-            />
-            <div className="absolute h-full inset-0 bg-secondaryColor/85"></div>
-          </div> */}
-        </div>
       </section>
     </div>
   );

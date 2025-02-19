@@ -47,13 +47,13 @@ export default function TopBar() {
             <div className="flex items-center gap-1">
 
               {
-                user.user.principal_adresse && (
+                user?.user?.street && (
                   <>
                     <p className="text-xl">
                       <FaLocationDot />
                     </p>
                     <p className="font-[400] block text-secondaryColor text-sm">
-                      {user?.user?.principal_adresse}, N°{user?.user?.number_street}, C/{user?.user?.town_id?.title}
+                      {user?.user?.street}, N°{user?.user?.number_street}, C/{user?.user?.town_id?.title}
                     </p>
                   </>
                 )
@@ -79,7 +79,7 @@ export default function TopBar() {
               // adrrsse visible sur les grands écrans
               <div className="flex items-center gap-1">
                 {
-                  user.user.principal_adresse && (
+                  user?.user?.street && (
                     <>
                       <p className="text-xl">
                         <FaLocationDot />
@@ -87,7 +87,7 @@ export default function TopBar() {
 
 
                       <p className="font-[400] block text-secondaryColor text-sm">
-                        {user?.user?.principal_adresse}, N°{user?.user?.number_street}, C/{user?.user?.town_id?.title}
+                        {user?.user?.street}, N°{user?.user?.number_street}, C/{user?.user?.town_id?.title}
                       </p>
                     </>
                   )

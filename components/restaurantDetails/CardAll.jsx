@@ -20,25 +20,26 @@ export default function CardAll({ product }) {
   }
 
   return (
-    <div className="relative w-full overflow-hidden box-shadow-custom flex py-6 px-6 md:py-8 md:px-8 gap-3  justify-center items-center bg-secondaryColor">
-      <div className="w-1/2 flex-shrink-0">
+    <div className="relative w-full overflow-hidden box-shadow-custom flex  gap-3  justify-center items-center bg-secondaryColor h-[210px]">
+      <div className="w-1/2 flex-shrink-0 p-4 md:py-5 md:px-5">
         <h3 className="text-primaryColor font-semibold text-lg mb-3 lowercase first-letter:uppercase">
           {product.title}
         </h3>
-        <p className="text-white font-light text-sm mb-3">
+        <p className="text-white font-light text-sm mb-5">
           {product.description ? product.description : "Pas de description pour ce produit"}
         </p>
-        <p className="text-secondaryColor font-bold text-xs sm:text-sm bg-primaryColor inline-block p-3 rounded-md box-shadow-custom">
+        <p className="text-secondaryColor font-[600] text-xs sm:text-sm bg-primaryColor inline-block p-2 box-shadow-custom">
           {product.price} <span>{product.currency.code}</span>
         </p>
       </div>
+      {/* image */}
       <div className="w-1/2 h-full flex-shrink-0">
         <Image
           width={300}
-          height={500}
+          height={210}
           alt={product.title}
           src={product.picture}
-          className="h-[150px] w-full object-cover rounded-xl"
+          className="h-full w-full object-cover rounded-xl"
         />
       </div>
       <div className="absolute bottom-0 right-0 z-10">

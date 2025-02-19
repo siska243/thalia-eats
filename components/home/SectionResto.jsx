@@ -19,7 +19,7 @@ export default function SectionResto({ data, isLoading, isError }) {
         <h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-secondaryColor text-center lg:text-left mb-10">
           Les categories populaires 🤩
         </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-5">
           {/* {RestoCat.map((cat, index) => {
             return <CardCategory key={index} cat={cat} />;
           })} */}

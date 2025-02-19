@@ -12,7 +12,6 @@ const Msg = ({ closeToast, toastProps,title }:any) => {
     return <div>
    {title}
     {/* <button>Retry</button> */}
-    <button onClick={closeToast}>Close</button>
   </div>
 }
 
