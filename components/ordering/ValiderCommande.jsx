@@ -7,7 +7,7 @@ export default function ValiderCommande({ currentOrder }) {
 
     // fonction pour valider la commande
     return (
-        <div>
+        <div data-aos="fade-up">
             <p className='mb-5 text-primaryColor uppercase text-base font-semibold '>
                 Coordonnées de la commande
             </p>

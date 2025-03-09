@@ -16,10 +16,10 @@ export default function SectionResto({ data, isLoading, isError }) {
   return (
     <section className="mt-6 lg:mt-12 max-w-[1300px] mx-auto px-3 md:px-5">
       <div className="border-b pb-10">
-        <h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-secondaryColor text-center lg:text-left mb-10">
+        <h2 data-aos="fade-up" className="text-lg md:text-xl lg:text-2xl font-semibold text-secondaryColor text-center lg:text-left mb-10">
           Les categories populaires 🤩
         </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-5">
+        <div data-aos="fade-up" className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-5">
           {/* {RestoCat.map((cat, index) => {
             return <CardCategory key={index} cat={cat} />;
           })} */}

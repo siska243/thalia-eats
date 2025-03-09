@@ -13,7 +13,7 @@ export default function BeforeFooterContent({ restaurant, infoResto }) {
     <section className="py-4 md:py-12">
       <div className="max-w-[1300px] mx-auto px-3 md:px-5">
         {/* <ContactInfo /> */}
-        <Map data={data == undefined ? [] : data} infoResto={infoResto} />
+        <Map  data={data == undefined ? [] : data} infoResto={infoResto} />
       </div>
       {/* reviews */}
       {/* <Reviews /> */}

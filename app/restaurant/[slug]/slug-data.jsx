@@ -56,7 +56,7 @@ export default function SlugData({ slug, restaurant }) {
       />
       <section className="mb-6 md:mb-10">
         <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 sm:flex-row">
-          <p className="text-center md:text-left text-xl md:text-2xl font-semibold text-secondaryColor">
+          <p data-aos="fade-up" className="text-center md:text-left text-xl md:text-2xl font-semibold text-secondaryColor">
             Toutes les offres de <span className="text-primaryColor">
               {restaurant?.data?.name}
             </span>
@@ -66,7 +66,7 @@ export default function SlugData({ slug, restaurant }) {
       {/* ********************** */}
       {/* afficher les categories si elles existent bien */}
       {
-        category_restaurant?.data?.length > 0 ? (<section className="bg-primaryColor">
+        category_restaurant?.data?.length > 0 ? (<section data-aos="fade-up" className="bg-primaryColor">
           <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center py-3 md:py-5 gap-2 md:gap-3 overflow-auto lg:overflow-hidden">
             {/*  categorie restaurant       */}
 
@@ -93,7 +93,7 @@ export default function SlugData({ slug, restaurant }) {
       <SectionOffers products={products == undefined ? [] : products} />
       {/* ********************** */}
       <section className="max-w-[1300px] mx-auto px-3 md:px-5 pb-6 md:pb-12">
-        <div className="flex flex-col gap-12">
+        <div data-aos="fade-up" className="flex flex-col gap-12">
           {
             subCategories?.map((cat) => {
               return <SectionAll key={cat.uid} cat={cat} />

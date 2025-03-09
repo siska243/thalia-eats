@@ -5,7 +5,7 @@ export default function Map({ data, infoResto }) {
   return (
     <section className="rounded-xl box-shadow-custom overflow-hidden w-full h-[500px] relative bg-red-700">
       <Image src={mapImg} className="h-full w-full object-cover" alt="map" />
-      <div className="absolute w-[95%] md:w-[300px] rounded-xl left-3 bottom-5 md:left-10 md:bottom-10 bg-secondaryColor/95 py-10 px-5">
+      <div data-aos="fade-right" className="absolute w-[95%] md:w-[300px] rounded-xl left-3 bottom-5 md:left-10 md:bottom-10 bg-secondaryColor/95 py-10 px-5">
         <div className="mb-5">
           <h3 className="text-white text-xl font-semibold">{data?.data?.name || infoResto?.name}</h3>
           <h4 className="text-primaryColor text-sm"> {data?.data?.adresse || infoResto?.adresse}</h4>

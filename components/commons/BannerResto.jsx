@@ -29,7 +29,7 @@ export default function BannerResto({ restaurant, restaurantIsLoading }) {
           height={800}
         /> */}
         <div className="w-full flex lg:flex-row flex-col-reverse gap-5 lg-gap-0 justify-between items-end h-full">
-          <div className="w-full lg:w-[60%]">
+          <div data-aos="fade-right" className="w-full lg:w-[60%]">
             <h6 className=" lg:text-left text-center text-base font-extralight mb-3 text-white">
               {restaurant?.reference || "Aucune ref"}
             </h6>
@@ -48,7 +48,7 @@ export default function BannerResto({ restaurant, restaurantIsLoading }) {
             </div>
           </div>
           {/* ******image */}
-          <div className="w-[70%] text-center md:w-[60%] lg:w-[40%] overflow-hidden rounded-xl mx-auto h-full">
+          <div data-aos="fade-left" className="w-[70%] text-center md:w-[60%] lg:w-[40%] overflow-hidden rounded-xl mx-auto h-full">
             <Image
               src={restaurant?.image || logo}
               className="w-full h-full object-scale-down rounded-xl"
@@ -58,7 +58,7 @@ export default function BannerResto({ restaurant, restaurantIsLoading }) {
             />
           </div>
           {/* *************** */}
-          <p className="absolute -bottom-7 z-20 bg-primaryColor flex items-center md:p-3 p-2 left-0 w-full sm:w-[400px] justify-center gap-2 md:gap-3 text-white text-xs sm:text-sm md:text-base sm:rounded-r-xl">
+          <p data-aos="fade-right" className="absolute -bottom-7 z-20 bg-primaryColor flex items-center md:p-3 p-2 left-0 w-full sm:w-[400px] justify-center gap-2 md:gap-3 text-white text-xs sm:text-sm md:text-base sm:rounded-r-xl">
             <Image src={clock} width={30} alt="clock" />
             Ouvert :
             {restaurant?.opens[0].startAt} - {restaurant?.opens[0].endAt}

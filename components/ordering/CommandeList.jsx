@@ -13,7 +13,7 @@ export default function CommandeList({ ordering, removeProduct }) {
   return (
     <div className="border border-gray-300 mt-4 overflow-hidden bg-[#f9f9f9] rounded-xl">
       {/* Header */}
-      <div className="bg-green-700 p-4 w-full h-[120px] flex justify-center items-center gap-4">
+      <div data-aos="fade-up" className="bg-green-700 p-4 w-full h-[120px] flex justify-center items-center gap-4">
         <span className="text-4xl text-white">
           <IoBagCheck />
         </span>

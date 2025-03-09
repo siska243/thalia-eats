@@ -46,10 +46,10 @@ export default function page() {
   if (ordering.length == 0 && !currentOrder) {
     return (
       <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center justify-center min-h-screen flex-col gap-5">
-        <p className="text-center text-primaryColor text-lg font-semibold">
+        <p data-aos="fade-up" className="text-center text-primaryColor text-lg font-semibold">
           Vous n'avez effetué aucune commande pour le moment...
         </p>
-        <Link href="/restaurant" className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg">
+        <Link data-aos="fade-up" href="/restaurant" className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg">
           Commandez dès maintenant
         </Link>
 

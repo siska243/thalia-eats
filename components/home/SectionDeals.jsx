@@ -31,7 +31,7 @@ export default function SectionDeals({ data, isLoading }) {
     <section className="max-w-[1300px] mx-auto px-4 md:px-6 lg:px-8 py-6">
       <div className="bg-white border-b pb-10">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-center  mb-8 md:mb-12 gap-3">
+        <div className="flex flex-col lg:flex-row justify-between items-center  mb-8 md:mb-12 gap-3" data-aos="fade-up">
           <h2 className="text-lg md:text-xl lg:text-2xl font-semibold text-secondaryColor text-center lg:text-left flex-shrink-0 border-b pb-5 sm:border-b-0 sm:pb-0">
             🎊 Découvrez nos catégories de plats
           </h2>
@@ -47,6 +47,7 @@ export default function SectionDeals({ data, isLoading }) {
 
         </div>
         <Swiper
+        data-aos="fade-up"
           className="w-full"
           modules={[Navigation, Pagination]} // Modules de navigation et pagination
           spaceBetween={10} // Espace entre les slides
@@ -88,7 +89,7 @@ export default function SectionDeals({ data, isLoading }) {
         </Swiper>
 
         {/* Restaurant Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-10">
+        <div data-aos="fade-up" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-10">
           {isLoading ? (
             <div className="col-span-full text-center">
               <p className="text-secondaryColor">Chargement des catégories...</p>

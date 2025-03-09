@@ -3,7 +3,7 @@ import { FaCircleArrowRight, FaCircleArrowDown } from "react-icons/fa6";
 export default function TotalPay({ currentOrder }) {
   const { products } = currentOrder
   return (
-    <div className="p-5 border-b border-gray-300">
+    <div data-aos="fade-up" className="p-5 border-b border-gray-300">
       <div className="bg-primaryColor p-5 flex items-center justify-between rounded-xl text-white mb-5">
         <p className="">Total à payer</p>
         <span>{currentOrder?.global_price} {products[0]?.currency?.code} </span>

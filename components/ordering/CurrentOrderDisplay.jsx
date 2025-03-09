@@ -8,7 +8,7 @@ export default function CurrentOrderDisplay({ currentOrder }) {
     return (
         <>
             {/* Liste des produits */}
-            <div>
+            <div data-aos="fade-up">
                 {currentOrder.products.map((product, index) => (
                     <CardList key={index} products={product} />
                 ))}
