@@ -8,16 +8,18 @@ import Link from "next/link";
 export default function SectionPub() {
   return (
     <section className="mt-8 md:mt-16 lg:mt-24 max-w-[1300px] mx-auto px-3 md:px-5 ">
-      <div className="bg-white-grdient shadow-xl rounded-lg flex flex-col xl:flex-row items-center relative xl:h-[500px] xl:justify-end pt-10 lg:pt-20 gap-4 xl:gap-0 ">
+      <div className="bg-white-gradient shadow-xl rounded-lg flex flex-col xl:flex-row items-center relative xl:h-[500px] xl:justify-end pt-10 lg:pt-20 gap-4 xl:gap-0 ">
         {/* image visible sur grands écrans */}
         <Image
+        
+        data-aos="fade-right"
           src={mobileImg}
           height={100}
           width={732}
           className="hidden xl:block absolute bottom-0 left-0 z-[4]"
           alt={"mobile"}
         />
-        <div className="xl:pr-24 w-full">
+        <div data-aos="fade-left" className="xl:pr-24 w-full">
           <div className="mb-3 text-center xl:text-right">
             <h4 className="text-secondaryColor text-3xl md:text-5xl font-bold">
               Thalia<span className="text-primaryColor">Eats</span>
@@ -65,6 +67,7 @@ export default function SectionPub() {
         {/* image visibe sur petits écrans sm */}
         <div>
           <Image
+          data-aos="fade-left"
             src={mobileImg}
             height={400}
             width={400}

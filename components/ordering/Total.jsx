@@ -7,7 +7,7 @@ export default function Total({ currentOrder }) {
   const { ordering } = useCreateOrdering();
   return (
     <div className="border-b border-gray-300">
-      <div className="p-5 flex gap-3 flex-col">
+      <div data-aos="fade-up" className="p-5 flex gap-3 flex-col">
         {/* affichr le prix */}
         <p className="flex items-center justify-between">
           <span className="text-base font-semibold text-secondaryColor">

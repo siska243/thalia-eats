@@ -71,19 +71,19 @@ export default function Checkout() {
                     window.location.href = response.data.url
                 }
 
-            } catch (e) {
-                console.log(e);
-            } finally {
-                setLoading(false);
-            }
-        }
+      } catch (e) {
+        console.log(e);
+      }
+      finally {
+        setLoading(false);
+      }
     }
-    return (
-        <div>
-            <div className="p-5">
-                <button
-                    className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer "
-                    onClick={handlerCheckPayement} disabled={loading}>
+  }
+  return (
+    <div>
+      <div data-aos="fade-up" className="p-5">
+        <button className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer "
+          onClick={handlerCheckPayement} disabled={loading}>
 
                     {
                         loading ? (<Spinner/>) : (

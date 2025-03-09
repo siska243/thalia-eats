@@ -107,7 +107,7 @@ export default function MainContent() {
       </div> */}
 
 
-      <UserInfo handlerNewAdresse={handlerNewAdresse} isNewAdresse={isNewAdresse} />
+      <UserInfo  handlerNewAdresse={handlerNewAdresse} isNewAdresse={isNewAdresse} />
       {/* Affichage conditionnel de LivraisonInfo */}
       {isNewAdresse && (
         <LivraisonInfo getFormData={getFormData} />

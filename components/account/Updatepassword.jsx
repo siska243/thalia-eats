@@ -67,7 +67,7 @@ export default function UpdatePassword() {
 
   return (
     <div className="w-full h-full rounded-xl relative flex gap-8">
-      <div className="box-shadow-custom p-5 rounded-xl w-full bg-white">
+      <div data-aos="fade-left" className="box-shadow-custom p-5 rounded-xl w-full bg-white">
         <p className="mb-10 text-primaryColor uppercase text-base font-semibold">
           Mettre à jour votre mot de passe
         </p>

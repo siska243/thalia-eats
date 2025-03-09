@@ -112,11 +112,11 @@ export default function SectionAbout() {
     <section className="max-w-[1300px] mx-auto px-3 md:px-5 mb-10">
       <div className="py-10 lg:py-20 lg:px-14 bg-[#f4f4f4] rounded-xl shadow-md px-5">
         <div className="flex items-center justify-between flex-col">
-          <p className="text-lg lg:text-2xl font-semibold text-primaryColor mb-10">
+          <p data-aos="fade-up" className="text-lg lg:text-2xl font-semibold text-primaryColor mb-10">
             En savoir plus sur nous !
           </p>
           {/* Navigation des onglets */}
-          <div className="flex gap-4 flex-wrap md:flex-nowrap justify-center">
+          <div  className="flex gap-4 flex-wrap md:flex-nowrap justify-center">
             {["about", "faq", "partner", "support"].map((tab) => (
               <button
                 key={tab}
@@ -136,7 +136,7 @@ export default function SectionAbout() {
         </div>
 
         {/* Contenu des onglets */}
-        <div className="bg-white p-4 lg:p-10 mt-5 lg:mt-10 rounded-lg shadow-lg">
+        <div data-aos="fade-up" className="bg-white p-4 lg:p-10 mt-5 lg:mt-10 rounded-lg shadow-lg">
           {tabs[activeTab]}
         </div>
       </div>
