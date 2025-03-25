@@ -29,6 +29,7 @@ export default function page() {
         password,
       };
       const response = await FetchData.sendData(Route.login, data);
+
       if (response.name === "AxiosError") {
 
         const { response: { data: { message } } } = response;

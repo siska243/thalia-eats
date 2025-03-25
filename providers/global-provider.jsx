@@ -4,6 +4,7 @@ import ReduxProvider from './redux-provider'
 import { ReactQueryProvider } from './query-provider'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import FirebaseMessaging from "@/providers/firebase-messaging";
 
 
 export default function GlobalProvider({ children }) {
@@ -12,6 +13,7 @@ export default function GlobalProvider({ children }) {
             <ReactQueryProvider>
                 {children}
                 <ToastContainer />
+                <FirebaseMessaging />
             </ReactQueryProvider>
         </ReduxProvider>
     )
