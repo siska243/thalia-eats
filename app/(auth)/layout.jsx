@@ -14,8 +14,8 @@ export default async function RootLayout({ children }) {
 
         if(response?.name!=="AxiosError"){
             redirect("/")
+            return null
         }
-
     }
     catch (e){
 

@@ -9,10 +9,6 @@ import  RequestPermissionAndGetToken from "@/providers/firebase-messaging";
 
 
 export default function GlobalProvider({ children }) {
-
-    useEffect(() => {
-        //requestPermissionAndGetToken();
-    }, []);
     return (
         <ReduxProvider>
             <ReactQueryProvider>
