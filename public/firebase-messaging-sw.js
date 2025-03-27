@@ -1,7 +1,9 @@
+"use client"
+// Importez Firebase SDK pour les notifications
+import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
-
+importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-messaging-compat.js');
 
 const firebaseConfig = {
     apiKey: "AIzaSyBXu54hKJtNjqd-_JTyA1HjyLwunSuOLlE",
@@ -13,11 +15,8 @@ const firebaseConfig = {
     measurementId: "G-GEW26MS1QF"
 };
 
-
-
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
-
 if (typeof window !== "undefined") {
 
 
@@ -51,23 +50,13 @@ if (typeof window !== "undefined") {
                                link = "/payement/cancel"
                                 break;
                         }
-
-                        const notificationOptions = {
-                            body: "Status paiement",
-                            icon: "/logo-thalia.png",
-                            link
-                        };
                     }
 
-
-                    else{
-                        const notificationOptions = {
-                            body: payload.notification.body,
-                            icon: "/logo-thalia.png",
-                        };
-                    }
-
-
+                    const notificationOptions = {
+                        body: "Status paiement",
+                        icon: "/logo-thalia.png",
+                        link
+                    };
 
                     self.registration.showNotification(notificationTitle, notificationOptions);
                 }

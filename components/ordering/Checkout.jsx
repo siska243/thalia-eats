@@ -71,14 +71,14 @@ export default function Checkout() {
                     window.location.href = response.data.url
                 }
 
-      } catch (e) {
-        console.log(e);
-      }
-      finally {
-        setLoading(false);
-      }
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setLoading(false);
+            }
+        }
     }
-  }
+
   return (
     <div>
       <div data-aos="fade-up" className="p-5">

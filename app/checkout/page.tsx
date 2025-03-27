@@ -7,7 +7,7 @@ import cart from "@/public/assets/images/cart.svg"
 import mobile from "@/public/assets/images/mobile.svg"
 import Image from "next/image";
 import {XMarkIcon} from "@heroicons/react/20/solid";
-import {FormEventHandler, Suspense, useState} from "react";
+import {FormEventHandler, useState} from "react";
 import PhoneNumber from "@/components/forms/phone-number";
 import Spinner from "@/components/Loader/Spinner";
 import {FaCircleArrowRight} from "react-icons/fa6";
