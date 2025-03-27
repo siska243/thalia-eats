@@ -8,7 +8,6 @@ import Loader from "../Loader/Loader";
 export default function CommandeList({ ordering, removeProduct }) {
   const { currentOrder } = useSelector((state) => state.cart);
 
-  console.log("ccurrentOrder", currentOrder);
 
   return (
     <div className="border border-gray-300 mt-4 overflow-hidden bg-[#f9f9f9] rounded-xl">

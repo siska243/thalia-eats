@@ -3,6 +3,7 @@ import { Route } from "@/helpers/Route";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Link from "next/link";
 import React, { useState } from "react";
+import {removeToken} from "@/server/manageToken";
 
 export default function Settings({ isSettingOpen, isMobile }) {
   const [loading, setLoading] = useState(false);
@@ -12,10 +13,10 @@ export default function Settings({ isSettingOpen, isMobile }) {
     if (user) {
       try {
         setLoading(true);
-        const response = await FetchData.getData(Route.logout)
+        const response = await FetchData.sendData(Route.logout)
 
-        if (response.status == "success") {
-          console.log(response);
+        if (response.status === "success") {
+          await removeToken()
           window.location.href = '/';
         } else {
           console.log("oups");

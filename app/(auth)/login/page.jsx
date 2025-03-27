@@ -29,16 +29,18 @@ export default function page() {
         password,
       };
       const response = await FetchData.sendData(Route.login, data);
+
       if (response.name === "AxiosError") {
 
         const { response: { data: { message } } } = response;
         Notify(message, "error");
 
       } else {
-        console.log(response);
+
         const { token } = response;
         if (token) {
           Notify("Connexion réussie", "success");
+          await setToken(token)
           await loginRedirect({ token, url: "/" });
 
         }

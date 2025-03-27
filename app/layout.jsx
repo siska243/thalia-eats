@@ -14,7 +14,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="scrollbar-thin scrollbar-thumb scrollbar-custom overflow-y-scroll">
+      <body className="scrollbar-thin scrollbar-thumb scrollbar-custom overflow-y-scroll"
+            cz-shortcut-listen="true"
+      >
 
         <GlobalProvider>
           <AosInit />

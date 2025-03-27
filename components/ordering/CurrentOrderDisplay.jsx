@@ -3,7 +3,6 @@ import Total from "./Total";
 import TotalPay from "./TotalPay"
 import Checkout from "./Checkout"
 export default function CurrentOrderDisplay({ currentOrder }) {
-    console.log("currentOrder dans currentOrder",);
 
     return (
         <>

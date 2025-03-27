@@ -30,8 +30,9 @@ export const getCurrenUser=async()=>{
         const hasToken = cookieStore.has('current_user_rdv')
 
         if(hasToken){
-            if(cookieStore.get('current_user_rdv')?.value){
-                return JSON.parse(cookieStore.get('current_user_rdv').value)
+            const user=cookieStore.get('current_user_rdv')?.value
+            if(user){
+                return JSON.parse(user)
             }
 
         }

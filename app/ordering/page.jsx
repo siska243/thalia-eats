@@ -27,7 +27,7 @@ export default function page() {
       }
     }
     catch (e) {
-      console.log(e)
+      //console.log(e)
     }
     finally {
       setLoading(false)
@@ -43,7 +43,7 @@ export default function page() {
   if (loading) {
     return <Loader />;
   }
-  if (ordering.length == 0 && !currentOrder) {
+  if (ordering?.length === 0 && !currentOrder) {
     return (
       <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center justify-center min-h-screen flex-col gap-5">
         <p className="text-center text-primaryColor text-lg font-semibold">
@@ -60,7 +60,7 @@ export default function page() {
     <div className="pt-[220px] md:pt-[230px]">
       {/* banner resto section */}
 
-      <BannerResto restaurant={infoResto == undefined ? [] : infoResto} />;
+      <BannerResto restaurant={infoResto === undefined ? [] : infoResto} />;
       {/* <section className="mb-10">
         <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 items-center justify-between sm:flex-row">
           <p className="text-base lg:text-lg font-semibold">
