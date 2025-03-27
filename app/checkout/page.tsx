@@ -7,7 +7,7 @@ import cart from "@/public/assets/images/cart.svg"
 import mobile from "@/public/assets/images/mobile.svg"
 import Image from "next/image";
 import {XMarkIcon} from "@heroicons/react/20/solid";
-import {FormEventHandler, useState} from "react";
+import {FormEventHandler, Suspense, useState} from "react";
 import PhoneNumber from "@/components/forms/phone-number";
 import Spinner from "@/components/Loader/Spinner";
 import {FaCircleArrowRight} from "react-icons/fa6";
@@ -15,33 +15,40 @@ import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import Notify from "@/components/toastify/Notify";
 
-const Page=()=>{
+const Page = () => {
 
-    const {isLargeScreen}=useIsLargeScreen()
 
-    const [isLoading,setIsLoading]=useState(false)
+    return <Suspense>
+       <CheckoutPage />
+    </Suspense>
+}
 
-    const [modalState,setModalState]=useState(false)
-    const [phone,setPhone]=useState<string|null>(null)
+const CheckoutPage=()=>{
+    const {isLargeScreen} = useIsLargeScreen()
+
+    const [isLoading, setIsLoading] = useState(false)
+
+    const [modalState, setModalState] = useState(false)
+    const [phone, setPhone] = useState<string | null>(null)
 
     const searchParams = useSearchParams()
 
     const search = searchParams.get('params')
 
-    const router=useRouter()
+    const router = useRouter()
 
-    const handleSubmit=async (e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if(search){
-            const decode=atob(search)
+        if (search) {
+            const decode = atob(search)
 
-            if(decode){
-                let data=JSON.parse(decode)
-                data.phone=phone
+            if (decode) {
+                let data = JSON.parse(decode)
+                data.phone = phone
                 setIsLoading(true)
 
-                try{
+                try {
                     const response = await FetchData.sendData(Route.valide_commande, data)
 
                     if (response.name === "AxiosError") {
@@ -55,10 +62,9 @@ const Page=()=>{
                         return router.push("/payement/attente")
                         //window.location.href = response.data.url
                     }
-                }catch (e){
+                } catch (e) {
 
-                }
-                finally {
+                } finally {
                     setIsLoading(false)
                 }
             }
@@ -66,34 +72,37 @@ const Page=()=>{
 
 
     }
-    return <div className={'w-full h-screen flex justify-center items-center'}>
+    return  <div className={'w-full h-screen flex justify-center items-center'}>
         <Grid columns={isLargeScreen ? "3" : "1"} className={"items-center justify-center"}>
-            <Grid.Col colSpan={isLargeScreen ? "3":"full"}>
+            <Grid.Col colSpan={isLargeScreen ? "3" : "full"}>
                 <Grid.Col colSpan={"full"}>
                     <h3 className={'font-bold text-2xl text-center mb-2'}>Choisissez votre mode de paiement</h3>
-                    <p className={'text-center mb-4'}>Sélectionnez votre méthode préférée pour régler votre facture facilement et rapidement </p>
+                    <p className={'text-center mb-4'}>Sélectionnez votre méthode préférée pour régler votre facture
+                        facilement et rapidement </p>
                 </Grid.Col>
-                <Grid columns={isLargeScreen ? "2" :"1"}>
+                <Grid columns={isLargeScreen ? "2" : "1"}>
                     <Grid.Col>
                         <div
                             className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
                             <a href="#">
-                                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement par M-Pesa</h5>
+                                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement
+                                    par M-Pesa</h5>
                             </a>
                             <div className={"w-full flex justify-center items-center"}>
-                                <Image src={mobile} alt={"mobile"} width={250} height={180} />
+                                <Image src={mobile} alt={"mobile"} width={250} height={180}/>
                             </div>
 
                             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                 Réglez votre facture en toute simplicité directement via votre compte M-Pesa.
                             </p>
                             <button
-                                    onClick={()=>setModalState(true)}
-                               className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                                onClick={() => setModalState(true)}
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                                 Payer
                                 <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
                                      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2"
                                           d="M1 5h12m0 0L9 1m4 4L9 9"/>
                                 </svg>
                             </button>
@@ -109,7 +118,7 @@ const Page=()=>{
                             </a>
 
                             <div className={"w-full flex justify-center items-center"}>
-                                <Image src={cart} alt={"mobile"} width={180} height={120} />
+                                <Image src={cart} alt={"mobile"} width={180} height={120}/>
                             </div>
                             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                 Réglez votre facture facilement et en toute sécurité avec votre carte bancaire.
@@ -119,7 +128,8 @@ const Page=()=>{
                                 Payer
                                 <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
                                      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2"
                                           d="M1 5h12m0 0L9 1m4 4L9 9"/>
                                 </svg>
                             </a>
@@ -139,7 +149,7 @@ const Page=()=>{
                         variant="text"
                         onClick={() => setModalState(false)}
                     >
-                        <XMarkIcon className="h-auto w-6" strokeWidth={1.8} />
+                        <XMarkIcon className="h-auto w-6" strokeWidth={1.8}/>
                     </ActionIcon>
                 </div>
                 <div className="[&_label>span]:font-medium">
@@ -147,14 +157,14 @@ const Page=()=>{
                     <PhoneNumber className={'w-full mb-4'}
                                  country="cd"
                                  value={phone}
-                                 onChange={(e:string)=>setPhone(e)}
+                                 onChange={(e: string) => setPhone(e)}
                                  inputProps={{
                                      name: 'phone',
                                      required: true,
                                      autoFocus: true
                                  }}
                                  preferredCountries={["cd"]}
-                                 label={"Votre numéro de téléphone"} />
+                                 label={"Votre numéro de téléphone"}/>
 
                     <Checkbox
                         size="lg"
@@ -179,7 +189,7 @@ const Page=()=>{
                         //onClick={() => setModalState(false)}
                     >
                         {
-                            isLoading ? <Spinner /> : <>
+                            isLoading ? <Spinner/> : <>
                                <span>
                   <FaCircleArrowRight/>
                 </span>
