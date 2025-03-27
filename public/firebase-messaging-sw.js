@@ -1,9 +1,7 @@
-"use client"
-// Importez Firebase SDK pour les notifications
-import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 
-importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBXu54hKJtNjqd-_JTyA1HjyLwunSuOLlE",
@@ -15,8 +13,11 @@ const firebaseConfig = {
     measurementId: "G-GEW26MS1QF"
 };
 
+
+
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
+
 if (typeof window !== "undefined") {
 
 

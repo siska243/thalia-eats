@@ -143,7 +143,7 @@ const CheckoutPage=()=>{
         <Modal isOpen={modalState} onClose={() => setModalState(false)} containerClassName={'bg-white'}>
             <form className="m-auto px-7 pt-6 pb-8" onSubmit={handleSubmit}>
                 <div className="mb-7 flex items-center justify-between">
-                    <Title as="h3">Welcome to RizzUi</Title>
+                    <Title as="h3">Mode de paiement</Title>
                     <ActionIcon
                         size="sm"
                         variant="text"
