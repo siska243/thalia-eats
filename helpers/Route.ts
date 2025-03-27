@@ -1,4 +1,5 @@
-class Route{
+class Route
+{
     static user="user"
     static me=`${this.user}/account`
     static login="auth/login"

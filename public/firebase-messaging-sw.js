@@ -1,5 +1,7 @@
 "use client"
 // Importez Firebase SDK pour les notifications
+import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
+
 importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.5.0/firebase-messaging-compat.js');
 
@@ -21,17 +23,49 @@ if (typeof window !== "undefined") {
 // Initialisez Firebase Messaging
 
     messaging.onBackgroundMessage((payload) => {
-        console.log(
-            "[firebase-messaging-sw.js] Received background message ",
-            payload
-        );
+
         // Personnalisez la notification
         const notificationTitle = payload.notification.title;
-        const notificationOptions = {
-            body: payload.notification.body,
-            icon: "/firebase-logo.png", // Remplacez par votre icône
-        };
 
-        self.registration.showNotification(notificationTitle, notificationOptions);
+        if (payload) {
+            const {notification}=payload
+
+            try{
+                const parse = JSON.parse(notification.body)
+                let link;
+                if (parse) {
+                    if (parse?.action === "paiement-check") {
+
+                        switch (parse?.status?.code) {
+                            case "0":
+                                link = "/payement/success";
+                                break;
+                            case "1":
+                                link = "/payement/error"
+                                break;
+                            case "2":
+                                link = "/payement/attente"
+                                break;
+                            default:
+                               link = "/payement/cancel"
+                                break;
+                        }
+                    }
+
+                    const notificationOptions = {
+                        body: "Status paiement",
+                        icon: "/logo-thalia.png",
+                        link
+                    };
+
+                    self.registration.showNotification(notificationTitle, notificationOptions);
+                }
+            }
+            catch (e){
+                console.log(e)
+            }
+
+        }
+
     });
 }

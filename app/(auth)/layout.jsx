@@ -10,12 +10,12 @@ const checkCurrentUser=async()=>{
 export default async function RootLayout({ children }) {
 
     try{
-        const {user}=await checkCurrentUser()
+        const response=await checkCurrentUser()
 
-        if(user?.email){
+        if(response?.name!=="AxiosError"){
             redirect("/")
-            return null
         }
+
     }
     catch (e){
 

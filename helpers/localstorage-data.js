@@ -9,7 +9,12 @@ export const setLocalStorageOrdering = (data) => {
     }
 
 }
+export const clearLocalStorageOrdering=()=>{
+    if (typeof window !== "undefined") {
 
+        localStorage.removeItem('thalia_orders')
+    }
+}
 export const getLocalstorageOrdering = () => {
 
     if (typeof window !== "undefined") {

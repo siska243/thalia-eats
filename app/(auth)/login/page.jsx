@@ -36,10 +36,11 @@ export default function page() {
         Notify(message, "error");
 
       } else {
-        console.log(response);
+
         const { token } = response;
         if (token) {
           Notify("Connexion réussie", "success");
+          await setToken(token)
           await loginRedirect({ token, url: "/" });
 
         }

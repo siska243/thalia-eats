@@ -12,6 +12,6 @@ export default function useGetCurrentUser() {
     user:data && data !=undefined ? data:null,
     isError,
     isLoading,
-    isFetched
+    isFetched,
   }
 }
