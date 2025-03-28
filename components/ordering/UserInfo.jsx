@@ -22,7 +22,7 @@ export default function UserInfo({ handlerNewAdresse, isNewAdresse }) {
                 </div>
             ) : (
                 // Sinon, afficher le reste
-                <div className="box-shadow-custom p-5 rounded-xl">
+                <div data-aos="fade-up" className="box-shadow-custom p-5 rounded-xl">
                     {/* Les informations du client */}
                     <p className='mb-5 text-primaryColor uppercase text-base font-semibold '>
                         Les informations du client
@@ -67,7 +67,7 @@ export default function UserInfo({ handlerNewAdresse, isNewAdresse }) {
                                     </div>
 
                                     {/* Bouton Enregistrer */}
-                                    <div className='mt-4'>
+                                    <div data-aos="fade-up" className='mt-4'>
                                         {!isNewAdresse && (
                                             <button className="px-10 py-2 text-sm sm:text-base sm:py-3 bg-secondaryColor text-white rounded-lg font-semibold hover:bg-secondaryColor/90 focus:ring-2 focus:ring-secondaryColor focus:ring-opacity-50 inline-block">
                                                 Enregistrer

@@ -35,10 +35,10 @@ export default function Footer() {
               />
             </Link>
           </div>
-          <p className="font-normal text-base text-black max-w-[300px] mt-4">
+          {/* <p className="font-normal text-base text-black max-w-[300px] mt-4">
             Entreprise # 490039-445, Enregistrée auprès de la Chambre des
             entreprises.
-          </p>
+          </p> */}
         </div>
 
         {/* Colonne 2 */}
@@ -66,7 +66,7 @@ export default function Footer() {
               <span className="text-xl">
                 <MdOutlineMailOutline />
               </span>
-              <Link href="mailto:thaliaeat.original@gmail.com" className="text-sm font-normal underline">
+              <Link href="mailto:thaliaeat.original@gmail.com" className="text-base font-[500] underline">
                 thaliaeat.original@gmail.com
               </Link>
             </div>
@@ -74,7 +74,7 @@ export default function Footer() {
               <span className="text-xl">
                 <MdOutlineWhatsapp />
               </span>
-              <Link href="tel:+33627758753 " className="text-sm font-normal underline">
+              <Link href="https://wa.me/33627758753" className="text-base font-[500] underline">
                 +33 6 27 75 87 53
               </Link>
             </div>

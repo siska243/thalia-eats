@@ -13,7 +13,7 @@ export default function BannerRestaurantPage() {
                 }}
             >
                 <div className="w-full flex lg:flex-row flex-col-reverse gap-5 justify-between items-end h-full">
-                    <div className="w-full lg:w-[60%]">
+                    <div data-aos="fade-right" className="w-full lg:w-[60%]">
                         <h6 className="lg:text-left text-center text-base font-extralight mb-3 text-white">
                             Description de thalia-eats
                         </h6>
@@ -32,7 +32,7 @@ export default function BannerRestaurantPage() {
                         </div>
                     </div>
                     {/* Image */}
-                    <div className="w-[70%] text-center md:w-[60%] lg:w-[40%] overflow-hidden rounded-xl mx-auto h-full">
+                    <div data-aos="fade-left" className="w-[70%] text-center md:w-[60%] lg:w-[40%] overflow-hidden rounded-xl mx-auto h-full">
                         <Image
                             src={logo}
                             className="w-full h-full object-scale-down rounded-xl"

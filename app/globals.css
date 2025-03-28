@@ -20,7 +20,7 @@
 body {
   background: var(--whiteColor);
   font-family: "poppins", sans-serif;
-  font-family: "Raleway", serif;
+  
 }
 /* h1,
 h2,
@@ -103,3 +103,6 @@ h6 {
   background-color: #d3d3d3; /* Couleur grise pour les boutons désactivés */
   cursor: not-allowed; /* Curseur en forme de main barrée */
 }
+
+/* --------------- */
+

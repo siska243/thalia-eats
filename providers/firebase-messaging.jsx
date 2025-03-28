@@ -1,80 +1,81 @@
-"use client";
-
-import { useEffect } from "react";
-import { messaging } from "@/lib/firebase";
-import { getToken, onMessage } from "firebase/messaging";
+import {initializeApp} from 'firebase/app';
+import {getMessaging, getToken, isSupported, onMessage} from 'firebase/messaging';
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 
-const FirebaseMessaging = () => {
-    useEffect(() => {
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker
-                .register("/firebase-messaging-sw.js")
-                .then((registration) => {
-                    //console.log("Service Worker registered: ", registration);
-                })
-                .catch((error) => {
-                    console.error("Service Worker registration failed: ", error);
-                });
+const firebaseConfig = {
+    apiKey: "AIzaSyBXu54hKJtNjqd-_JTyA1HjyLwunSuOLlE",
+    authDomain: "thalia-eats.firebaseapp.com",
+    projectId: "thalia-eats",
+    messagingSenderId: "174715865134",
+    appId: "1:174715865134:web:b0f2455745c52fb62fb7bf"
+};
+
+const app = initializeApp(firebaseConfig);
+
+// Vérifie si Firebase messaging est supporté
+let messaging = null;
+isSupported().then((supported) => {
+    if (supported) {
+        messaging = getMessaging(app);
+    } else {
+        console.warn('Firebase messaging non supporté');
+    }
+});
+
+export const requestPermissionAndGetToken = async () => {
+
+    if (!messaging) {
+        console.error("Firebase messaging n'est pas initialisé !");
+        return;
+    }
+
+    try {
+
+        const token = await getToken(messaging, {vapidKey: 'BKgrBwqfFrK0AhcNfdlwutJzqTdwNwCHa3m_Zb_xrwsgNzcFrCjE5PDmqzSjaNNUsn3YpDRcbuvMXkk8enIK7UM'});
+
+        if (token) {
+            await FetchData.sendData(Route.send_expo_token, {expo_token: token})
         }
 
-        // Demander un jeton FCM (Firebase Cloud Messaging)
-        getToken(messaging, { vapidKey: "BKgrBwqfFrK0AhcNfdlwutJzqTdwNwCHa3m_Zb_xrwsgNzcFrCjE5PDmqzSjaNNUsn3YpDRcbuvMXkk8enIK7UM" })
-            .then((currentToken) => {
-                if (currentToken) {
-                    FetchData.sendData(Route.send_expo_token, {expo_token: currentToken})
-                } else {
-                    console.warn("No registration token available.");
-                }
-            })
-            .catch((error) => {
-                console.error("An error occurred while retrieving token. ", error);
-            });
+        onMessage(messaging, (payload) => {
+            if (payload) {
+                const {notification}=payload
 
-        if (messaging) {
-            onMessage(messaging, (payload) => {
-                if (payload) {
-                    const {notification}=payload
+                try{
+                    const parse = JSON.parse(notification.body)
 
-                    try{
-                        const parse = JSON.parse(notification.body)
+                    if (parse) {
+                        if (parse?.action === "paiement-check") {
 
-                        if (parse) {
-                            if (parse?.action === "paiement-check") {
-
-                                switch (parse?.status?.code) {
-                                    case "0":
-                                        window.location.href = "/payement/success";
-                                        clearLocalStorageOrdering()
-                                        break;
-                                    case "1":
-                                        window.location.href = "/payement/error"
-                                        break;
-                                    case "2":
-                                        window.location.href = "/payement/attente"
-                                        break;
-                                    default:
-                                        window.location.href = "/payement/cancel"
-                                        break;
-                                }
+                            switch (parse?.status?.code) {
+                                case "0":
+                                    window.location.href = "/payement/success";
+                                    clearLocalStorageOrdering()
+                                    break;
+                                case "1":
+                                    window.location.href = "/payement/error"
+                                    break;
+                                case "2":
+                                    window.location.href = "/payement/attente"
+                                    break;
+                                default:
+                                    window.location.href = "/payement/cancel"
+                                    break;
                             }
                         }
                     }
-                    catch (e){
-                        console.log(e)
-                    }
-
                 }
-            });
-        } else {
-            //console.error("Firebase Messaging is not initialized.");
-        }
+                catch (e){
+                    console.log(e)
+                }
 
-    }, []);
+            }
+        });
 
-    return null; // Pas de rendu
+    } catch (error) {
+        console.error('Erreur récupération token:', error);
+    }
 };
-
-export default FirebaseMessaging;

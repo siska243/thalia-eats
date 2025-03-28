@@ -7,7 +7,7 @@ const EditCompte = () => {
 
 
   return (
-    <div className="w-full flex md:flex-row flex-col gap-5">
+    <div className="w-full flex md:flex-row flex-col gap-5 md:gap-10">
       <UpdateAdresse />
       <Updatepassword />
 

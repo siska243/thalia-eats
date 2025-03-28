@@ -55,7 +55,7 @@ export default function Home() {
       {/* section about */}
       <SectionAbout />
       {/* section counter */}
-      <SectionCount />
+      {/* <SectionCount /> */}
     </div>
   );
 }
