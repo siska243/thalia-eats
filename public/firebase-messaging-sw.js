@@ -51,13 +51,23 @@ if (typeof window !== "undefined") {
                                link = "/payement/cancel"
                                 break;
                         }
+
+                        const notificationOptions = {
+                            body: "Status paiement",
+                            icon: "/logo-thalia.png",
+                            link
+                        };
                     }
 
-                    const notificationOptions = {
-                        body: "Status paiement",
-                        icon: "/logo-thalia.png",
-                        link
-                    };
+
+                    else{
+                        const notificationOptions = {
+                            body: payload.notification.body,
+                            icon: "/logo-thalia.png",
+                        };
+                    }
+
+
 
                     self.registration.showNotification(notificationTitle, notificationOptions);
                 }

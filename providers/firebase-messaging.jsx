@@ -60,6 +60,9 @@ const FirebaseMessaging = () => {
                                         break;
                                 }
                             }
+                            else{
+                                window.location.href = "/payement/error"
+                            }
                         }
                     }
                     catch (e){
