@@ -17,7 +17,6 @@ import Notify from "@/components/toastify/Notify";
 
 const Page = () => {
 
-
     return <Suspense>
        <CheckoutPage />
     </Suspense>

@@ -106,6 +106,8 @@ export const removeToken=async ()=>{
 
 }
 
+
+
 export const userIsAuth=async ()=>{
 
     const token =await getToken()
@@ -116,4 +118,20 @@ export const userIsAuth=async ()=>{
 
 export const deleteAll=async ()=>{
     return await removeToken()
+}
+
+//flex pay order
+export const setFlexPayOrder=async (orderNumber:string):Promise<void>=>{
+    const cookieStore=await cookies()
+    cookieStore.set('flex_pay_number_order_thalia_eats',orderNumber,{secure:true,httpOnly:true,expires:60*3600})
+}
+
+export const getFlexPayOrder=async ():Promise<string|undefined>=>{
+    const cookieStore=await cookies()
+    return cookieStore.get('flex_pay_number_order_thalia_eats')?.value
+}
+
+export const deleteFlexPayOrder=async ():Promise<void>=>{
+    const cookieStore=await cookies()
+    cookieStore.delete('flex_pay_number_order_thalia_eats')
 }
