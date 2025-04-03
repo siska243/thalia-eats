@@ -14,11 +14,18 @@ export default function ErrorPage() {
     const handlerCheckPayement = async (uid) => {
         try {
             const response = await FetchData.sendData(Route.check_paiement, { uid });
-            console.log(response);
+
+            localStorage.removeItem("flex_pay_number_order_thalia_eats")
         } catch (e) {
             console.log(e);
         }
     };
+
+    useEffect(() => {
+        if (localStorage && typeof window !== "undefined") {
+            localStorage.removeItem("flex_pay_number_order_thalia_eats")
+        }
+    }, [])
 
     useEffect(() => {
         if (currentCommande?.uid) {

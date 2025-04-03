@@ -1,6 +1,6 @@
+"use client"
 import {initializeApp} from 'firebase/app';
 import {getMessaging, getToken, isSupported, onMessage} from 'firebase/messaging';
-import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";

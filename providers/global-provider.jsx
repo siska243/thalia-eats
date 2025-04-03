@@ -4,19 +4,19 @@ import ReduxProvider from './redux-provider'
 import { ReactQueryProvider } from './query-provider'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import  {requestPermissionAndGetToken} from "@/providers/firebase-messaging";
-import PusherProvider from "@/providers/PusherProvider";
+import  RequestPermissionAndGetToken from "@/providers/firebase-messaging-old";
+import UsswrPolling from "@/providers/usswr-polling";
 
 
 export default function GlobalProvider({ children }) {
 
-    useEffect(() => {
-        requestPermissionAndGetToken();
-    }, []);
+
     return (
         <ReduxProvider>
             <ReactQueryProvider>
                 {children}
+                <UsswrPolling />
+                <RequestPermissionAndGetToken />
                 <ToastContainer />
             </ReactQueryProvider>
         </ReduxProvider>

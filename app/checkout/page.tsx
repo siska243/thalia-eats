@@ -15,9 +15,9 @@ import {FaCircleArrowRight} from "react-icons/fa6";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import Notify from "@/components/toastify/Notify";
+import {setFlexPayOrder} from "@/server/manageToken";
 
 const Page = () => {
-
 
     return <Suspense>
        <CheckoutPage />
@@ -56,11 +56,15 @@ const CheckoutPage=()=>{
                         const {response: {data: {message}}} = response;
                         Notify(message, "error");
                     } else {
+
+
+                        localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
+
                         Notify(response.message, "success");
                         setModalState(false)
 
-                        router.prefetch("/payement/attente")
-                        return router.push("/payement/attente")
+                        //router.prefetch("/payement/attente")
+                        //return router.push("/payement/attente")
                         //window.location.href = response.data.url
                     }
                 } catch (e) {

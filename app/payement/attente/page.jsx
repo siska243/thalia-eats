@@ -12,15 +12,6 @@ export default function SuccessPage() {
     const { currentCommande, isLoading } = useCurrentCommande()
     const router = useRouter()
 
-    const handlerCheckPayement = async (uid) => {
-        try {
-            const response = await FetchData.sendData(Route.check_paiement, { uid })
-            console.log(response);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
 
     if (isLoading) {
         return (
