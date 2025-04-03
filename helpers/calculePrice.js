@@ -1,11 +1,18 @@
 import { MdOutlineBorderVertical } from "react-icons/md"
 
+// export const calcul_price = (products = []) => {
+//     const sum = products.reduce((accumulator, object) => {
+//         return accumulator + (object.quantity * object.product.price)
+//     }, 0)
+
+//     return sum
+// }
 export const calcul_price = (products = []) => {
     const sum = products.reduce((accumulator, object) => {
-        return accumulator + (object.quantity * object.product.price)
-    }, 0)
+        return accumulator + (object.quantity * object.product.price);
+    }, 0);
 
-    return sum
+    return parseFloat(sum.toFixed(2));
 }
 
 export const price_delivrery = (valeurRecherchee, tableauObjets = [], town) => {

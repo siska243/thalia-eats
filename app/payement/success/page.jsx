@@ -53,14 +53,14 @@ export default function SuccessPage() {
                     {/* Icone de succès */}
                     <MdCheckCircle data-aos="fade-left" className="w-12 h-12 md:w-16 md:h-16 text-green-500" />
                 </div>
-                <h2 data-aos="fade-left" className="text-2xl font-bold text-gray-800 mb-2">Paiement réussi !</h2>
-                <p data-aos="fade-left" className="text-gray-600 mb-6">
+                <h2 data-aos="fade-left" className=" text-xl md:text-2xl font-bold text-gray-800 mb-2">Paiement réussi !</h2>
+                <p data-aos="fade-left" className="text-sm md:text-base text-gray-600 mb-6">
                     Votre commande a été confirmée avec succès. Vous pouvez suivre son statut à tout moment.
                 </p>
                 {/* Bouton de redirection */}
                 <button data-aos="fade-left"
                     onClick={() => router.push('/tracking')}
-                    className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
+                    className="text-sm md:text-base bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
                 >
                     Suivre ma commande
                 </button>

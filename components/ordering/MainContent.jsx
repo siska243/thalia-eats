@@ -12,6 +12,7 @@ import useReferentialData from "@/hooks/useQueryTanStack";
 import { Route } from '@/helpers/Route'
 import { setCurrentOrder, setDeliveryPrice } from "@/store/reducers/cartSlice";
 import { useSelector, useDispatch } from "react-redux";
+import Notify from "@/components/toastify/Notify";
 
 
 export default function MainContent() {
@@ -44,12 +45,18 @@ export default function MainContent() {
   // fonction pour recuperer les données de la commande du l'utilisateur
   const getFormData = async (FormData) => {
 
+    
+
     const livraisonPrix = price_delivrery(calcul_price(ordering), townData.delivrery_price, FormData.town)
+
+   
 
     const frais_livraison = livraisonPrix ? livraisonPrix.frais_livraison : 0;
     const service_price = livraisonPrix ? livraisonPrix.service_price : 0
+    
 
     const total_prix = total(calcul_price(ordering), service_price, frais_livraison)
+
     const findTown = townData.town.find((item) => item.slug === FormData.town)
 
     const commande = {
@@ -68,17 +75,19 @@ export default function MainContent() {
         number_street: FormData.numberStreet
       }
     }
+
     if (ordering) {
       const response = await FetchData.sendData(Route.send_commande, commande)
 
       if (response.name == "AxiosError") {
-        console.log(response.error);
+
+        const { response: { data: { message } } } = response;
+        Notify(message, "error");
 
       }
       else {
         dispatch(setCurrentOrder(response.data))
-        //toas message =response.message
-        //toast title =response.title
+        Notify("Commande enregistrée", "success");
       }
 
     }
