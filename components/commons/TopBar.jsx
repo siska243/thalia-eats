@@ -12,15 +12,20 @@ import { calcul_price } from "@/helpers/calculePrice";
 export default function TopBar() {
   const { user } = useGetCurrentUser();
   const [showPanier, setShowPanier] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { ordering } = useCreateOrdering();
-  // Empêche le défilement lorsque le popup est visible
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Gestion du scroll quand le popup est ouvert
   useEffect(() => {
     if (showPanier) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-
     return () => {
       document.body.style.overflow = "auto";
     };
@@ -29,6 +34,9 @@ export default function TopBar() {
   const toggleShowPanier = () => {
     setShowPanier(!showPanier);
   };
+
+  // On ne rend rien tant que le composant n'est pas monté côté client
+  if (!mounted) return null;
 
   return (
     <>
@@ -45,20 +53,17 @@ export default function TopBar() {
         <div className="flex md:hidden gap-3 items-center">
           {user ? (
             <div className="flex items-center gap-1">
-
-              {
-                user?.user?.street && (
-                  <>
-                    <p className="text-xl">
-                      <FaLocationDot />
-                    </p>
-                    <p className="font-[400] block text-secondaryColor text-sm">
-                      {user?.user?.street}, N°{user?.user?.number_street}, C/{user?.user?.town_id?.title}
-                    </p>
-                  </>
-                )
-              }
-
+              {user?.user?.street && (
+                <>
+                  <p className="text-xl">
+                    <FaLocationDot />
+                  </p>
+                  <p className="font-[400] block text-secondaryColor text-sm">
+                    {user?.user?.street}, N°{user?.user?.number_street}, C/
+                    {user?.user?.town_id?.title}
+                  </p>
+                </>
+              )}
             </div>
           ) : (
             <div className="flex gap-3 items-center">
@@ -75,25 +80,18 @@ export default function TopBar() {
         <div className="flex gap-8">
           <div className="hidden md:flex gap-3 items-center">
             {user && (
-
-              // adrrsse visible sur les grands écrans
               <div className="flex items-center gap-1">
-                {
-                  user?.user?.street && (
-                    <>
-                      <p className="text-xl">
-                        <FaLocationDot />
-                      </p>
-
-
-                      <p className="font-[400] block text-secondaryColor text-sm">
-                        {user?.user?.street}, N°{user?.user?.number_street}, C/{user?.user?.town_id?.title}
-                      </p>
-                    </>
-                  )
-                }
-
-
+                {user?.user?.street && (
+                  <>
+                    <p className="text-xl">
+                      <FaLocationDot />
+                    </p>
+                    <p className="font-[400] block text-secondaryColor text-sm">
+                      {user?.user?.street}, N°{user?.user?.number_street}, C/
+                      {user?.user?.town_id?.title}
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -106,12 +104,14 @@ export default function TopBar() {
             >
               <FaShoppingBag className="w-6 h-6" />
               <span className="absolute top-[5px] right-[5px] bg-primaryColor h-5 w-5 text-xs rounded-full flex items-center justify-center pointer-events-none">
-                {ordering.length}
+                {ordering && ordering.length > 0 ? ordering.length : 0}
               </span>
             </button>
 
             <p className="p-3 md:p-4 text-white border-l text-xs md:text-sm border-gray-300/65">
-              {calcul_price(ordering)} {ordering[0]?.product?.currency.code}
+              {ordering && ordering.length > 0
+                ? `${calcul_price(ordering)} ${ordering[0]?.product?.currency.code}`
+                : "0"}
             </p>
 
             <Link

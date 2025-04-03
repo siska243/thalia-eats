@@ -20,7 +20,7 @@ export default function ListInfoUser({ Icon, title, lastBorder, Isdevery_address
                             {/* avenue */}
                             <div className='flex'>
                                 <h6 className='text-gray-500 text-sm flex gap-10 items-center w-[100px] '>Avenue : </h6>
-                                <span>{currentOrder?.address_delivery}</span>
+                                <span>{currentOrder?.street}</span>
                             </div>
                             {/* numéro */}
                             <div className='flex'>

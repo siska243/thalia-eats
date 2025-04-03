@@ -12,13 +12,20 @@ import useCreateOrdering from "@/hooks/useCreateOrdering";
 import Loader from "@/components/Loader/Loader";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
+import BannerRestaurantPage from "@/components/restaurants/BannerRestaurantPage";
+
+
 
 export default function page() {
   const { ordering, removeProduct } = useCreateOrdering()
   const { currentOrder } = useSelector((state) => state.cart);
-  const [infoResto, setInfoResto] = useState([])
+  const [infoResto, setInfoResto] = useState({});
   const [loading, setLoading] = useState(true);
 
+  // recuperer l'utilisateur connecté
+   const { user } = useGetCurrentUser();
+   
   const loadData = () => {
     try {
       setLoading(true)
@@ -35,6 +42,7 @@ export default function page() {
     }
   }
 
+
   useEffect(() => {
     loadData()
   }, [ordering]);
@@ -43,24 +51,35 @@ export default function page() {
   if (loading) {
     return <Loader />;
   }
-  if (ordering?.length === 0 && !currentOrder) {
+ 
+  // 1. Vérification de la connexion en premier
+  if (!user) {
     return (
       <div className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center justify-center min-h-screen flex-col gap-5">
-        <p data-aos="fade-up" className="text-center text-primaryColor text-lg font-semibold">
-          Vous n'avez effetué aucune commande pour le moment...
+        <p data-aos="fade-up" className="text-center text-primaryColor text-base md:text-lg font-semibold">
+          Veuillez vous connecter pour accéder à vos commandes.
         </p>
-        <Link data-aos="fade-up" href="/restaurant" className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg">
-          Commandez dès maintenant
+        <Link 
+          data-aos="fade-up" 
+          href="/login" // Adapte le chemin selon ta route de connexion
+          className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg hover:bg-secondaryColor transition-colors"
+        >
+          Se connecter
         </Link>
-
       </div>
     )
   }
+
   return (
     <div className="pt-[220px] md:pt-[230px]">
-      {/* banner resto section */}
-
-      <BannerResto restaurant={infoResto === undefined ? [] : infoResto} />;
+       {/* Affiche BannerResto si infoResto contient des données */}
+       {Object.keys(infoResto).length > 0 ? (
+        <BannerResto restaurant={infoResto} restaurantIsLoading={loading}
+        />
+      ) : (
+        // Affiche BannerRestaurantPage si infoResto est vide
+        <BannerRestaurantPage />
+      )}
       {/* <section className="mb-10">
         <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 items-center justify-between sm:flex-row">
           <p className="text-base lg:text-lg font-semibold">
