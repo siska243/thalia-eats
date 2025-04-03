@@ -29,7 +29,6 @@ const fetcher = async (url: string) => {
 
         return response;
     } catch (error) {
-        //console.error("🚨 Erreur fetcher:", error);
         throw error;
     }
 };
