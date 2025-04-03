@@ -35,14 +35,14 @@ export default function SuccessPage() {
                     {/* Icone de succès */}
                     <BiLoader   className="spin-slow w-12 h-12 md:w-16 md:h-16 text-green-500" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Paiement est en attente !</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className=" text-xl md:text-2xl font-bold text-gray-800 mb-2">Paiement est en attente !</h2>
+                <p className="text-sm md:text-base text-gray-600  mb-6">
                     Veuillez suivre les instructions envoyées sur votre téléphone par message pour valider votre paiement
                 </p>
                 {/* Bouton de redirection */}
                 <button
                     onClick={() => router.push('/ordering')}
-                    className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
+                    className="text-sm md:text-base bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
                 >
                     Consulter ma commande
                 </button>

@@ -15,8 +15,7 @@ export default function BannerRestaurantPage() {
                 <div className="w-full flex lg:flex-row flex-col-reverse gap-5 justify-between items-end h-full">
                     <div data-aos="fade-right" className="w-full lg:w-[60%]">
                         <h6 className="lg:text-left text-center text-base font-extralight mb-3 text-white">
-                            Description de thalia-eats
-                        </h6>
+                        THALIA EATS est une plateforme numérique qui connecte restaurants locaux et consommateurs pour faciliter la commande et la livraison de repas.                        </h6>
                         <h2 className="text-center lg:text-left text-white font-semibold text-xl md:text-3xl lg:text-4xl md:mb-10 mb-5">
                             Thalia-Eats
                         </h2>

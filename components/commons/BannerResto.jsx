@@ -6,11 +6,19 @@ import clock from "@/public/assets/images/clock.png";
 import logo from "@/public/assets/logo-thalia.png";
 import Loader from "../Loader/Loader";
 
+
 export default function BannerResto({ restaurant, restaurantIsLoading }) {
 
   if (restaurantIsLoading) {
     return <Loader />;
   }
+
+
+if(!restaurant){
+  return (
+    <BannerRestaurantPage/>
+  )
+}
 
   return (
     <section className="max-w-[1300px] mx-auto px-3 md:px-5 mb-20">
@@ -34,7 +42,7 @@ export default function BannerResto({ restaurant, restaurantIsLoading }) {
               {restaurant?.reference || "Aucune ref"}
             </h6>
             <h2 className="text-center lg:text-left text-primaryColor font-semibol text-2xl md:text-4xl md:mb-10 mb-5">
-              {restaurant?.name || 'Thalia-Eats'}
+              {restaurant?.name || 'THALIA EATS est une plateforme numérique qui connecte restaurants locaux et consommateurs pour faciliter la commande et la livraison de repas.'}
             </h2>
             <div className="flex gap-3 items-center justify-center lg:items-start lg:justify-start flex-col md:flex-row">
               <p className="flex items-center gap-2 text-sm font-normal text-white border border-white py-2 px-6 rounded-full">
@@ -61,7 +69,7 @@ export default function BannerResto({ restaurant, restaurantIsLoading }) {
           <p data-aos="fade-right" className="absolute -bottom-7 z-20 bg-primaryColor flex items-center md:p-3 p-2 left-0 w-full sm:w-[400px] justify-center gap-2 md:gap-3 text-white text-xs sm:text-sm md:text-base sm:rounded-r-xl">
             <Image src={clock} width={30} alt="clock" />
             Ouvert :
-            {restaurant?.opens[0].startAt} - {restaurant?.opens[0].endAt}
+            {restaurant?.opens[0]?.startAt} - {restaurant?.opens[0]?.endAt}
           </p>
         </div>
       </div>

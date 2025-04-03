@@ -5,6 +5,7 @@ import {ActionIcon, AdvancedRadio, Button, Checkbox, Grid, Modal, Text, Title} f
 import useIsLargeScreen from "@/hooks/useLargeScreen";
 import cart from "@/public/assets/images/cart.svg"
 import mobile from "@/public/assets/images/mobile.svg"
+import mpesa from "@/public/assets/images/mpesa.png"
 import Image from "next/image";
 import {XMarkIcon} from "@heroicons/react/20/solid";
 import {FormEventHandler, Suspense, useState} from "react";
@@ -71,24 +72,24 @@ const CheckoutPage=()=>{
 
 
     }
-    return  <div className={'w-full h-screen flex justify-center items-center'}>
+    return  <div className={'w-full pb-10 md:pd:0 pt-[200px] lg:pt-[150px] min-h-screen flex justify-center items-center  max-w-[1300px] mx-auto px-4 md:px-5  gap-8'}>
         <Grid columns={isLargeScreen ? "3" : "1"} className={"items-center justify-center"}>
             <Grid.Col colSpan={isLargeScreen ? "3" : "full"}>
                 <Grid.Col colSpan={"full"}>
-                    <h3 className={'font-bold text-2xl text-center mb-2'}>Choisissez votre mode de paiement</h3>
-                    <p className={'text-center mb-4'}>Sélectionnez votre méthode préférée pour régler votre facture
+                    <h3 className={'font-bold text-primaryColor text-xl md:text-2xl text-center mb-4'}>Choisissez votre mode de paiement</h3>
+                    <p className={'text-sm md:text-base text-center mb-10'}>Sélectionnez votre méthode préférée pour régler votre facture
                         facilement et rapidement </p>
                 </Grid.Col>
                 <Grid columns={isLargeScreen ? "2" : "1"}>
                     <Grid.Col>
                         <div
-                            className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                            className="lg:max-w-sm p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
                             <a href="#">
-                                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement
+                                <h5 className="mb-4 text-xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement
                                     par M-Pesa</h5>
                             </a>
                             <div className={"w-full flex justify-center items-center"}>
-                                <Image src={mobile} alt={"mobile"} width={250} height={180}/>
+                                <Image className='h-[180px] object-contain' src={mpesa} alt={"mobile"} width={250} height={180}/>
                             </div>
 
                             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
@@ -109,15 +110,15 @@ const CheckoutPage=()=>{
                     </Grid.Col>
                     <Grid.Col>
                         <div
-                            className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                            className="lg:max-w-sm p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
                             <a href="#">
-                                <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                <h5 className="mb-4 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                                     Paiement par carte bancaire
                                 </h5>
                             </a>
 
                             <div className={"w-full flex justify-center items-center"}>
-                                <Image src={cart} alt={"mobile"} width={180} height={120}/>
+                                <Image className='h-[180px] object-contain' src={cart} alt={"cart"} width={180} height={120}/>
                             </div>
                             <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
                                 Réglez votre facture facilement et en toute sécurité avec votre carte bancaire.

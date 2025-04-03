@@ -139,7 +139,7 @@ export default function UpdatePassword() {
                 htmlFor="passwordConfirmation"
                 className="text-gray-700 mb-2"
               >
-                Confirmation du mot de passe
+                Confirmer le mot de passe
               </label>
               <input
                 type={showPasswordConfirmation ? "text" : "password"}

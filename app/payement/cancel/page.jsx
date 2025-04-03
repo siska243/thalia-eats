@@ -47,10 +47,10 @@ export default function CancelPage() {
                 </p>
                 <div data-aos="fade-left" className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
-                        onClick={() => router.push("/products")}
+                        onClick={() => router.push("/restaurants")}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 sm:px-6 rounded-md transition duration-200 text-sm md:text-base shadow-md hover:shadow-lg"
                     >
-                        Retourner à la boutique
+                        Retourner aux restaurants
                     </button>
                     <button
                         onClick={() => router.push("/support")}
