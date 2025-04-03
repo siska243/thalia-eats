@@ -21,6 +21,7 @@ export default function SuccessPage() {
         try {
             const response = await FetchData.sendData(Route.check_paiement, { uid })
 
+            localStorage.removeItem("flex_pay_number_order_thalia_eats")
             if(response?.name==="AxiosError"){
                 Notify(response?.response?.data?.title,'error',response?.response?.data?.message)
             }
@@ -33,6 +34,12 @@ export default function SuccessPage() {
             console.log(e);
         }
     }
+
+    useEffect(() => {
+        if (localStorage && typeof window !== "undefined") {
+            localStorage.removeItem("flex_pay_number_order_thalia_eats")
+        }
+    }, [])
 
     useEffect(() => {
         if (currentCommande?.uid) {

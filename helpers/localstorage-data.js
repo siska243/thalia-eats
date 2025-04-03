@@ -13,6 +13,7 @@ export const clearLocalStorageOrdering=()=>{
     if (typeof window !== "undefined") {
 
         localStorage.removeItem('thalia_orders')
+        localStorage.removeItem("flex_pay_number_order_thalia_eats")
     }
 }
 export const getLocalstorageOrdering = () => {

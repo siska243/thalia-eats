@@ -1,23 +1,29 @@
 "use client"
 import useCurrentCommande from '@/hooks/useCurrentCommande'
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Route } from '@/helpers/Route'
-import { FetchData } from "@/helpers/FetchData";
+import React, {useEffect} from 'react'
+import {useRouter} from 'next/navigation'
+import {Route} from '@/helpers/Route'
+import {FetchData} from "@/helpers/FetchData";
 import Loader from '@/components/Loader/Loader'
-import { MdCancel } from "react-icons/md";
+import {MdCancel} from "react-icons/md";
 
 export default function CancelPage() {
     const router = useRouter();
-    const { currentCommande, isLoading, isError, isFetched } = useCurrentCommande()
+    const {currentCommande, isLoading, isError, isFetched} = useCurrentCommande()
     const handlerCheckPayement = async (uid) => {
         try {
-            const response = await FetchData.sendData(Route.check_paiement, { uid })
-            console.log(response);
+            const response = await FetchData.sendData(Route.check_paiement, {uid})
+            localStorage.removeItem("flex_pay_number_order_thalia_eats")
         } catch (e) {
             console.log(e);
         }
     }
+
+    useEffect(() => {
+        if (localStorage && typeof window !== "undefined") {
+            localStorage.removeItem("flex_pay_number_order_thalia_eats")
+        }
+    }, [])
 
     useEffect(() => {
         if (currentCommande?.uid) {
@@ -27,16 +33,17 @@ export default function CancelPage() {
 
     if (isLoading) {
         return (
-            <Loader />
+            <Loader/>
         )
     }
 
     return (
         <div className="flex items-center justify-center h-screen pt-[150px] bg-gray-50 px-4 sm:px-6 lg:px-8">
-            <div data-aos="fade-left" className="bg-white box-shadow-custom rounded-lg p-6 sm:p-8 lg:p-10 max-w-xl w-full text-center">
+            <div data-aos="fade-left"
+                 className="bg-white box-shadow-custom rounded-lg p-6 sm:p-8 lg:p-10 max-w-xl w-full text-center">
                 <div data-aos="fade-left" className="flex justify-center mb-4 md:mb-6">
                     {/* SVG pour annulation */}
-                    <MdCancel className="w-12 h-12 md:w-16 md:h-16 text-yellow-500" />
+                    <MdCancel className="w-12 h-12 md:w-16 md:h-16 text-yellow-500"/>
                 </div>
                 <h1 data-aos="fade-left" className="text-xl sm:text-2xl font-bold text-yellow-600 mb-4">
                     Commande annulée !
