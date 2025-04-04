@@ -18,7 +18,7 @@ export default function SectionAbout() {
     {
       question: "Quels modes de paiement sont acceptés ?",
       answer:
-        "Nous acceptons toutes les principales cartes de crédit, PayPal et le paiement à la livraison dans certaines zones.",
+        "Nous acceptons toutes les principales cartes de crédit,Paiement Mobile-Money, PayPal et le paiement à la livraison dans certaines zones.",
     },
     {
       question: "Puis-je suivre ma commande en temps réel ?",

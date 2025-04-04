@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export default function Modal({ title, children, toggleModal }) {
     return (
-        <div className="absolute top-0 left-0 right-0 z-[999999] w-full bg-black/90 h-screen flex justify-center items-center overflow-hidden px-5">
+        <div className="absolute top-0 left-0 right-0 z-[99999999] w-full bg-black/90 h-svh flex justify-center items-center overflow-scroll px-5">
             <div className="max-w-[600px] bg-white relative rounded-xl w-full">
                 {/* bouton clos popup */}
                 <button

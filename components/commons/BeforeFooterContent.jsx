@@ -17,7 +17,7 @@ export default function BeforeFooterContent({ restaurant, infoResto }) {
       </div>
       {/* reviews */}
       {/* <Reviews /> */}
-      <SectionPopularResto />
+      {/* <SectionPopularResto /> */}
     </section>
   );
 }
