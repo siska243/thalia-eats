@@ -6,8 +6,8 @@ export default function PanierItems({ item, handleDecrement, handleIncrement }) 
 
   return (
     <div className="bg-[#D9D9D999]/60 p-4 rounded-lg flex md:flex-row flex-col items-center justify-between gap-3 md:gap-0">
-      <div className="flex items-center flex-col md:flex-row">
-        <div className="md:border-r-2 border-gray-300 md:pr-4 md:mr-4 mb-2 md:mb-0">
+      <div className="flex items-center gap-3 flex-row">
+        <div className="border-r-2 border-gray-300 pr-4 md:mr-4 mb-2 md:mb-0">
           <Image
             src={product.picture}
             alt={product.title}
@@ -16,7 +16,7 @@ export default function PanierItems({ item, handleDecrement, handleIncrement }) 
             className="object-cover rounded-full w-[60px] h-[60px]"
           />
         </div>
-        <div>
+        <div className="flex flex-col items-start">
           <h3 className="text-secondaryColor text-base font-medium">
             {product.title}
           </h3>

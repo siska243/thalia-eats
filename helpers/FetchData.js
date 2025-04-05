@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { getToken } from "@/server/manageToken";
 class FetchData {
-    //BASE_URL = () => process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" :'https://thalia.cooceckivu.org/api';
+    // BASE_URL = () => process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" :'https://thalia.cooceckivu.org/api';
     BASE_URL = () => process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" :'http://127.0.0.1:8000/api';
     // BASE_URL = () => "https://admin.rdvmonde.com/api/v1";
 
