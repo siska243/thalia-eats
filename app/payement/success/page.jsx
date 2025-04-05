@@ -20,14 +20,14 @@ export default function SuccessPage() {
     const handlerCheckPayement = async (uid) => {
         try {
             const response = await FetchData.sendData(Route.check_paiement, { uid })
-
+            clearLocalStorageOrdering()
             localStorage.removeItem("flex_pay_number_order_thalia_eats")
             if(response?.name==="AxiosError"){
                 Notify(response?.response?.data?.title,'error',response?.response?.data?.message)
             }
             else{
                 Notify(response.title,'success',response.message)
-                clearLocalStorageOrdering()
+
                 dispatch(setCurrentOrder(null))
             }
         } catch (e) {

@@ -23,6 +23,8 @@ class Route
     static valide_commande = `${this.user}/commande/valide`
     static check_paiement =`${this.user}/commande/check-paiement`
     static traitement_commande =`${this.user}/commande/traitement`
+
+    static cart_checkout_commande = `${this.user}/commande/valide`
     static swr_check_paiement =(params:string)=>`${this.user}/commande/swr-check-paiement/${params}`
     
 }
