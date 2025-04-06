@@ -29,8 +29,6 @@ export default function Page() {
       }
    };
 
-   console.log("data from ordering page", data);
-
    useEffect(() => {
       handlerTraitement();
    }, []);

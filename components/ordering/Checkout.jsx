@@ -78,7 +78,7 @@ export default function Checkout() {
     <div>
       <div data-aos="fade-up" className="p-5">
         <button
-          className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer "
+          className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer hover:bg-green-900 transition-all duration-300 ease-in-out"
           onClick={handlerCheckPayement}
           disabled={loading}
         >
@@ -89,7 +89,7 @@ export default function Checkout() {
               <span>
                 <FaCircleArrowRight />
               </span>
-              <span className="text-lg font-medium">Checkout!</span>
+              <span className="text-lg font-medium">Passer au paiement</span>
             </>
           )}
         </button>
