@@ -10,25 +10,22 @@ export default function CommandeList({ ordering, removeProduct }) {
 
 
   return (
-    <div className="border border-gray-300 mt-4 overflow-hidden bg-[#f9f9f9] rounded-xl">
+    <div className="border border-gray-300 overflow-hidden bg-[#f9f9f9] rounded-xl">
       {/* Header */}
       <div data-aos="fade-up" className="bg-green-700 p-4 w-full h-[120px] flex justify-center items-center gap-4">
         <span className="text-4xl text-white">
           <IoBagCheck />
         </span>
         <h5 className="text-2xl text-white font-semibold">
-          {
-            !currentOrder?.products ? "Mon Panier" : "Ma commande"
-          }
+         Mon Panier
         </h5>
       </div>
 
       {/* Contenu du panier */}
-      {currentOrder?.products?.length > 0 ? (
-        <CurrentOrderDisplay currentOrder={currentOrder} />
-      ) : ordering?.length > 0 ? (
-        <OrderingDisplay ordering={ordering} removeProduct={removeProduct} />
-      ) : (
+      {currentOrder?.products?.length > 0  && ordering?.length > 0 ? (
+
+        <OrderingDisplay ordering={ordering} removeProduct={removeProduct} />)
+      : (
         <p className="p-4 text-gray-600">Votre panier est vide</p>
       )}
     </div>

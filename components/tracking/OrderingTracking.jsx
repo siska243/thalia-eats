@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 export default function OrderingTracking({ data }) {
   const orders = Array.isArray(data) ? data : [];
-  const currency = orders[0]?.products[0]?.currency?.code || '€';
+  const currency = orders[0]?.products[0]?.currency?.code || "€";
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const handleSelectOrder = (orderId) => {
@@ -16,17 +16,29 @@ export default function OrderingTracking({ data }) {
 
     return (
       <div className="mb-6">
-        <div className={`p-4 rounded-lg ${selectedOrder.accepted_at ? 'bg-blue-100 border-l-4 border-blue-500' : 'bg-yellow-100 border-l-4 border-yellow-500'}`}>
-          <p className={`font-medium ${selectedOrder.accepted_at ? 'text-blue-700' : 'text-yellow-700'}`}>
-            {selectedOrder.accepted_at ? 
-              "✅ Commande en cours de préparation" : 
-              "🕒 En attente de confirmation"}
+        <div
+          className={`p-4 rounded-lg ${
+            selectedOrder.accepted_at
+              ? "bg-blue-100 border-l-4 border-blue-500"
+              : "bg-yellow-100 border-l-4 border-yellow-500"
+          }`}
+        >
+          <p
+            className={`font-medium ${
+              selectedOrder.accepted_at ? "text-blue-700" : "text-yellow-700"
+            }`}
+          >
+            {selectedOrder.accepted_at
+              ? "✅ Commande en cours de préparation"
+              : "🕒 En attente de confirmation"}
           </p>
         </div>
 
         {selectedOrder.delivery_at && selectedOrder.delivrery_driver_id && (
           <div className="mt-4 p-4 bg-green-100 border-l-4 border-green-500 rounded-lg">
-            <p className="text-green-700 font-medium">🚚 En cours de livraison</p>
+            <p className="text-green-700 font-medium">
+              🚚 En cours de livraison
+            </p>
           </div>
         )}
       </div>
@@ -37,18 +49,28 @@ export default function OrderingTracking({ data }) {
     if (!selectedOrder?.delivrery_driver_id) return null;
 
     const driver = selectedOrder.delivrery_driver_id.user;
-    
+
     return (
       <div className="mt-6 p-6 bg-gray-50 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4 text-primaryColor">Informations du livreur</h3>
+        <h3 className="text-lg font-semibold mb-4 text-primaryColor">
+          Informations du livreur
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p><strong>Nom :</strong> {driver.full_name}</p>
-            <p><strong>Téléphone :</strong> {driver.phone}</p>
+            <p>
+              <strong>Nom :</strong> {driver.full_name}
+            </p>
+            <p>
+              <strong>Téléphone :</strong> {driver.phone}
+            </p>
           </div>
           <div>
-            <p><strong>Email :</strong> {driver.email}</p>
-            <p><strong>Adresse :</strong> {driver.principal_adresse}</p>
+            <p>
+              <strong>Email :</strong> {driver.email}
+            </p>
+            <p>
+              <strong>Adresse :</strong> {driver.principal_adresse}
+            </p>
           </div>
         </div>
       </div>
@@ -60,7 +82,7 @@ export default function OrderingTracking({ data }) {
       <h1 className="text-3xl font-extrabold text-center mb-8 text-primaryColor">
         Suivi de commande
       </h1>
-      
+
       <div className="rounded-xl shadow-[0px_4px_6px_0px_rgba(0,_0,_0,_0.1)] p-6 bg-primaryColor">
         {/* Sélection de commande */}
         <div className="mb-8">
@@ -69,12 +91,16 @@ export default function OrderingTracking({ data }) {
           </label>
           <select
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            value={selectedOrder ? selectedOrder.uid : ""}
             onChange={(e) => handleSelectOrder(e.target.value)}
           >
-            <option value="" disabled>Sélectionnez une commande...</option>
+            <option value="" disabled>
+              Sélectionnez une commande...
+            </option>
             {orders.map((order) => (
               <option key={order?.uid} value={order?.uid}>
-                Commande #{order?.reference} - {order?.global_price || '0'}          {currency}
+                Commande #{order?.reference} - {order?.global_price || "0"}{" "}
+                {currency}
               </option>
             ))}
           </select>
@@ -87,14 +113,18 @@ export default function OrderingTracking({ data }) {
               <h2 className="text-2xl font-bold text-primaryColor mb-4">
                 Commande #{selectedOrder.reference}
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-gray-700">
-                    <strong>Date :</strong> {new Date(selectedOrder.accepted_at).toLocaleDateString('fr-FR')}
+                    <strong>Date :</strong>{" "}
+                    {new Date(selectedOrder.accepted_at).toLocaleDateString(
+                      "fr-FR"
+                    )}
                   </p>
                   <p className="text-gray-600">
-                    <strong>Total :</strong> {selectedOrder.global_price}{currency}
+                    <strong>Total :</strong> {selectedOrder.global_price}
+                    {currency}
                   </p>
                 </div>
                 <div>
@@ -114,9 +144,9 @@ export default function OrderingTracking({ data }) {
             {/* Liste des produits */}
             <div className="bg-white shadow-sm rounded-lg overflow-hidden">
               <h3 className="px-6 py-4 bg-gray-50 text-lg font-semibold border-b text-primaryColor">
-               Plats Commandés
+                Plats Commandés
               </h3>
-              
+
               <ul className="divide-y divide-gray-200">
                 {selectedOrder.products?.map((item, index) => (
                   <li key={index} className="p-6 hover:bg-gray-50">
@@ -139,7 +169,8 @@ export default function OrderingTracking({ data }) {
                           {item.quantity} x {item.price} {currency}
                         </p>
                         <p className="font-medium text-gray-800 mt-1">
-                          Total : {(item.quantity * item.price).toFixed(2)}             {currency}
+                          Total : {(item.quantity * item.price).toFixed(2)}{" "}
+                          {currency}
                         </p>
                       </div>
                     </div>
