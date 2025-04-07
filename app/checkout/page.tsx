@@ -113,7 +113,7 @@ const CheckoutPage=()=>{
 
 
     }
-    return  <div className={'w-full pb-10 md:pd:0 pt-[200px] lg:pt-[150px] min-h-screen flex justify-center items-center  max-w-[1300px] mx-auto px-4 md:px-5  gap-8'}>
+    return  <div className={'min-h-screen w-full flex justify-center items-center bg-gray-100 px-4 pt-[210px] md:pt-[200px] pb-5'}>
         <Grid columns={isLargeScreen ? "3" : "1"} className={"items-center justify-center"}>
             <Grid.Col colSpan={isLargeScreen ? "3" : "full"}>
                 <Grid.Col colSpan={"full"}>
@@ -124,16 +124,16 @@ const CheckoutPage=()=>{
                 <Grid columns={isLargeScreen ? "2" : "1"}>
                     <Grid.Col>
                         <div
-                            className="lg:max-w-sm p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                            className="lg:max-w-sm p-6 bg-white shadow-lg rounded-lg">
                             <a href="#">
-                                <h5 className="mb-4 text-xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement
+                                <h5 className="mb-4 text-lg md:text-xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement
                                     par M-Pesa</h5>
                             </a>
                             <div className={"w-full flex justify-center items-center"}>
                                 <Image className='h-[180px] object-contain' src={mpesa} alt={"mobile"} width={250} height={180}/>
                             </div>
 
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                            <p className="mb-3 text-sm md:text-base font-normal text-gray-700 dark:text-gray-400">
                                 Réglez votre facture en toute simplicité directement via votre compte M-Pesa.
                             </p>
                             <button
@@ -151,9 +151,9 @@ const CheckoutPage=()=>{
                     </Grid.Col>
                     <Grid.Col>
                         <div
-                            className="lg:max-w-sm p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                            className="lg:max-w-sm p-6 bg-white shadow-lg rounded-lg">
                             <a href="#">
-                                <h5 className="mb-4 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                                <h5 className="mb-4 text-lg md:text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                                     Paiement par carte bancaire
                                 </h5>
                             </a>
@@ -161,7 +161,7 @@ const CheckoutPage=()=>{
                             <div className={"w-full flex justify-center items-center"}>
                                 <Image className='h-[180px] object-contain' src={cart} alt={"cart"} width={180} height={120}/>
                             </div>
-                            <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
+                            <p className="mb-3 text-sm md:text-base font-normal text-gray-700 dark:text-gray-400">
                                 Réglez votre facture facilement et en toute sécurité avec votre carte bancaire.
                             </p>
                             <button
