@@ -28,10 +28,13 @@ const cartSlice = createSlice({
             state.delivery_price = action.payload
         },
         setCurrentOrder: (state, action) => {
+
+
             const currentOrder = action.payload
             state.currentOrder = action.payload;
-            console.log(state.delivery_price, state.orders)
+
             return state
+
             const livraisonPrix = price_delivrery(calcul_price(state.orders), state.delivery_price, currentOrder.uid.slug)
 
             const frais_livraison = livraisonPrix ? livraisonPrix.frais_livraison : 0;
@@ -68,26 +71,6 @@ const cartSlice = createSlice({
 
             return state
         },
-
-        // removeProduct: (state, action) => {
-        //     const copy_order = state.orders
-        //     const findIndex = copy_order.findIndex((item) => item.product.slug !== action.payload.slug)
-        //     if (findIndex !== -1) {
-        //         const quantity = copy_order[findIndex].quantity
-        //         if (quantity === 1) {
-        //             const data = copy_order.filter(item => item.product.slug !== action.payload.slug)
-
-        //             state.orders = data
-        //             setLocalStorageOrdering(data)
-        //         } else {
-        //             const current_qty = quantity - 1;
-        //             copy_order[findIndex].quantity = current_qty
-        //             state.orders = copy_order
-        //             setLocalStorageOrdering(copy_order)
-        //         }
-        //     }
-
-        // }
         removeProduct: (state, action) => {
 
             let copy_order = state.orders;
@@ -109,7 +92,6 @@ const cartSlice = createSlice({
 
             return state
         },
-        // ***
 
     },
 });
