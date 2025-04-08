@@ -32,7 +32,7 @@ const cartSlice = createSlice({
 
             const currentOrder = action.payload
             state.currentOrder = action.payload;
-            
+
             return state
 
             const livraisonPrix = price_delivrery(calcul_price(state.orders), state.delivery_price, currentOrder.uid.slug)
