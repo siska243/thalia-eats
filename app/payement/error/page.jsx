@@ -6,6 +6,8 @@ import { FetchData } from "@/helpers/FetchData";
 import { Route } from "@/helpers/Route";
 import Loader from "@/components/Loader/Loader";
 import { MdError } from "react-icons/md";
+import {useDispatch} from "react-redux";
+import {fetchCurrentOrder} from "@/store/reducers/cartSlice";
 
 export default function ErrorPage() {
     const router = useRouter();
@@ -21,9 +23,13 @@ export default function ErrorPage() {
         }
     };
 
+    const dispatch=useDispatch()
+
     useEffect(() => {
         if (localStorage && typeof window !== "undefined") {
             localStorage.removeItem("flex_pay_number_order_thalia_eats")
+
+            dispatch(fetchCurrentOrder())
         }
     }, [])
 

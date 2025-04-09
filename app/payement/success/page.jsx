@@ -7,7 +7,7 @@ import { FetchData } from "@/helpers/FetchData";
 import Loader from '@/components/Loader/Loader'
 import { MdCheckCircle } from "react-icons/md";
 import Notify from "@/components/toastify/Notify";
-import {setCurrentOrder} from "@/store/reducers/cartSlice";
+import {fetchCurrentOrder, setCurrentOrder} from "@/store/reducers/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 
@@ -35,9 +35,13 @@ export default function SuccessPage() {
         }
     }
 
+
     useEffect(() => {
         if (localStorage && typeof window !== "undefined") {
             localStorage.removeItem("flex_pay_number_order_thalia_eats")
+
+            dispatch(fetchCurrentOrder())
+
         }
     }, [])
 
