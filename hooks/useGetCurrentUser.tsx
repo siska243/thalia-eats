@@ -23,12 +23,7 @@ export default function useGetCurrentUser() {
         dispatch(fetchAccountData())
     }, [])
 
-    useEffect(() => {
-        if(isAuth){
-            refetch()
-        }
-    }, [isAuth]);
-
+    
     if (error) {
         dispatch(setIsAuth(false))
     }
