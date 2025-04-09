@@ -23,6 +23,7 @@ export default function useGetCurrentUser() {
         dispatch(fetchAccountData())
     }, [])
 
+    
     if (error) {
         dispatch(setIsAuth(false))
     }

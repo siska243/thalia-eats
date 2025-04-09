@@ -9,13 +9,17 @@ import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
 import {FaEye, FaEyeSlash} from "react-icons/fa";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
+import {fetchAccountData} from "@/store/reducers/account";
+import {useDispatch} from "react-redux";
 
 export default function page() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const {refetch} = useGetCurrentUser()
+    const { refetch } = useGetCurrentUser();
+
+    const dispatch=useDispatch()
 
     const handlerSubmit = async (e) => {
         e.preventDefault();
@@ -31,15 +35,17 @@ export default function page() {
             if (response.name === "AxiosError") {
 
                 const {response: {data: {message}}} = response;
-                Notify(message, "error");
+                Notify("Email ou mot de passe incorrecte","error" );
 
             } else {
 
                 const {token} = response;
                 if (token) {
+                    await refetch()
+                    dispatch(fetchAccountData())
                     Notify("Connexion réussie", "success");
                     await setToken(token)
-                    await refetch()
+                    //await refetch()
                     await loginRedirect({token, url: "/"});
 
                 }
