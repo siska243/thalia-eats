@@ -2,6 +2,7 @@ import CardList from "./CardList"
 import Total from "./Total";
 import TotalPay from "./TotalPay"
 import Checkout from "./Checkout"
+import ConfirmAdress from "@/components/ordering/ConfirmAdress";
 export default function CurrentOrderDisplay({ currentOrder }) {
 
     return (
@@ -16,6 +17,7 @@ export default function CurrentOrderDisplay({ currentOrder }) {
             {/* Composants Totaux */}
             <Total currentOrder={currentOrder} />
             <TotalPay currentOrder={currentOrder} />
+            <ConfirmAdress />
             <Checkout />
         </>
     );

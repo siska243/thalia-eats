@@ -6,6 +6,7 @@ import useReferentialData from "@/hooks/useQueryTanStack";
 import BannerRestaurantPage from "@/components/restaurants/BannerRestaurantPage";
 import Loader from "@/components/Loader/Loader"
 import SectionAbout from "@/components/home/SectionAbout";
+import {Suspense} from "react";
 
 
 export default function restaurant() {
@@ -22,10 +23,16 @@ export default function restaurant() {
   return (
     <>
       <div className="pt-[220px] md:pt-[230px]">
-        <BannerRestaurantPage />
+          <Suspense>
+              <BannerRestaurantPage />
+          </Suspense>
+
 
         {/* ********************* */}
-        <Restaurants data={data === undefined ? [] : data} isLoading={isLoading} />
+          <Suspense>
+              <Restaurants data={data === undefined ? [] : data} isLoading={isLoading} />
+          </Suspense>
+
         {/* ********************** */}
 
       </div>

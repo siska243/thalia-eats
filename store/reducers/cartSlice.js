@@ -1,7 +1,129 @@
-const { createSlice, current } = require("@reduxjs/toolkit");
-import { calcul_price, price_delivrery, total } from "@/helpers/calculePrice";
-import { getLocalstorageOrdering, setLocalStorageOrdering } from "@/helpers/localstorage-data"
+import {createAsyncThunk} from "@reduxjs/toolkit";
 
+const {createSlice} = require("@reduxjs/toolkit");
+import {getLocalstorageOrdering, setLocalStorageOrdering} from "@/helpers/localstorage-data"
+import {FetchData} from "@/helpers/FetchData";
+import {Route} from "@/helpers/Route";
+
+const customApiSendData=(orders=[])=>{
+    let tabs=[]
+
+    orders?.forEach(item=>{
+        tabs.push({
+            product_id:item.product.uid,
+            quantity:item.quantity,
+            pricing:item.product?.currency.id
+        })
+    })
+
+    return tabs
+}
+
+export const fetchCurrentOrder = createAsyncThunk(
+    "order/CurrentOrder",
+    async (data,thunkAPI) => {
+
+        try {
+
+            const response = await FetchData.getData(
+                Route.current_commande,
+            );
+            if (response.name === "AxiosError") {
+                return thunkAPI.rejectWithValue(response.response.data);
+            }
+
+            return response
+
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+
+    }
+)
+
+export const sendCurrentOrder = createAsyncThunk(
+    "order/CurrentOrder-send",
+    async ({products}, thunkAPI) => {
+
+        const data={
+            products:customApiSendData(products)
+        }
+
+        try {
+
+            const response = await FetchData.sendData(
+                Route.add_produit_commande,
+                data
+            );
+            if (response.name === "AxiosError") {
+                return thunkAPI.rejectWithValue(response.response.data);
+            }
+
+            return response
+
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+
+
+    }
+)
+
+export const updateAddresseCurrentOrder = createAsyncThunk(
+    "order/CurrentOrder-update-addresse",
+    async (data, thunkAPI) => {
+
+
+
+        try {
+
+            const response = await FetchData.sendData(
+                Route.update_address_delivery,
+                data
+            );
+            if (response.name === "AxiosError") {
+                return thunkAPI.rejectWithValue(response.response.data);
+            }
+
+            return response
+
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+
+
+    }
+)
+
+export const removeProductCurrentOrder = createAsyncThunk(
+    "order/CurrentOrder-remove",
+    async ({product}, thunkAPI) => {
+
+        try {
+
+            const response = await FetchData.sendData(
+                Route.delete_produit_commande,
+                {
+                    product_id:product
+                }
+            );
+            if (response.name === "AxiosError") {
+                return thunkAPI.rejectWithValue(response.response.data);
+            }
+
+            return response
+
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+
+
+    }
+)
 const cartSlice = createSlice({
     name: "cart-slice",
     initialState: {
@@ -29,26 +151,10 @@ const cartSlice = createSlice({
         },
         setCurrentOrder: (state, action) => {
 
-
-            const currentOrder = action.payload
             state.currentOrder = action.payload;
 
             return state
 
-            const livraisonPrix = price_delivrery(calcul_price(state.orders), state.delivery_price, currentOrder.uid.slug)
-
-            const frais_livraison = livraisonPrix ? livraisonPrix.frais_livraison : 0;
-            const service_price = livraisonPrix ? livraisonPrix.service_price : 0
-
-            const total_prix = total(calcul_price(state.orders), service_price, frais_livraison)
-
-            state.pricings.livraison_price = frais_livraison
-            state.pricings.service_price = service_price
-            state.pricings.total = total_prix
-            state.pricings.currency = livraisonPrix?.currency
-
-
-            return state
         },
         handleAddProduct: (state, action) => {
             const value = {
@@ -63,10 +169,14 @@ const cartSlice = createSlice({
             if (findIndex !== -1) {
                 var current_quantity = copy_order[findIndex].quantity;
                 copy_order[findIndex].quantity = current_quantity + 1;
+
             } else {
                 copy_order.push(value);
             }
+
+
             state.orders = copy_order
+
             setLocalStorageOrdering(copy_order);
 
             return state
@@ -94,7 +204,58 @@ const cartSlice = createSlice({
         },
 
     },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchCurrentOrder.pending, (state) => {
+
+            })
+            .addCase(fetchCurrentOrder.fulfilled,(state,action)=>{
+                state.currentOrder=action.payload
+            })
+            .addCase(fetchCurrentOrder.rejected,(state,action)=>{
+
+            })
+            .addCase(sendCurrentOrder.pending, (state) => {
+
+            })
+            .addCase(sendCurrentOrder.fulfilled,(state,action)=>{
+                state.currentOrder=action.payload
+
+            })
+            .addCase(sendCurrentOrder.rejected,(state,action)=>{
+
+            })
+
+            .addCase(removeProductCurrentOrder.pending, (state) => {
+
+            })
+            .addCase(removeProductCurrentOrder.fulfilled,(state,action)=>{
+                state.currentOrder=action.payload
+
+            })
+            .addCase(removeProductCurrentOrder.rejected,(state,action)=>{
+
+            })
+
+            .addCase(updateAddresseCurrentOrder.pending, (state) => {
+
+            })
+            .addCase(updateAddresseCurrentOrder.fulfilled,(state,action)=>{
+                state.currentOrder=action.payload
+
+            })
+            .addCase(updateAddresseCurrentOrder.rejected,(state,action)=>{
+
+            })
+    }
 });
 
-export const { setCurrentOrder, setOrders, handleAddProduct, setDeliveryPrice, setDeliveryAdress, removeProduct } = cartSlice.actions;
+export const {
+    setCurrentOrder,
+    setOrders,
+    handleAddProduct,
+    setDeliveryPrice,
+    setDeliveryAdress,
+    removeProduct
+} = cartSlice.actions;
 export default cartSlice.reducer;

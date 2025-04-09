@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
 import { useRouter } from "next/navigation";
+import useIsLargeScreen from "@/hooks/useLargeScreen";
 
 export default function Checkout() {
   const { ordering } = useCreateOrdering();
@@ -74,26 +75,46 @@ export default function Checkout() {
     }
   };
 
+  const {isLargeScreen}=useIsLargeScreen()
+
   return (
     <div>
-      <div data-aos="fade-up" className="p-5">
+      {isLargeScreen ? <div data-aos="fade-up" className="p-5">
         <button
-          className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer hover:bg-green-900 transition-all duration-300 ease-in-out"
-          onClick={handlerCheckPayement}
-          disabled={loading}
+            className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer hover:bg-green-900 transition-all duration-300 ease-in-out"
+            onClick={handlerCheckPayement}
+            disabled={loading}
         >
           {loading ? (
-            <Spinner />
+              <Spinner />
           ) : (
-            <>
+              <>
               <span>
                 <FaCircleArrowRight />
               </span>
-              <span className="text-lg font-medium">Passer au paiement</span>
-            </>
+                <span className="text-lg font-medium">Passer au paiement</span>
+              </>
           )}
         </button>
-      </div>
+      </div> : <div className="p-5">
+        <button
+            className="p-4 flex items-center justify-center gap-2 w-full rounded-xl text-white bg-green-700 cursor-pointer hover:bg-green-900 transition-all duration-300 ease-in-out"
+            onClick={handlerCheckPayement}
+            disabled={loading}
+        >
+          {loading ? (
+              <Spinner />
+          ) : (
+              <>
+              <span>
+                <FaCircleArrowRight />
+              </span>
+                <span className="text-lg font-medium">Passer au paiement</span>
+              </>
+          )}
+        </button>
+      </div> }
+
     </div>
   );
 }
