@@ -12,12 +12,14 @@ import Spinner from "@/components/Loader/Spinner";
 import logo from "@/public/assets/logo-thalia.png";
 import Notify from "@/components/toastify/Notify";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 
 export default function page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const {refetch}=useGetCurrentUser()
 
   const handlerSubmit = async (e) => {
     e.preventDefault();
@@ -41,6 +43,7 @@ export default function page() {
         if (token) {
           Notify("Connexion réussie", "success");
           await setToken(token)
+          await refetch()
           await loginRedirect({ token, url: "/" });
 
         }

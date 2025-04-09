@@ -30,7 +30,9 @@ class Route
     static delete_produit_commande =`${this.user}/commande/delete-product`
     // pour voir l'historique de mes commandes
     static historique_commande =`${this.user}/commande/tracking`
-
+    // pour suivre ma commande
+    static tracking_commande =`${this.user}/commande/tracking`
+    static cart_checkout_commande = `${this.user}/commande/valide`
     static swr_check_paiement =(params:string)=>`${this.user}/commande/swr-check-paiement/${params}`
     
 }
