@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaLocationDot } from "react-icons/fa6";
-import { FaShoppingBag } from "react-icons/fa";
+import { FaShoppingBag,FaHistory } from "react-icons/fa";
 import { MdLocalShipping } from "react-icons/md";
 import Panier from "../popups/Panier";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import { calcul_price } from "@/helpers/calculePrice";
+
 
 export default function TopBar() {
   const { user } = useGetCurrentUser();
@@ -113,6 +114,7 @@ export default function TopBar() {
                 ? `${calcul_price(ordering)} ${ordering[0]?.product?.currency.code}`
                 : "0"}
             </p>
+            {/* suivvre les commandes */}
 
             <Link
               href="/tracking"
@@ -120,6 +122,14 @@ export default function TopBar() {
             >
               <MdLocalShipping className="w-6 h-6" />
             </Link>
+            {/* afficher l'historique des commandes */}
+            <Link
+              href="/historique"
+              className="p-4 text-white text-3xl border-l border-gray-300/65 flex items-center justify-center"
+            >
+              <FaHistory className="w-6 h-6" />
+            </Link>
+
           </div>
         </div>
       </div>
