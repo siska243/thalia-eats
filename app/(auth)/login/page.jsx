@@ -46,7 +46,9 @@ export default function page() {
                     Notify("Connexion réussie", "success");
                     await setToken(token)
                     //await refetch()
-                    await loginRedirect({token, url: "/"});
+
+                    window.location.href="/"
+                    //await loginRedirect({token, url: "/"});
 
                 }
             }
