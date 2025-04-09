@@ -15,7 +15,7 @@ export default function Settings({ isSettingOpen, isMobile }) {
         setLoading(true);
         const response = await FetchData.sendData(Route.logout)
 
-        if (response.status === "success") {
+        if (response.success) {
           await removeToken()
           window.location.href = '/';
         } else {
@@ -37,12 +37,12 @@ export default function Settings({ isSettingOpen, isMobile }) {
         : "top-[-100%] opacity-0 invisible"
         } mt-3 rounded-lg p-5 shadow-md flex flex-col w-full z-[9999999] bg-white gap-3 overflow-hidden`}
     >
-      <Link
+      <a
         href="/reglages"
         className="text-base text-primaryColor text-center"
       >
         Réglages
-      </Link>
+      </a>
       {/* button de deconnexion */}
       <button
         onClick={handlerLogout}

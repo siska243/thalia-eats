@@ -3,41 +3,6 @@ import restoImage from "@/public/assets/images/restoPopular.png";
 import CardPopularResto from "./CardPopularResto";
 
 export default function SectionPopularResto({ data }) {
-  const restoData = [
-    {
-      imageSrc: restoImage, // Les chemins réels de tes images
-      title: "Titre 1",
-      resto: "21 restaurants",
-    },
-    {
-      imageSrc: restoImage, // Les chemins réels de tes images
-      title: "Titre 2",
-      resto: "21 restaurants",
-    },
-    {
-      imageSrc: restoImage, // Les chemins réels de tes images
-      title: "Titre 3",
-      resto: "90 restaurants",
-    },
-    {
-      imageSrc: restoImage, // Les chemins réels de tes images
-      title: "Titre 4",
-      resto: "10 restaurants",
-    },
-    {
-      imageSrc: restoImage, // Les chemins réels de tes images
-      title: "Titre 5",
-      resto: "6 restaurants",
-    },
-    {
-      imageSrc: restoImage, // Les chemins réels de tes images
-      title: "Titre 6",
-      resto: "30 restaurants",
-    },
-  ];
-
-  console.log("previews", data);
-
 
   return (
     <section className="my-6 lg:my-12 max-w-[1300px] mx-auto px-3 md:px-5">
