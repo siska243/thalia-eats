@@ -53,7 +53,7 @@ if (typeof window !== "undefined") {
                     }
 
                     const notificationOptions = {
-                        body: "Status paiement",
+                        body: "Status paiement : "+ parse?.status?.name,
                         icon: "/logo-thalia.png",
                         link
                     };
