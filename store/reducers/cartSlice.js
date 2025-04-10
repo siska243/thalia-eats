@@ -75,8 +75,6 @@ export const updateAddresseCurrentOrder = createAsyncThunk(
     "order/CurrentOrder-update-addresse",
     async (data, thunkAPI) => {
 
-
-
         try {
 
             const response = await FetchData.sendData(
@@ -174,7 +172,6 @@ const cartSlice = createSlice({
                 copy_order.push(value);
             }
 
-
             state.orders = copy_order
 
             setLocalStorageOrdering(copy_order);
@@ -211,6 +208,7 @@ const cartSlice = createSlice({
             })
             .addCase(fetchCurrentOrder.fulfilled,(state,action)=>{
                 state.currentOrder=action.payload
+
             })
             .addCase(fetchCurrentOrder.rejected,(state,action)=>{
 

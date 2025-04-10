@@ -45,7 +45,7 @@ export default function useCreateOrdering() {
 
     useEffect(() => {
         dispatch(sendCurrentOrder({products:orders}))
-    }, [orders]);
+    }, []);
 
     const handleAddProducts = (product: any, quantity: number | null) => {
         const title = `Vous avez ajouter le produit ${product.title} dans votre panier`
