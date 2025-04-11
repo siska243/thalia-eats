@@ -23,8 +23,8 @@ export default function Panier({ toggleShowPanier }) {
               <div className="flex flex-col gap-4 overflow-y-scroll">
                 {ordering.map((item, index) => {
                   return <PanierItems key={index} item={item}
-                    handleDecrement={() => removeProduct(item.product)}
-                    handleIncrement={() => handleAddProduct(item.product)}
+                    handleDecrement={() => removeProduct(item.product,1)}
+                    handleIncrement={() => handleAddProduct(item.product,1)}
                   />;
                 })}
               </div>
@@ -35,7 +35,7 @@ export default function Panier({ toggleShowPanier }) {
               <div className="flex items-center  gap-3 md:gap-5 justify-between flex-col md:flex-row">
                 <div className="bg-primaryColor py-3 px-5 rounded-md text-white flex items-center gap-4 flex-shrink-0">
                   <p className="">
-                    Total: <span className="font-medium text-base md:text-lg">{calculateTotalPrice()} </span>
+                    Total: <span className="font-medium text-base md:text-lg">{calculateTotalPrice(ordering)} </span>
                   </p>
                   <p>{ordering[0]?.product?.currency?.code}</p>
                 </div>

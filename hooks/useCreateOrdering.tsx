@@ -47,13 +47,13 @@ export default function useCreateOrdering() {
         dispatch(sendCurrentOrder({products:orders}))
     }, []);
 
-    const handleAddProducts = (product: any, quantity: number | null) => {
+    const handleAddProducts = (product: any, quantity?: number | null) => {
         const title = `Vous avez ajouter le produit ${product.title} dans votre panier`
         notification(title)
         dispatch(handleAddProduct(product))
     }
 
-    const removeProducts = (product: any, quantity: number | null) => {
+    const removeProducts = (product: any, quantity?: number | null) => {
         const title = `Vous avez supprimer le produit ${product.title} dans votre panier`
         notification(title)
 
