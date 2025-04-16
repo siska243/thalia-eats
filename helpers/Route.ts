@@ -2,7 +2,7 @@ class Route
 {
     static user="user"
     static me=`${this.user}/account`
-    static login="auth/login"
+    static login="login"
     static register="register"
     static list_restaurant="list-restaurant";
     static slug_restaurant=(slug:string):string=>`${this.list_restaurant}/${slug}`

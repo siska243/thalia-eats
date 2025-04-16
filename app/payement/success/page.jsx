@@ -22,6 +22,7 @@ export default function SuccessPage() {
             const response = await FetchData.sendData(Route.check_paiement, { uid })
             clearLocalStorageOrdering()
             localStorage.removeItem("flex_pay_number_order_thalia_eats")
+            dispatch(fetchCurrentOrder())
             if(response?.name==="AxiosError"){
                 Notify(response?.response?.data?.title,'error',response?.response?.data?.message)
             }
@@ -34,7 +35,6 @@ export default function SuccessPage() {
             console.log(e);
         }
     }
-
 
     useEffect(() => {
         if (localStorage && typeof window !== "undefined") {
