@@ -6,6 +6,7 @@ import AosInit from "@/components/commons/AosInit";
 import GlobalProvider from "@/providers/global-provider";
 
 
+
 export const metadata = {
   title: "Thalia Eats",
   description: "Thalia eats",
