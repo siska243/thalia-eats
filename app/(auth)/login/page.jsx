@@ -40,12 +40,13 @@ export default function page() {
             } else {
 
                 const {token} = response;
+
                 if (token) {
                     await refetch()
                     dispatch(fetchAccountData())
                     Notify("Connexion réussie", "success");
                     await setToken(token)
-                    //await refetch()
+                    await refetch()
 
                     window.location.href="/"
                     //await loginRedirect({token, url: "/"});
@@ -75,13 +76,13 @@ export default function page() {
 
                         <div className="flex flex-col">
                             <label htmlFor="email" className="text-gray-700 mb-2">
-                                Email
+                                Identifiant
                             </label>
                             <input
-                                type="email"
+
                                 id="email"
                                 className="py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                                placeholder="exemple@email.com"
+                                placeholder="Votre email ou numéro de téléphone"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
