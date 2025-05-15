@@ -26,6 +26,7 @@ export default function Checkout() {
   const success_url = `${window.location.origin}/payement/success`;
   const error_url = `${window.location.origin}/payement/error`;
   const cancel_url = `${window.location.origin}/payement/cancel`;
+  const webhook_sse_url = `${window.location.origin}/api/events`;
   const callback_url =
     process.env.NODE_ENV === "production"
       ? "https://thalia.cooceckivu.org/api/webhook-paiement-flexpay"
@@ -46,6 +47,7 @@ export default function Checkout() {
         cancel_url,
         callback_url,
         pricing,
+        webhook_sse_url
       };
 
       const url = "/checkout?params=" + btoa(JSON.stringify(data));
