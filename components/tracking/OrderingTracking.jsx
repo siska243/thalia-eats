@@ -11,7 +11,7 @@ export default function OrderingTracking({ data }) {
     setSelectedOrder(order);
   };
 
-  const renderStatusMessage = () => {
+  const renderStatusMessage = (selectedOrder) => {
     if (!selectedOrder) return null;
 
     return (
@@ -37,7 +37,7 @@ export default function OrderingTracking({ data }) {
     );
   };
 
-  const renderDriverInfo = () => {
+  const renderDriverInfo = (selectedOrder) => {
     if (!selectedOrder?.delivrery_driver_id) return null;
 
     const driver = selectedOrder.delivrery_driver_id.user;
@@ -71,13 +71,13 @@ export default function OrderingTracking({ data }) {
 
   return (
     <section className="max-w-4xl mx-auto px-4 pt-8 pb-16">
-      <h1 className="text-3xl font-extrabold text-center text-[#e24713] mb-10">
+      <h1 className="text-3xl font-extrabold text-center text-[#e24713] mb-5">
         Suivi de commande
       </h1>
 
       <div className="bg-white rounded-2xl shadow-md p-6 space-y-8">
         {/* Sélection */}
-        <div>
+        <div className={'hidden'}>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Sélectionnez une commande
           </label>
@@ -99,80 +99,87 @@ export default function OrderingTracking({ data }) {
         </div>
 
         {/* Infos commande */}
-        {selectedOrder && (
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#e24713] mb-4">
-                Commande #{selectedOrder.reference}
-              </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-                <div>
-                  <p>
-                    <strong>Date :</strong>{" "}
-                    {new Date(selectedOrder.accepted_at).toLocaleDateString(
-                      "fr-FR"
-                    )}
-                  </p>
-                  <p>
-                    <strong>Total :</strong>{" "}
-                    {selectedOrder.global_price}
-                    {currency}
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>Adresse :</strong>{" "}
-                    {selectedOrder?.address_delivery}
-                  </p>
-                  <p>
-                    <strong>Statut :</strong> {selectedOrder.status.name}
-                  </p>
-                </div>
-              </div>
-            </div>
+        {
+          orders?.map((items,key)=>(
+              <div className="space-y-6" key={key}>
+                <div className="bg-gray-50 p-6 rounded-xl">
+                  <h2 className="text-2xl font-semibold text-[#e24713] mb-4">
+                    Commande #{items.reference}
+                  </h2>
 
-            {renderStatusMessage()}
-            {renderDriverInfo()}
-
-            {/* Liste des produits */}
-            <div className="bg-white border rounded-xl">
-              <h3 className="px-6 py-4 bg-gray-100 text-lg font-semibold text-[#e24713] border-b">
-                Plats Commandés
-              </h3>
-              <ul className="divide-y divide-gray-200">
-                {selectedOrder.products?.map((item, index) => (
-                  <li key={index} className="p-6 hover:bg-gray-50">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      <img
-                        src={item?.product?.picture}
-                        alt={item?.product?.title}
-                        className="w-24 h-24 object-cover rounded-xl"
-                      />
-                      <div className="flex-1">
-                        <h4 className="text-lg font-medium text-gray-800">
-                          {item?.product?.title}
-                        </h4>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {item?.product?.description}
-                        </p>
-                      </div>
-                      <div className="md:text-right text-sm text-gray-700">
-                        <p>
-                          {item.quantity} × {item.price} {currency}
-                        </p>
-                        <p className="font-semibold mt-1">
-                          Total : {(item.quantity * item.price).toFixed(2)}{" "}
-                          {currency}
-                        </p>
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <div>
+                      <p>
+                        <strong>Date :</strong>{" "}
+                        {new Date(items.accepted_at).toLocaleDateString(
+                            "fr-FR"
+                        )}
+                      </p>
+                      <p>
+                        <strong>Total :</strong>{" "}
+                        {items.global_price}
+                        {currency}
+                      </p>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
+                    <div>
+                      <p>
+                        <strong>Adresse :</strong>{" "}
+                        {items?.address_delivery}
+                      </p>
+                      <p>
+                        <strong>Statut :</strong> {items.status.name}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {renderStatusMessage(items)}
+                {renderDriverInfo(items)}
+
+                {/* Liste des produits */}
+                <div className="bg-white border rounded-xl">
+                  <h3 className="px-6 py-4 bg-gray-100 text-lg font-semibold text-[#e24713] border-b">
+                    Plats Commandés
+                  </h3>
+                  <ul className="divide-y divide-gray-200">
+                    {items.products?.map((item, index) => (
+                        <li key={index} className="p-6 hover:bg-gray-50">
+                          <div className="flex flex-col md:flex-row gap-4">
+                            <img
+                                src={item?.product?.picture}
+                                alt={item?.product?.title}
+                                className="w-24 h-24 object-cover rounded-xl"
+                            />
+                            <div className="flex-1">
+                              <h4 className="text-lg font-medium text-gray-800">
+                                {item?.product?.title}
+                              </h4>
+                              <p className="text-sm text-gray-500 mt-1">
+                                {item?.product?.description}
+                              </p>
+                            </div>
+                            <div className="md:text-right text-sm text-gray-700">
+                              <p>
+                                {item.quantity} × {item.price} {currency}
+                              </p>
+                              <p className="font-semibold mt-1">
+                                Total : {(item.quantity * item.price).toFixed(2)}{" "}
+                                {currency}
+                              </p>
+                            </div>
+                          </div>
+                        </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <hr className={"mb-4 mt-3"} />
+              </div>
+          ))
+        }
+
+
       </div>
     </section>
   );
