@@ -11,7 +11,7 @@ import {useRouter} from "next/navigation";
 
 const API_BASE_URL = process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" : 'http://127.0.0.1:8000/api'
 
-const fetcher = async (url: string) => {
+const fetcher = async () => {
     try {
         // Récupérer l'ID de paiement
         const getSessionOrder = localStorage && window != undefined ? localStorage.getItem("flex_pay_number_order_thalia_eats") : null;
