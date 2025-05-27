@@ -7,14 +7,18 @@ import { MdLocalShipping } from "react-icons/md";
 import Panier from "../popups/Panier";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
-import { calcul_price } from "@/helpers/calculePrice";
+import {calcul_price, calcul_quantity} from "@/helpers/calculePrice";
+import {useSelector} from "react-redux";
+import {getLocalstorageOrdering} from "@/helpers/localstorage-data";
 
 
 export default function TopBar() {
   const { user } = useGetCurrentUser();
   const [showPanier, setShowPanier] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { ordering } = useCreateOrdering();
+
+  const {cart:ordering} = useSelector((state) => state.shop)
+
 
   useEffect(() => {
     setMounted(true);
@@ -105,13 +109,13 @@ export default function TopBar() {
             >
               <FaShoppingBag className="w-6 h-6" />
               <span className="absolute top-[5px] right-[5px] bg-primaryColor h-5 w-5 text-xs rounded-full flex items-center justify-center pointer-events-none">
-                {ordering && ordering.length > 0 ? ordering.length : 0}
+                {ordering && ordering.length > 0 ? calcul_quantity(ordering) : 0}
               </span>
             </button>
 
             <p className="p-3 md:p-4 text-white border-l text-xs md:text-sm border-gray-300/65">
               {ordering && ordering.length > 0
-                ? `${calcul_price(ordering)} ${ordering[0]?.product?.currency.code}`
+                ? `${calcul_price(ordering ?? [])} ${ordering[0]?.product?.currency.code}`
                 : "0"}
             </p>
             {/* suivvre les commandes */}

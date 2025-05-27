@@ -1,9 +1,11 @@
 import { useSelector } from "react-redux";
 import CardList from "./CardList";
 import Total from "./Total";
+import ConfirmAddress from "@/components/ordering/ConfirmAdress";
+import Checkout from "@/components/ordering/Checkout";
 
 export default function OrderingDisplay({ ordering, removeProduct }) {
-    const { currentOrder } = useSelector((state) => state.cart);
+
     return (
         <>
             {/* Liste des produits */}
@@ -12,7 +14,9 @@ export default function OrderingDisplay({ ordering, removeProduct }) {
                     <CardList key={index} products={product} removeProduct={removeProduct} />
                 ))}
             </div>
-            <Total currentOrder={currentOrder ? currentOrder : []} ordering={ordering ? ordering : []} />
+            <Total currentOrder={ordering ?? []} ordering={ordering ?? []} />
+            <ConfirmAddress />
+            <Checkout />
         </>
     );
 }

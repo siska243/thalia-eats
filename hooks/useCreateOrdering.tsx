@@ -44,7 +44,7 @@ export default function useCreateOrdering() {
 
 
     useEffect(() => {
-        dispatch(sendCurrentOrder({products:orders}))
+        //dispatch(sendCurrentOrder({products:orders}))
     }, []);
 
     const handleAddProducts = (product: any, quantity?: number | null) => {

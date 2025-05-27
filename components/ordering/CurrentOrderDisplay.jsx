@@ -14,9 +14,10 @@ export default function CurrentOrderDisplay({ currentOrder }) {
                 ))}
             </div>
 
-            {/* Composants Totaux */}
+            {/* Composants Totaux
             <Total currentOrder={currentOrder} />
             <TotalPay currentOrder={currentOrder} />
+            */}
             <ConfirmAdress />
             <Checkout />
         </>

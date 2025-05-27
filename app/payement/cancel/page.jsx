@@ -8,34 +8,43 @@ import Loader from '@/components/Loader/Loader'
 import {MdCancel} from "react-icons/md";
 import {useDispatch} from "react-redux";
 import {fetchCurrentOrder} from "@/store/reducers/cartSlice";
+import {setOrderCart, setShopCart} from "@/store/reducers/shopSlice";
 
 export default function CancelPage() {
     const router = useRouter();
     const {currentCommande, isLoading, isError, isFetched} = useCurrentCommande()
-    const handlerCheckPayement = async (uid) => {
+    const dispatch=useDispatch()
+    const handlerCheckPayement = async () => {
         try {
-            const response = await FetchData.sendData(Route.check_paiement, {uid})
-            localStorage.removeItem("flex_pay_number_order_thalia_eats")
+            const response = await FetchData.sendData(Route.cancel_paiement, {})
+
+            if(response?.name=="AxiosError"){
+
+            }
+            else{
+                localStorage.removeItem("flex_pay_number_order_thalia_eats")
+                dispatch(setShopCart([]))
+                dispatch(setOrderCart({
+                    data:null,
+                    is_passed:false
+                }))
+            }
+
         } catch (e) {
             console.log(e);
         }
     }
 
-    const dispatch=useDispatch()
+
 
     useEffect(() => {
         if (localStorage && typeof window !== "undefined") {
             localStorage.removeItem("flex_pay_number_order_thalia_eats")
-
-            dispatch(fetchCurrentOrder())
+            handlerCheckPayement()
         }
     }, [])
 
-    useEffect(() => {
-        if (currentCommande?.uid) {
-            handlerCheckPayement(currentCommande.uid)
-        }
-    }, [currentCommande])
+
 
     if (isLoading) {
         return (

@@ -1,7 +1,7 @@
 "use client"
 import useReferentialData from "@/hooks/useQueryTanStack";
 import {Route} from "@/helpers/Route";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {BiEdit} from "react-icons/bi";
 import {ActionIcon, Modal, Title} from "rizzui";
@@ -9,37 +9,72 @@ import {XMarkIcon} from "@heroicons/react/20/solid";
 import {updateAddresseCurrentOrder} from "@/store/reducers/cartSlice";
 import Spinner from "@/components/Loader/Spinner";
 import {notification} from "@/hooks/useCreateOrdering";
+import useCart from "@/hooks/useCart";
+import {OrderType, ShopType} from "@/types/main";
 
 const ConfirmAdress = () => {
 
     const {data, isLoading, isError, isFetched} = useReferentialData({
         url: Route.default,
-        queryKey: "dafault",
+        queryKey: "default",
     });
+
+    const {order} = useSelector((state:{shop:{order:{data:OrderType}}}) => state.shop)
+
     const [town, setTown] = useState("");
     const [street, setStreet] = useState("");
     const [numberStreet, setNumberStreet] = useState("");
     const [reference, setReference] = useState("");
     const [error, setError] = useState("");
 
-    const {currentOrder} = useSelector((state: any) => state.cart)
+    const [complet_address,setCustomAddress]=useState("")
+
     const [modalState,setModalState]=useState<boolean>(false)
 
     const [loading,setLoading]=useState<boolean>(false)
 
-    const dispatch=useDispatch()
+    const {handleCustomOrder}=useCart()
+
+    const updateAddress=useCallback((address)=>{
+
+        setTown(address.town?.slug)
+        setStreet(address.street)
+        setReference(address?.reference)
+        setNumberStreet(address?.number_street)
+        setCustomAddress(`${address.adresse ?? ""}`)
+
+    },[order])
+
 
     useEffect(() => {
-        if(currentOrder){
+        if(typeof window !=="undefined"){
+            const delivery_address = localStorage.getItem("thalia_eat_order_delivery_address")
+            let address=delivery_address
+            if(typeof delivery_address=="string"){
+                address=JSON.parse(delivery_address)
+            }
 
-            setTown(currentOrder.town_id?.slug)
-            setStreet(currentOrder.street)
-            setReference(currentOrder?.reference_adresse)
-            setNumberStreet(currentOrder?.number_street)
+            if(address){
+                updateAddress(address)
+                handleCustomOrder(address.town)
+            }
+
         }
-    }, [currentOrder]);
 
-    const handlerSendData = (e) => {
+    }, []);
+
+
+    useEffect(() => {
+        if(order?.data){
+
+            const {adresse:address}=order.data
+            if(address){
+               updateAddress(address)
+            }
+        }
+    }, [order?.data]);
+
+    const handlerSendData = (e:any) => {
         e.preventDefault();
         let close=null;
 
@@ -56,30 +91,37 @@ const ConfirmAdress = () => {
                 setError("Veuillez remplir tous les champs");
                 return;
             } else {
-                const formData = {
-                    town,
-                    street,
-                    number_street:numberStreet,
-                    reference,
-                };
 
+
+                const current_address= {
+                    adresse: `${street} ${numberStreet} ${town}`,
+                    town: data?.town?.find(item=>item.slug==town),
+                    reference: reference,
+                    street: street,
+                    number_street: numberStreet
+                }
+
+                setCustomAddress(`${current_address.street} ${current_address?.number_street} ${current_address?.reference ?? ""} ${current_address?.town?.title ?? ""}`)
+                localStorage.setItem("thalia_eat_order_delivery_address",JSON.stringify(current_address))
+
+                handleCustomOrder(current_address?.town)
 
                 close=true
-                dispatch(updateAddresseCurrentOrder(formData))
 
 
-                // Réinitialiser tous les champs du formulaire
             }
         }
         catch (e) {
 
         }finally {
             if(close){
-                setModalState(false)
-                notification("Votre adresse de livraison a été mis à jour")
+                setTimeout(()=>{
+                    setLoading(false)
+                    notification("Votre adresse est enregistré avec success")
+                    setModalState(false)
+                },1000)
             }
 
-            setLoading(false)
         }
 
     };
@@ -93,7 +135,7 @@ const ConfirmAdress = () => {
         </div>
 
         <div className={"mb-2"}>
-            <p className={'text-muted'}>{currentOrder?.user_delivery_complet_adress}</p>
+            <p className={'text-muted'}>{complet_address}</p>
         </div>
 
 
@@ -128,7 +170,7 @@ const ConfirmAdress = () => {
                                     value={town}
                                 >
                                     <option value="" className="text-sm">
-                                        Selectionner la commune
+                                        Sélectionner la commune
                                     </option>
                                     {data?.town?.map((town:any) => {
                                         return <option value={town.slug} key={town.uid}>

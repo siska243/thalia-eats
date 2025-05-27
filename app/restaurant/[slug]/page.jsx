@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, {Suspense} from "react";
 
 import { Route } from "@/helpers/Route";
 import SlugData from "@/app/restaurant/[slug]/slug-data";
@@ -25,8 +25,8 @@ export default async function restaurants({ params }) {
   const { data } = await fetch(slug)
 
   return (
-    <>
+    <Suspense>
       <SlugData slug={slug} restaurant={data} />
-    </>
+    </Suspense>
   );
 }

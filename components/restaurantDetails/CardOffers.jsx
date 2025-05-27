@@ -2,14 +2,16 @@ import useCreateOrdering from "@/hooks/useCreateOrdering";
 import Image from "next/image";
 
 import { FaCirclePlus } from "react-icons/fa6";
+import useCart from "@/hooks/useCart";
 
 export default function CardOffers({ product }) {
 
-  const { ordering, handleAddProduct, removeProduct } = useCreateOrdering()
+
+    const {handleAddProductCart}=useCart()
 
   const fetchMenuProduct = (product) => {
 
-    handleAddProduct(product)
+      handleAddProductCart(product)
   }
   return (
     <div className="relative w-full overflow-hidden rounded-xl box-shadow-custom h-[250px] md:h-[300px]">

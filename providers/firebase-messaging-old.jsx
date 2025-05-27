@@ -25,7 +25,7 @@ const FirebaseMessaging = () => {
             .then((currentToken) => {
                 if (currentToken) {
                     FetchData.sendData(Route.send_expo_token, {expo_token: currentToken})
-                    // Envoyez ce jeton à votre serveur pour gérer les notifications push
+
                 } else {
                     console.warn("No registration token available.");
                 }

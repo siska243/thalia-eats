@@ -16,6 +16,9 @@ import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import Notify from "@/components/toastify/Notify";
 import {setFlexPayOrder} from "@/server/manageToken";
+import {useSelector} from "react-redux";
+import {OrderType} from "@/types/main";
+import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 
 const Page = () => {
 
@@ -27,6 +30,7 @@ const Page = () => {
 const CheckoutPage=()=>{
     const {isLargeScreen} = useIsLargeScreen()
 
+
     const [isLoading, setIsLoading] = useState(false)
 
     const [modalState, setModalState] = useState(false)
@@ -36,7 +40,6 @@ const CheckoutPage=()=>{
 
     const search = searchParams.get('params')
 
-    const router = useRouter()
 
     const handleCartPayement=async()=>{
 
@@ -49,6 +52,18 @@ const CheckoutPage=()=>{
                 const json=JSON.parse(decode)
                 json.method="cart"
 
+                if(!json?.order){
+
+                    return Notify("Oups veuillez recommencer svp","error");
+                }
+                json.pricing=json?.order?.pricing
+                json.products=json?.order?.products
+                json.address=json?.order?.adresse
+                json.total_price=json?.order.total_price
+
+                delete json.order
+
+
                 const response=await FetchData.sendData(Route.cart_checkout_commande,json)
 
                 if(response.name=="AxiosError"){
@@ -56,11 +71,17 @@ const CheckoutPage=()=>{
                     Notify(message, "error");
                 }
                 else{
-                    localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
+
+
+                    clearLocalStorageOrdering()
 
                     Notify(response.message, "success");
 
-                    window.location.href = response.data.url
+                    setTimeout(()=>{
+                        localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
+                        window.location.href = response.data.url
+                    },300)
+
                 }
             }
             catch (e){
@@ -81,26 +102,41 @@ const CheckoutPage=()=>{
             const decode = atob(search)
 
             if (decode) {
-                let data = JSON.parse(decode)
-                data.phone = phone
+                let json = JSON.parse(decode)
+                json.phone = phone
+
+                if(!json?.order){
+
+                    return Notify("Oups veuillez recommencer svp","error");
+                }
+                json.pricing=json?.order?.pricing
+                json.products=json?.order?.products
+                json.address=json?.order?.adresse
+                json.total_price=json?.order.total_price
+
+                delete json.order
+
                 setIsLoading(true)
 
                 try {
-                    const response = await FetchData.sendData(Route.valide_commande, data)
+                    const response = await FetchData.sendData(Route.valide_commande, json)
 
                     if (response.name === "AxiosError") {
                         const {response: {data: {message}}} = response;
                         Notify(message, "error");
                     } else {
 
-
-                        localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
+                        clearLocalStorageOrdering()
 
                         Notify(response.message, "success");
                         setModalState(false)
 
-                        router.prefetch("/payement/attente")
-                        return router.push("/payement/attente")
+                        setTimeout(()=>{
+                            localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
+                            window.location.href = "/payement/attente"
+                        },300)
+
+
                         //window.location.href = response.data.url
                     }
                 } catch (e) {
@@ -127,14 +163,14 @@ const CheckoutPage=()=>{
                             className="lg:max-w-sm p-6 bg-white shadow-lg rounded-lg">
                             <a href="#">
                                 <h5 className="mb-4 text-lg md:text-xl font-bold tracking-tight text-gray-900 dark:text-white">Paiement
-                                    par M-Pesa</h5>
+                                    par Mobile money</h5>
                             </a>
                             <div className={"w-full flex justify-center items-center"}>
                                 <Image className='h-[180px] object-contain' src={mpesa} alt={"mobile"} width={250} height={180}/>
                             </div>
 
                             <p className="mb-3 text-sm md:text-base font-normal text-gray-700 dark:text-gray-400">
-                                Réglez votre facture en toute simplicité directement via votre compte M-Pesa.
+                                Réglez votre facture via votre compte M-Pesa, Orange Money, Airtel Money.
                             </p>
                             <button
                                 onClick={() => setModalState(true)}

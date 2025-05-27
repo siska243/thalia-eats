@@ -13,6 +13,7 @@ import { Route } from "@/helpers/Route";
 import useReferentialData from "@/hooks/useQueryTanStack";
 import Loader from "@/components/Loader/Loader";
 import Hero from "@/components/home/Hero";
+import {Suspense} from "react";
 
 export default function Home() {
   const { data, isLoading, isError, isFetched } = useReferentialData({
@@ -39,15 +40,24 @@ export default function Home() {
       {/* hero section */}
       <Hero />
       {/* categorie des produits */}
-      <SectionDeals
-        data={data == undefined ? [] : data}
-        isLoading={isLoading}
-      />
+        <Suspense>
+            <SectionDeals
+                data={data ?? []}
+                isLoading={isLoading}
+            />
+        </Suspense>
+
       {/* section resto */}
-      <SectionResto data={data == undefined ? [] : data}
-        isLoading={isLoading} isError={isError} />
+        <Suspense>
+            <SectionResto data={data ?? [] }
+                          isLoading={isLoading} isError={isError} />
+        </Suspense>
+
       {/* section popular resto */}
-      <SectionPopularResto data={previews == undefined ? [] : previews} />
+        <Suspense>
+            <SectionPopularResto data={previews ?? [] } />
+        </Suspense>
+
       {/* section pub */}
       <SectionPub />
       {/* section partner */}

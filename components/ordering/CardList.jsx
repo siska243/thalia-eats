@@ -43,7 +43,7 @@ export default function CardList({ products }) {
         {/* bouton suppresion */}
 
         {/* bouton suppression */}
-        {isCurrentOrderEmpty && (
+        {!isCurrentOrderEmpty && (
           <button
             className="flex-shrink-0 text-gray-500 hover:text-red-600"
             onClick={() => removeProduct(product, quantity)}

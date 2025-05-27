@@ -5,7 +5,7 @@ import useReferentialData from "@/hooks/useQueryTanStack";
 export default function LivraisonInfo({ getFormData = (data) => {} }) {
   const { data, isLoading, isError, isFetched } = useReferentialData({
     url: Route.default,
-    queryKey: "dafault",
+    queryKey: "default",
   });
   const [town, setTown] = useState("");
   const [street, setStreet] = useState("");

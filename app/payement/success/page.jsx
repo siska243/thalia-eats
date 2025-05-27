@@ -16,20 +16,22 @@ export default function SuccessPage() {
     const router = useRouter()
     const dispatch=useDispatch()
 
-    const {currentOrder} = useSelector((state)=>state.cart)
     const handlerCheckPayement = async (uid) => {
         try {
             const response = await FetchData.sendData(Route.check_paiement, { uid })
-            clearLocalStorageOrdering()
-            localStorage.removeItem("flex_pay_number_order_thalia_eats")
+
             dispatch(fetchCurrentOrder())
             if(response?.name==="AxiosError"){
                 Notify(response?.response?.data?.title,'error',response?.response?.data?.message)
             }
             else{
-                Notify(response.title,'success',response.message)
 
-                dispatch(setCurrentOrder(null))
+                if(localStorage.getItem("flex_pay_number_order_thalia_eats")){
+                    clearLocalStorageOrdering()
+                    localStorage.removeItem("flex_pay_number_order_thalia_eats")
+                    Notify(response.title,'success',response.message)
+                }
+
             }
         } catch (e) {
             console.log(e);
@@ -37,19 +39,11 @@ export default function SuccessPage() {
     }
 
     useEffect(() => {
-        if (localStorage && typeof window !== "undefined") {
-            localStorage.removeItem("flex_pay_number_order_thalia_eats")
-
-            dispatch(fetchCurrentOrder())
-
+        if(typeof window !=="undefined" && localStorage.getItem("flex_pay_number_order_thalia_eats")){
+            handlerCheckPayement()
         }
+
     }, [])
-
-    useEffect(() => {
-        if (currentCommande?.uid) {
-            handlerCheckPayement(currentCommande.uid)
-        }
-    }, [currentCommande])
 
     if (isLoading) {
         return (

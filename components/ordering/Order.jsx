@@ -13,7 +13,7 @@ export default function Order({ ordering, removeProduct }) {
       </div> */}
 
       {/* commande list */}
-      <CommandeList ordering={ordering === undefined ? [] : ordering} removeProduct={removeProduct} />
+      <CommandeList ordering={ordering  ?? [] } removeProduct={removeProduct} />
     </section>
   );
 }
