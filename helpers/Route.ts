@@ -23,14 +23,18 @@ class Route
     static current_commande =`${this.user}/commande/current`
     static valide_commande = `${this.user}/commande/valide`
     static check_paiement =`${this.user}/commande/check-paiement`
+    static cancel_paiement=`${this.user}/commande/cancel`
     // pour suivre mes commandes
     static traitement_commande =`${this.user}/commande/traitement`
+
+    //
+    static get_track_uid=(uid:string)=>`${this.user}/commande/get-track/${uid}`
 
     // pour supprimer un produit dans la commande
     static delete_produit_commande =`${this.user}/commande/delete-product`
     static add_produit_commande =`${this.user}/commande/add-product`
     // pour voir l'historique de mes commandes
-    static historique_commande =`${this.user}/commande/tracking`
+    static historique_commande =`${this.user}/commande/past`
     // pour suivre ma commande
     static tracking_commande =`${this.user}/commande/tracking`
     static cart_checkout_commande = `${this.user}/commande/valide`

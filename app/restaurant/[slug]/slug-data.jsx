@@ -53,7 +53,7 @@ export default function SlugData({slug, restaurant}) {
         <div className="pt-[220px] md:pt-[230px]">
             <Suspense>
                 <BannerResto
-                    restaurant={restaurant.data == undefined ? [] : restaurant.data}
+                    restaurant={restaurant?.data ?? [] }
                 />
             </Suspense>
             <Suspense>

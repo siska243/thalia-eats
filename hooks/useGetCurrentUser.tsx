@@ -24,12 +24,15 @@ export default function useGetCurrentUser() {
     }, [])
 
 
-    if (error) {
-        dispatch(setIsAuth(false))
-    }
-    if (data) {
-        dispatch(setIsAuth(false))
-    }
+    useEffect(() => {
+        if (error) {
+            dispatch(setIsAuth(false))
+        }
+        if (data) {
+            dispatch(setIsAuth(false))
+        }
+    }, [error, data]);
+
 
     return {
         user: data ?? null,

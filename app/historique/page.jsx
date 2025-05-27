@@ -6,41 +6,21 @@ import { Route } from "@/helpers/Route";
 import Loader from "@/components/Loader/Loader";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Link from "next/link";
+import useReferentialData from "@/hooks/useQueryTanStack";
 
 export default function page() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+
+  const {data,isLoading}=useReferentialData({
+    url:Route.historique_commande,
+    queryKey:"get-historique"
+  })
+
   // Récupérer l'utilisateur connecté
   const { user } = useGetCurrentUser();
 
-  // Fonction pour récupérer l'historique des commandes
-  const fetchHistorique = async () => {
-    try {
-      setLoading(true);
-      const response = await FetchData.getData(Route.historique_commande);
-      if (response?.name === "AxiosError") {
-        console.error(response.error);
-      } else {
-        setData(response);
 
-        console.log('Historique des commandes:', response);
-        
-      }
-    } catch (error) {
-      console.error(
-        "Erreur lors du chargement de l'historique des commandes :",
-        error
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    fetchHistorique();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return <Loader />;
   }
 
@@ -71,7 +51,7 @@ export default function page() {
         </p>
         <Link
           data-aos="fade-up"
-          href="/restaurants"
+          href="/restaurant"
           className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg hover:bg-secondaryColor transition-colors"
         >
           Consulter les restaurants

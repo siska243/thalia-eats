@@ -32,10 +32,11 @@ const fetchData = async <T>(url: string): Promise<T> => {
  * @param params - Paramètres supplémentaires pour la requête
  * @returns Un objet avec les données, l'erreur et l'état de chargement
  */
-const useReferentialData = <T,>({ url, queryKey, params }: Props): ReactQueryResult<T,Error> => {
+const useReferentialData = <T,>({ url, queryKey, params,...rest }: Props): ReactQueryResult<T,Error> => {
     return useQuery<T, Error>({
         queryKey: [queryKey, params],
         queryFn: () => fetchData<T>(url),
+        ...rest
     });
 
 };

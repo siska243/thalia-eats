@@ -5,18 +5,18 @@ import { Route } from "@/helpers/Route";
 import useReferentialData from "@/hooks/useQueryTanStack";
 import { useState } from "react";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
+import {ProductType} from "@/types/main";
+import useCart from "@/hooks/useCart";
 
 
 
-export default function CardAll({ product }) {
-  const { slug } = useParams()
-  const [isLoading, setIsloading] = useState(false)
-  const [menu, setMenu] = useState([])
-  const { ordering, handleAddProduct, removeProduct } = useCreateOrdering()
+export default function CardAll({ product }:{product:ProductType}) {
 
-  const fetchMenuProduct = (product) => {
+    const {handleAddProductCart}=useCart()
 
-    handleAddProduct(product)
+  const fetchMenuProduct = (product:ProductType) => {
+
+      handleAddProductCart(product)
   }
 
   return (

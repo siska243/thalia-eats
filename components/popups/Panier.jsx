@@ -4,10 +4,15 @@ import PanierItems from "./PanierItems";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
 import Modal from "./Modal"
 import Link from "next/link";
+import useCart from "@/hooks/useCart";
+import {useSelector} from "react-redux";
 
 export default function Panier({ toggleShowPanier }) {
 
-  const { ordering, handleAddProduct, removeProduct, calculateTotalPrice } = useCreateOrdering()
+  const { calculateTotalPrice } = useCreateOrdering()
+
+  const {cart:ordering} = useSelector((state) => state.shop)
+  const {handleAddProductCart,handleRemoveProduct}=useCart()
   
 
   return (
@@ -23,8 +28,8 @@ export default function Panier({ toggleShowPanier }) {
               <div className="flex flex-col gap-4 overflow-y-scroll">
                 {ordering.map((item, index) => {
                   return <PanierItems key={index} item={item}
-                    handleDecrement={() => removeProduct(item.product,1)}
-                    handleIncrement={() => handleAddProduct(item.product,1)}
+                    handleDecrement={() => handleRemoveProduct(item.product)}
+                    handleIncrement={() => handleAddProductCart(item.product)}
                   />;
                 })}
               </div>
@@ -37,7 +42,7 @@ export default function Panier({ toggleShowPanier }) {
                   <p className="">
                     Total: <span className="font-medium text-base md:text-lg">{calculateTotalPrice(ordering)} </span>
                   </p>
-                  <p>{ordering[0]?.product?.currency?.code}</p>
+                  <p>{ordering[0]?.currency?.code}</p>
                 </div>
                 <p className="text-sm text-gray-600 font-medium text-center md:text-left">
                   La livraison et les taxes seront calculées à l'étape suivante.
