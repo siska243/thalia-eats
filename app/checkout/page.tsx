@@ -4,11 +4,10 @@ import {useRouter, useSearchParams} from 'next/navigation'
 import {ActionIcon, AdvancedRadio, Button, Checkbox, Grid, Modal, Text, Title} from "rizzui";
 import useIsLargeScreen from "@/hooks/useLargeScreen";
 import cart from "@/public/assets/images/cart.svg"
-import mobile from "@/public/assets/images/mobile.svg"
-import mpesa from "@/public/assets/images/mpesa.png"
+import mpesa from "@/public/assets/images/mobile.jpeg"
 import Image from "next/image";
 import {XMarkIcon} from "@heroicons/react/20/solid";
-import {FormEventHandler, Suspense, useState} from "react";
+import {Suspense, useState} from "react";
 import PhoneNumber from "@/components/forms/phone-number";
 import Spinner from "@/components/Loader/Spinner";
 import {FaCircleArrowRight} from "react-icons/fa6";
