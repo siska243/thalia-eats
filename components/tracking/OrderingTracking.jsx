@@ -69,14 +69,6 @@ export default function OrderingTracking({data,refetch}) {
                             <strong>Téléphone :</strong> {driver.phone}
                         </p>
                     </div>
-                    <div>
-                        <p>
-                            <strong>Email :</strong> {driver.email}
-                        </p>
-                        <p>
-                            <strong>Adresse :</strong> {driver.principal_adresse}
-                        </p>
-                    </div>
                 </div>
             </div>
         );

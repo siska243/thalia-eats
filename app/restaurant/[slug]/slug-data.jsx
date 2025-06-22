@@ -45,6 +45,21 @@ export default function SlugData({slug, restaurant}) {
         })
         setProducts(products);
     };
+    
+    const handleProductByCategory=()=>{
+        const tabs=[]
+        subCategories?.forEach((items)=>{
+            const product=items.product.filter(i=>i.restaurant.slug==slug)
+            tabs.push({
+                ...items,
+                product
+            })
+        })
+        
+        return tabs;
+    }
+    
+
     if (isLoading) {
         return <Loader/>;
     }
@@ -108,8 +123,10 @@ export default function SlugData({slug, restaurant}) {
                 <section className="max-w-[1300px] mx-auto px-3 md:px-5 pb-6 md:pb-12">
                     <div data-aos="fade-up" className="flex flex-col gap-12">
                         {
-                            subCategories?.map((cat) => {
-                                return <SectionAll key={cat.uid} cat={cat}/>
+                            handleProductByCategory()?.map((cat,idx) => {
+                                
+                                console.log(cat)
+                                return <SectionAll key={idx} cat={cat}/>
                             })
                         }
                     </div>
