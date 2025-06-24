@@ -45,14 +45,14 @@ export default function SlugData({slug, restaurant}) {
         })
 
 
-        setProducts(products.filter(i => i.restaurant.slug == slug))
+        setProducts(products.flat().filter(i => i.restaurant?.slug == slug))
 
     };
 
     const handleProductByCategory = () => {
         const tabs = []
         subCategories?.forEach((items) => {
-            const product = items.product.filter(i => i.restaurant.slug == slug)
+            const product = items.product.filter(i => i.restaurant?.slug == slug)
             tabs.push({
                 ...items,
                 product
@@ -62,18 +62,7 @@ export default function SlugData({slug, restaurant}) {
         return tabs;
     }
 
-    const handleProductByCategory2 = () => {
-        const tabs = []
-        category_restaurant?.sub_category_product?.forEach((items) => {
-            const product = items.product.filter(i => i.restaurant.slug == slug)
-            tabs.push({
-                ...items,
-                product
-            })
-        })
 
-        return tabs;
-    }
 
 
     if (isLoading) {
