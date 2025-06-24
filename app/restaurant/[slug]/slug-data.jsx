@@ -43,22 +43,38 @@ export default function SlugData({slug, restaurant}) {
         sub_cat?.forEach(item => {
             products.push(item.product)
         })
-        setProducts(products);
+
+
+        setProducts(products.filter(i => i.restaurant.slug == slug))
+
     };
-    
-    const handleProductByCategory=()=>{
-        const tabs=[]
-        subCategories?.forEach((items)=>{
-            const product=items.product.filter(i=>i.restaurant.slug==slug)
+
+    const handleProductByCategory = () => {
+        const tabs = []
+        subCategories?.forEach((items) => {
+            const product = items.product.filter(i => i.restaurant.slug == slug)
             tabs.push({
                 ...items,
                 product
             })
         })
-        
+
         return tabs;
     }
-    
+
+    const handleProductByCategory2 = () => {
+        const tabs = []
+        category_restaurant?.sub_category_product?.forEach((items) => {
+            const product = items.product.filter(i => i.restaurant.slug == slug)
+            tabs.push({
+                ...items,
+                product
+            })
+        })
+
+        return tabs;
+    }
+
 
     if (isLoading) {
         return <Loader/>;
@@ -68,7 +84,7 @@ export default function SlugData({slug, restaurant}) {
         <div className="pt-[220px] md:pt-[230px]">
             <Suspense>
                 <BannerResto
-                    restaurant={restaurant?.data ?? [] }
+                    restaurant={restaurant?.data ?? []}
                 />
             </Suspense>
             <Suspense>
@@ -93,6 +109,7 @@ export default function SlugData({slug, restaurant}) {
                         {/*  categorie restaurant       */}
 
                         {category_restaurant?.data?.map((cat, index) => {
+
                             return (
                                 <>
                                     <button
@@ -115,7 +132,7 @@ export default function SlugData({slug, restaurant}) {
 
             {/* ********************* */}
             <Suspense>
-                <SectionOffers products={products == undefined ? [] : products}/>
+                <SectionOffers products={products === undefined ? [] : products}/>
             </Suspense>
             {/* ********************** */}
 
@@ -123,9 +140,8 @@ export default function SlugData({slug, restaurant}) {
                 <section className="max-w-[1300px] mx-auto px-3 md:px-5 pb-6 md:pb-12">
                     <div data-aos="fade-up" className="flex flex-col gap-12">
                         {
-                            handleProductByCategory()?.map((cat,idx) => {
-                                
-                                console.log(cat)
+                            handleProductByCategory()?.map((cat, idx) => {
+
                                 return <SectionAll key={idx} cat={cat}/>
                             })
                         }
