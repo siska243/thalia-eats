@@ -157,7 +157,7 @@ export default function Signup() {
                   id="phone"
                   className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
                   required
-                  placeholder="ex:+33627758753"
+                  placeholder="ex:+24382********"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />

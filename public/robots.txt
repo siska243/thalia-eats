@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thaliaeats.com/sitemap.xml
