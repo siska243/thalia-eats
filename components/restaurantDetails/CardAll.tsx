@@ -22,10 +22,10 @@ export default function CardAll({ product }:{product:ProductType}) {
   return (
     <div className="relative w-full overflow-hidden box-shadow-custom flex  gap-3  justify-center items-center bg-secondaryColor h-[210px]">
       <div className="w-1/2 flex-shrink-0 p-4 md:py-5 md:px-5">
-        <h3 className="text-primaryColor font-semibold text-lg mb-3 lowercase first-letter:uppercase">
+        <h3 className="text-primaryColor font-semibold text-lg mb-3 lowercase first-letter:uppercase line-clamp-2">
           {product.title}
         </h3>
-        <p className="text-white font-light text-sm mb-5">
+        <p className="text-white font-light text-sm mb-5 !line-clamp-2">
           {product.description ? product.description : "Pas de description pour ce produit"}
         </p>
         <p className="text-secondaryColor font-[600] text-xs sm:text-sm bg-primaryColor inline-block p-2 box-shadow-custom">
