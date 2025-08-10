@@ -10,7 +10,7 @@ class FetchData {
             baseURL: this.BASE_URL(),
             headers: {
                 "X-API-KEY": "2-34x5-s-w9yh5iv7---",
-                Accept: "*/*",
+                Accept: "application/json",
                 "Content-Type": contentType || 'application/json',
             },
             timeout: 600000,

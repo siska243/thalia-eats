@@ -53,8 +53,8 @@ const useCart = () => {
 
         if(data){
 
-            Notify(`Vous avez une commande en attente de paiement, veuillez finaliser`,'error')
-            return
+            //Notify(`Vous avez une commande en attente de paiement, veuillez finaliser`,'error')
+            //return
         }
         const copy_cart: ShopType[] = [...cart]
         const value: ShopType = {
