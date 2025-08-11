@@ -70,16 +70,13 @@ const CheckoutPage=()=>{
                     Notify(message, "error");
                 }
                 else{
-
-
                     clearLocalStorageOrdering()
-
                     Notify(response.message, "success");
-
+                    localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
                     setTimeout(()=>{
-                        localStorage.setItem("flex_pay_number_order_thalia_eats",response.data.orderNumber)
+
                         window.location.href = response.data.url
-                    },300)
+                    },100)
 
                 }
             }
