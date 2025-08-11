@@ -9,11 +9,13 @@ import {calcul_price, customProduct, price_delivrery, total} from "@/helpers/cal
 import useDefaultData from "@/hooks/useCommandeData";
 import {useEffect} from "react";
 import useCurrentCommande from "@/hooks/useCurrentCommande";
-import Notify from "@/components/toastify/Notify";
+import useReferentialData from "@/hooks/useQueryTanStack";
+import {Route} from "@/helpers/Route";
+
 
 const useCart = () => {
 
-    const {data,refetch}=useCurrentCommande()
+    const {data}=useCurrentCommande()
 
     const {cart} = useSelector((state: {
         shop: {
@@ -25,8 +27,8 @@ const useCart = () => {
     }) => state.shop)
 
 
+    const {data:townData,refetch}=useReferentialData({url: Route.default, queryKey: 'query-default-data-account-user'});
 
-    const {data: townData} = useDefaultData()
 
     const updatePriccing=(custom_cart=null)=>{
         if (townData) {
@@ -42,6 +44,7 @@ const useCart = () => {
 
     useEffect(() => {
         if (typeof window !== "undefined" && localStorage.getItem("thalia_eat_order_delivery_address")) {
+            refetch()
            updatePriccing()
         }
     }, [townData]);
@@ -49,8 +52,9 @@ const useCart = () => {
     const dispatch = useDispatch()
 
 
-    const handleAddProductCart = (product: ProductType) => {
+    const handleAddProductCart = async (product: ProductType) => {
 
+        await refetch()
         if(data){
 
             //Notify(`Vous avez une commande en attente de paiement, veuillez finaliser`,'error')
@@ -91,6 +95,7 @@ const useCart = () => {
         } else {
             newCart = [...copy_cart, value];
         }
+        
 
         const title = `Vous avez ajouter le produit ${product.title} dans votre panier`
         notification(title)
@@ -102,10 +107,11 @@ const useCart = () => {
 
         updatePriccing(newCart)
 
-        refetch()
+
 
     }
-    const handleRemoveProduct = (product: ProductType) => {
+    const handleRemoveProduct = async (product: ProductType) => {
+        await refetch()
         const copy_cart: ShopType[] = [...cart]
         const findIndex = copy_cart.findIndex(
             (item) => item.product.slug === product.slug
@@ -139,7 +145,6 @@ const useCart = () => {
 
         updatePriccing(newCart)
 
-        refetch()
     }
 
     const handleDeleteAll = () => {
