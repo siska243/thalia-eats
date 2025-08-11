@@ -36,6 +36,7 @@ const useReferentialData = <T,>({ url, queryKey, params,...rest }: Props): React
     return useQuery<T, Error>({
         queryKey: [queryKey, params],
         queryFn: () => fetchData<T>(url),
+        retry: false,
         ...rest
     });
 
