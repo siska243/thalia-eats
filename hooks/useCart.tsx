@@ -6,7 +6,6 @@ import {setOrderCart, setShopCart} from "@/store/reducers/shopSlice";
 import {clearLocalStorageOrdering, setLocalStorageOrdering} from "@/helpers/localstorage-data";
 import {notification} from "@/hooks/useCreateOrdering";
 import {calcul_price, customProduct, price_delivrery, total} from "@/helpers/calculePrice";
-import useDefaultData from "@/hooks/useCommandeData";
 import {useEffect} from "react";
 import useCurrentCommande from "@/hooks/useCurrentCommande";
 import useReferentialData from "@/hooks/useQueryTanStack";

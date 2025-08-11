@@ -54,13 +54,13 @@ export const price_delivrery = (current_price, town_pricings = [], town) => {
     const filterPricing=town_pricings?.filter(item=>item.town.slug===town?.slug)
 
     if(filterPricing?.length>0){
-        const findPricing = filterPricing.find(
+        const findPricing = filterPricing?.find(
             item => current_price >= item.interval_pricing && current_price <= item.interval_max_price
         );
 
         return {
             frais_livraison:findPricing?.frais_livraison ?? 0,
-            service_price:findPricing.service_price ?? 0,
+            service_price:findPricing?.service_price ?? 0,
             currency:findPricing?.currency ?? null
         }
     }
