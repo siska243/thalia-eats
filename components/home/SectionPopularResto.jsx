@@ -4,6 +4,7 @@ import CardPopularResto from "./CardPopularResto";
 
 export default function SectionPopularResto({ data }) {
 
+    const shuffledProducts = data?.sort(() => 0.5 - Math.random()).slice(0, 10);
   return (
     <section className="my-6 lg:my-12 max-w-[1300px] mx-auto px-3 md:px-5">
       <div>
@@ -11,7 +12,7 @@ export default function SectionPopularResto({ data }) {
           Les plats populaires
         </h2>
         <div data-aos="fade-up" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {data?.data?.map((preview) => {
+          {shuffledProducts?.map((preview) => {
             return (
               <CardPopularResto key={preview.uid} preview={preview} />
             );

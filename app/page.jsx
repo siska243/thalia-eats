@@ -15,6 +15,21 @@ import Loader from "@/components/Loader/Loader";
 import Hero from "@/components/home/Hero";
 import {Suspense} from "react";
 
+
+function shuffle(array,count=10) {
+    let currentIndex = array.length, randomIndex;
+
+    while (currentIndex !== 0) {
+
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+
+    return array.slice(0, count);
+}
 export default function Home() {
   const { data, isLoading, isError, isFetched } = useReferentialData({
     url: Route.categorie,
@@ -49,13 +64,13 @@ export default function Home() {
 
       {/* section resto */}
         <Suspense>
-            <SectionResto data={data ?? [] }
+            <SectionResto data={data ?? []}
                           isLoading={isLoading} isError={isError} />
         </Suspense>
 
       {/* section popular resto */}
         <Suspense>
-            <SectionPopularResto data={previews ?? [] } />
+            <SectionPopularResto data={previews?.data ?? [] } />
         </Suspense>
 
       {/* section pub */}

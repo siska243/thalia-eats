@@ -12,7 +12,7 @@ export default function SectionResto({ data, isLoading, isError }) {
     )
   );
   // Étape 2 : Mélanger les produits
-  const shuffledProducts = allProducts.sort(() => 0.5 - Math.random());
+  const shuffledProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 6);
   return (
     <section className="mt-6 lg:mt-12 max-w-[1300px] mx-auto px-3 md:px-5">
       <div className="border-b pb-10">
