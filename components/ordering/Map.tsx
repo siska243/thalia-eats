@@ -5,13 +5,10 @@ import {useQuery} from "@tanstack/react-query";
 import useReferentialData from "@/hooks/useQueryTanStack";
 import {Route} from "@/helpers/Route";
 import {Badge} from "rizzui";
+import useHookAddressToLnAndLat from "@/hooks/useHookAdressToLnAndLat";
 
 const containerStyle = { width: "100%", height: "500px" };
 
-
-const CLIENT_POSITION = { lat: 48.858370, lng: 2.294481 };
-
-const DRIVER_POSITION = { lat: 49.868370, lng: 2.294481 };
 
 export default function TrackingPage({currentOrder}:{currentOrder:any}) {
 
@@ -24,8 +21,10 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
         staleTime: 0,
     })
 
+    const {converterAddressToLatLng}=useHookAddressToLnAndLat()
 
     const [driverPosition, setDriverPosition] = useState<{ lat: number; lng: number } | null>(null);
+    const [clientPosition, setClientPosition] = useState<{ lat: number; lng: number } | null>(null);
 
     const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
 
@@ -36,6 +35,18 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
         libraries: ['places'],
     });
+    
+
+    useEffect(()=>{
+
+        if(currentOrder?.user_delivery_complet_adress){
+            converterAddressToLatLng(currentOrder?.user_delivery_complet_adress).then((res)=>{
+                setClientPosition(res)
+            })
+        }
+    },[currentOrder])
+
+
 
 
     useEffect(() => {
@@ -60,8 +71,7 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
         );
     }, [driverPosition, isLoaded,currentOrder]);
 
-
-
+    
     useEffect(() => {
 
         if(data?.location_delivery){
@@ -85,7 +95,7 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
                     </div>
                     <GoogleMap
                         mapContainerStyle={containerStyle}
-                        center={driverPosition || CLIENT_POSITION}
+                        center={driverPosition || clientPosition}
                         zoom={driverPosition ? 14 : 12}
                     >
                         {driverPosition && (
@@ -98,7 +108,7 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
                             />
                         )}
                         <Marker
-                            position={CLIENT_POSITION}
+                            position={data?.location_customer ?? clientPosition}
                         />
                         {directions && (
                             <DirectionsRenderer

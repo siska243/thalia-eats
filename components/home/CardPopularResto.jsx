@@ -10,7 +10,7 @@ export default function CardPopularResto({ preview }) {
     >
       <Image src={preview.picture} width={300} height={100} alt={preview.title} className="w-full h-[150px] object-cover" />
       <div className="p-3 bg-primaryColor">
-        <p className=" text-base font-semibold text-center text-white">
+        <p className=" text-base font-semibold text-center text-white line-clamp-1">
           {preview.title}
         </p>
       </div>
