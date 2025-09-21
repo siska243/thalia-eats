@@ -42,7 +42,8 @@ export default function SectionPub() {
             </p>
             <div className="flex gap-2 mt-3 sm:flex-row flex-col justify-center items-center">
               <Link
-                href="/"
+                href="https://testflight.apple.com/join/WCbCp2d3"
+                target={"_blank"}
                 className="w-[150px] h-[40px] md:h-[50px] rounded-lg overflow-hidden"
               >
                 <Image
@@ -52,7 +53,8 @@ export default function SectionPub() {
                 />
               </Link>
               <Link
-                href="/"
+                href="https://play.google.com/store/apps/details?id=com.thalia_eats.app"
+                target={"_blank"}
                 className="w-[150px] h-[40px] md:h-[50px] rounded-lg overflow-hidden"
               >
                 <Image
