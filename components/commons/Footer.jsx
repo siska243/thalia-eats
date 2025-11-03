@@ -75,7 +75,7 @@ export default function Footer() {
                 <MdOutlineWhatsapp />
               </span>
               <Link href="https://wa.me/33627758753" className="text-base font-[500] underline">
-                +33 6 27 75 87 53
+                +33 6 05 86 42 76
               </Link>
             </div>
 
@@ -87,7 +87,7 @@ export default function Footer() {
       <section className="bg-secondaryColor ">
         <div className="py-5 max-w-[1300px] mx-auto px-5">
           <p className="text-xs text-center text-gray-300">
-            ThaliaEats Copyright 2024, Tous droits réservés.
+            ThaliaEats Copyright 2025, Tous droits réservés.
           </p>
         </div>
       </section>
