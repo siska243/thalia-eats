@@ -47,10 +47,10 @@ export default function Footer() {
                         Pages légales
                     </h5>
                     <div className="flex flex-col gap-3">
-                        <Link href="/" className="text-sm font-normal underline">
+                        <Link href="/privacy" className="text-sm font-normal underline">
                             Conditions d'utilisation
                         </Link>
-                        <Link href="/" className="text-sm font-normal underline">
+                        <Link href="/privacy" className="text-sm font-normal underline">
                             Confidentialité
                         </Link>
                     </div>
