@@ -11,6 +11,8 @@ class Route
     // static menu_product_restaurant=(slugRestaurant:string,slugProduct:string)=>`menu/${slugRestaurant}/${slugProduct}`
     static default="default"
     static produits_a_la_une="default/preview"
+    // chiffrage serveur : plat + livraison + service
+    static quote="quote"
     static send_expo_token=`${this.user}/update/expo/token`
   
     static logout = "auth/logout"
