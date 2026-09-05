@@ -13,6 +13,7 @@ class Route
     static produits_a_la_une="default/preview"
     // chiffrage serveur : plat + livraison + service
     static quote="quote"
+    static products_search="products/search"
     static send_expo_token=`${this.user}/update/expo/token`
   
     static logout = "auth/logout"
