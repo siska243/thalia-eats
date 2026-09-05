@@ -14,6 +14,7 @@ class Route
     // chiffrage serveur : plat + livraison + service
     static quote="quote"
     static products_search="products/search"
+    static budget_suggestions="budget-suggestions"
     static send_expo_token=`${this.user}/update/expo/token`
   
     static logout = "auth/logout"
