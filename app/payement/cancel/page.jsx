@@ -1,84 +1,63 @@
 "use client"
-import useCurrentCommande from '@/hooks/useCurrentCommande'
 import React, {useEffect} from 'react'
 import {useRouter} from 'next/navigation'
-import {Route} from '@/helpers/Route'
-import {FetchData} from "@/helpers/FetchData";
-import Loader from '@/components/Loader/Loader'
 import {MdCancel} from "react-icons/md";
-import {useDispatch} from "react-redux";
-import {fetchCurrentOrder} from "@/store/reducers/cartSlice";
-import {setOrderCart, setShopCart} from "@/store/reducers/shopSlice";
 
+/**
+ * Retour d'un paiement abandonné.
+ *
+ * Cette page appelait `/commande/cancel` au chargement, c'est-à-dire qu'elle
+ * ANNULAIT LA COMMANDE. Abandonner un paiement — fermer l'onglet du
+ * prestataire, revenir en arrière, manquer de réseau — détruisait donc la
+ * commande, alors que le client voulait seulement réessayer plus tard. Elle
+ * vidait aussi le panier, ne laissant rien à reprendre.
+ *
+ * C'est très probablement l'origine des commandes trouvées en base avec
+ * `cancel_at` renseigné et le statut resté à « en attente de paiement » : une
+ * annulation partielle, écrite par cette page.
+ *
+ * Désormais elle n'écrit rien. La commande reste en attente de paiement, et le
+ * client repart de `/ordering` pour la régler. L'annulation, elle, reste
+ * possible depuis « Mes commandes » — un geste explicite, avec confirmation.
+ */
 export default function CancelPage() {
     const router = useRouter();
-    const {currentCommande, isLoading, isError, isFetched} = useCurrentCommande()
-    const dispatch=useDispatch()
-    const handlerCheckPayement = async () => {
-        try {
-            const response = await FetchData.sendData(Route.cancel_paiement, {})
-
-            if(response?.name=="AxiosError"){
-
-            }
-            else{
-                localStorage.removeItem("flex_pay_number_order_thalia_eats")
-                dispatch(setShopCart([]))
-                dispatch(setOrderCart({
-                    data:null,
-                    is_passed:false
-                }))
-            }
-
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-
 
     useEffect(() => {
-        if (localStorage && typeof window !== "undefined") {
-            localStorage.removeItem("flex_pay_number_order_thalia_eats")
-            handlerCheckPayement()
-        }
-    }, [])
+        if (typeof window === "undefined") return;
 
-
-
-    if (isLoading) {
-        return (
-            <Loader/>
-        )
-    }
+        // Seule chose à effacer : la référence du paiement abandonné, que la
+        // page d'attente interrogerait sinon indéfiniment. Le panier et la
+        // commande ne sont pas touchés.
+        localStorage.removeItem("flex_pay_number_order_thalia_eats");
+    }, []);
 
     return (
         <div className="flex items-center justify-center h-screen pt-[150px] bg-gray-50 px-4 sm:px-6 lg:px-8">
             <div data-aos="fade-left"
                  className="bg-white box-shadow-custom rounded-lg p-6 sm:p-8 lg:p-10 max-w-xl w-full text-center">
                 <div data-aos="fade-left" className="flex justify-center mb-4 md:mb-6">
-                    {/* SVG pour annulation */}
                     <MdCancel className="w-12 h-12 md:w-16 md:h-16 text-yellow-500"/>
                 </div>
                 <h1 data-aos="fade-left" className="text-xl sm:text-2xl font-bold text-yellow-600 mb-4">
-                    Commande annulée !
+                    Paiement annulé
                 </h1>
                 <p data-aos="fade-left" className="text-sm sm:text-base text-gray-600 mb-6">
-                    Vous avez annulé votre commande. Si c'était une erreur, vous pouvez
-                    relancer le processus ou nous contacter pour toute question.
+                    Votre commande est conservée, elle attend simplement son règlement.
+                    Vous pouvez reprendre le paiement quand vous le souhaitez.
                 </p>
                 <div data-aos="fade-left" className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
-                        onClick={() => router.push("/restaurants")}
+                        onClick={() => router.push("/ordering")}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 sm:px-6 rounded-md transition duration-200 text-sm md:text-base shadow-md hover:shadow-lg"
                     >
-                        Retourner aux restaurants
+                        Reprendre le paiement
                     </button>
                     <button
-                        onClick={() => router.push("/support")}
+                        onClick={() => router.push("/historique")}
                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-4 sm:px-6 rounded-md transition duration-200 text-sm md:text-base shadow-md hover:shadow-lg"
                     >
-                        Contacter le support
+                        Mes commandes
                     </button>
                 </div>
             </div>

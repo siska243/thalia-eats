@@ -76,7 +76,7 @@ export default function OrderingTracking({data,refetch}) {
 
     const handleCancelOrder=async (uid)=>{
 
-        const response = await FetchData.sendData(Route.cancel_paiement,{uid})
+        const response = await FetchData.sendData(Route.cancel_commande,{uid})
 
         if(response.name=="AxiosError"){
             notification(response.response?.data?.message)
