@@ -30,7 +30,17 @@ class FetchData {
 
     BASE_URL = () => API_BASE_URL;
 
-    instance = (contentType) => {
+    /**
+     * `avecJeton` a false ne pose pas l'en-tete Authorization.
+     *
+     * C'est ce qu'il faut pour le lien de paiement d'une pre-commande : son
+     * autorisation est la signature de l'URL, pas un jeton. Cote backend,
+     * RefuserAgentSansAbility refuse tout jeton porteur d'abilities sur une
+     * route qui n'en declare aucune — et cette route n'en declare aucune,
+     * volontairement. Un visiteur dont le navigateur traine un jeton d'assistant
+     * verrait donc son propre lien rejete en 403. On n'envoie rien.
+     */
+    instance = (contentType, avecJeton = true) => {
         const http = axios.create({
             baseURL: this.BASE_URL(),
             headers: {
@@ -43,7 +53,7 @@ class FetchData {
 
         http.interceptors.request.use(
             async (config) => {
-                const token = await getToken()
+                const token = avecJeton ? await getToken() : null
 
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
@@ -136,6 +146,37 @@ class FetchData {
             return response.data;
         } catch { }
     }
+    /**
+     * Les deux appels du lien de paiement d'une pre-commande : signes par
+     * l'URL, jamais par un jeton. Meme convention d'erreur que le reste de la
+     * classe — l'erreur axios est RETOURNEE, pas levee.
+     */
+    static async getSigned(url) {
+        try {
+            const $req = new FetchData().instance("application/json", false);
+            const response = await $req.get(url).then((e) => e).catch((e) => e);
+
+            if (response?.name === "AxiosError") return response;
+
+            return response.data;
+        } catch (e) {
+            return e;
+        }
+    }
+
+    static async postSigned(url, data) {
+        try {
+            const $req = new FetchData().instance("application/json", false);
+            const response = await $req.post(url, data).then((e) => e).catch((e) => e);
+
+            if (response?.name === "AxiosError") return response;
+
+            return response.data;
+        } catch (e) {
+            return e;
+        }
+    }
+
     static async putData(url, data, $token) {
         try {
             let $req = new FetchData().instance($token, "application/json");

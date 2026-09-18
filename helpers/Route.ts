@@ -49,6 +49,14 @@ class Route
     static tracking_commande =`${this.user}/commande/tracking`
     static cart_checkout_commande = `${this.user}/commande/valide`
 
+    // Le lien de paiement d'une pre-commande, remis au client par son
+    // assistant. La chaine de requete porte `expires` et `signature` : elle
+    // vient du lien lui-meme et doit etre repassee telle quelle, sinon le
+    // backend ne peut pas verifier la signature — elle a ete calculee sur
+    // CETTE URL d'API, hote compris.
+    static lien_paiement_precommande=(uid:string,query:string):string=>
+        `precommandes/${encodeURIComponent(uid)}/lien-paiement${query ? `?${query}` : ""}`
+
     static update_address_delivery=`${this.user}/commande/update-address-delivery`
     static swr_check_paiement =(params:string)=>`${this.user}/commande/swr-check-paiement/${params}`
     

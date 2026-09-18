@@ -14,6 +14,15 @@ import Link from "next/link";
  * l'ecran sans pouvoir defiler des que le telephone etait petit ou le clavier
  * ouvert.
  */
+/**
+ * @param {{
+ *   ton?: "succes" | "attente" | "echec" | "neutre",
+ *   icone?: any,
+ *   titre?: string,
+ *   message?: string,
+ *   actions?: Array<{href: string, label: string}>,
+ * }} props
+ */
 export default function EcranPaiement({ton = "neutre", icone, titre, message, actions = []}) {
     const tons = {
         succes: "bg-success-surface text-success",
