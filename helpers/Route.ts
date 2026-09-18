@@ -16,6 +16,12 @@ class Route
     static products_search="products/search"
     static budget_suggestions="budget-suggestions"
     static send_expo_token=`${this.user}/update/expo/token`
+
+    // Assistants connectes (Claude, ChatGPT...). Le client les liste et les
+    // revoque depuis son compte : un acces qu'on ne peut pas retirer n'est pas
+    // un acces qu'on accorde volontiers.
+    static assistants=`${this.user}/assistants`
+    static assistant_delete=(uid:string):string=>`${this.user}/assistants/${uid}`
   
     static logout = "auth/logout"
     // mise à jour des informations de l'utilisateur

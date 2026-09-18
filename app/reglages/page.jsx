@@ -1,26 +1,30 @@
+import AssistantsConnectes from "@/components/account/AssistantsConnectes";
 import EditCompte from "@/components/account/EditCompte";
 import Information from "@/components/account/Informations";
-import logo from "@/public/assets/logo-thalia.png";
 
-export default function page() {
-  return (
+/** Le compte : les informations, l'adresse, le mot de passe, les assistants. */
+export default function PageReglages() {
+    return (
+        <div className="min-h-svh bg-surface-sunken pt-[var(--header-h)]">
+            <div className="mx-auto flex max-w-[1300px] flex-col gap-6 px-4 pb-12 pt-6 sm:px-5">
+                <header>
+                    <h1 className="text-display font-extrabold text-secondaryColor">
+                        Mon compte
+                    </h1>
+                    <p className="mt-1 text-caption text-ink-muted">
+                        Vos informations, votre adresse de livraison, votre mot de passe et les
+                        assistants connectés à votre compte.
+                    </p>
+                </header>
 
-    <div className="min-h-screen bg-[#F3F4F6] h-full pt-[220px] md:pt-[200px] "
-      // style={{
-      //   backgroundImage: `linear-gradient(rgba(3, 8, 31, 0.92), rgba(3, 8, 31, 0.92)), url(${logo.src})`,
-      //   backgroundSize: 'cover',
-      //   backgroundPosition: 'center',
-      //   backgroundRepeat: 'no-repeat',
-      // }}
-      >
-      <div className="max-w-[1300px] mx-auto px-4 md:px-5  gap-8 pb-10 pt-3 flex flex-col">
-        <div className="rounded-xl bg-white box-shadow-custom shadow-2xl h-full">
-          <Information />
+                <div className="rounded-card bg-surface shadow-card">
+                    <Information />
+                </div>
+
+                <EditCompte />
+
+                <AssistantsConnectes />
+            </div>
         </div>
-        <div className="h-full">
-          <EditCompte />
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
