@@ -1,7 +1,7 @@
 import "./globals.css";
 import Footer from "@/components/commons/Footer";
 import Header from "@/components/commons/Header";
-import {Analytics} from "@vercel/analytics/react";
+import AnalytiqueNettoyee from "@/components/analytics/AnalytiqueNettoyee";
 import AosInit from "@/components/commons/AosInit";
 import GlobalProvider from "@/providers/global-provider";
 
@@ -47,7 +47,7 @@ export default function RootLayout({children}) {
             <Header/>
             <main className="min-h-screen bg-white">{children}</main>
             <Footer/>
-            <Analytics/>
+            <AnalytiqueNettoyee />
         </GlobalProvider>
         <script
             type="application/ld+json"

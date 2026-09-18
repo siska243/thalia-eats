@@ -23,6 +23,11 @@
  * D'ou ce module partage : une seule definition du nettoyage, branchee sur les
  * trois configurations. En avoir trois copies, c'est garantir qu'une seule
  * sera corrigee le jour ou un champ s'ajoute.
+ *
+ * `nettoyerUrl` sert au-dela de Sentry : `components/analytics/AnalytiqueNettoyee`
+ * s'en sert aussi pour la charge utile de Vercel Web Analytics, qui relevait la
+ * page vue depuis `location.href`, chaine de requete comprise. Le nom du
+ * fichier dit son premier usage, pas sa portee.
  */
 
 /** Les parametres qui ne doivent jamais quitter le produit. */
