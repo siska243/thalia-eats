@@ -1,13 +1,18 @@
+"use client";
+
 import { FetchData } from "@/helpers/FetchData";
 import { Route } from "@/helpers/Route";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import React, { useState } from "react";
 import {removeToken} from "@/server/manageToken";
+import Notify from "@/components/toastify/Notify";
 
 export default function Settings({ isSettingOpen, isMobile }) {
   const [loading, setLoading] = useState(false);
   const { user } = useGetCurrentUser();
+  const router = useRouter();
 
   const handlerLogout = async () => {
     if (user) {
@@ -17,12 +22,16 @@ export default function Settings({ isSettingOpen, isMobile }) {
 
         if (response.success) {
           await removeToken()
-          window.location.href = '/';
+          // Meme raison qu'a la connexion : le cookie de session vit cote
+          // serveur, `refresh()` fait relire l'etat deconnecte aux pages
+          // rendues la-bas sans recharger toute l'application.
+          router.replace('/');
+          router.refresh();
         } else {
-          console.log("oups");
-
+          Notify("Déconnexion impossible, réessayez", "error");
         }
-      } catch (error) {
+      } catch {
+        Notify("Déconnexion impossible, réessayez", "error");
       } finally {
         setLoading(false);
       }

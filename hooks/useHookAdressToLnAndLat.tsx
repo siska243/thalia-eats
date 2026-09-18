@@ -31,7 +31,7 @@ const useHookAddressToLnAndLat = () => {
     }
 
 
-    function getCurrentLocation() {
+    function getCurrentLocation(): Promise<{lat: number; lng: number}> {
         return new Promise((resolve, reject) => {
             if (!("geolocation" in navigator)) {
                 return reject(new Error("La géolocalisation n'est pas supportée."));
@@ -56,9 +56,8 @@ const useHookAddressToLnAndLat = () => {
 
                 setLat(coords.lat)
                 setLng(coords.lng)
-                console.log("Latitude:", coords.lat, "Longitude:", coords.lng);
             } catch (e) {
-                console.error("Erreur:", e.message);
+                console.error("Position indisponible", e);
             }
         })();
     }, []);

@@ -1,144 +1,133 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import {useEffect, useState} from "react";
 import Link from "next/link";
-import { FaLocationDot } from "react-icons/fa6";
-import { FaShoppingBag,FaHistory } from "react-icons/fa";
-import { MdLocalShipping } from "react-icons/md";
+import {useSelector} from "react-redux";
+import {FaLocationDot} from "react-icons/fa6";
+import {FaHistory, FaShoppingBag} from "react-icons/fa";
+import {MdLocalShipping} from "react-icons/md";
 import Panier from "../popups/Panier";
-import useCreateOrdering from "@/hooks/useCreateOrdering";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {calcul_price, calcul_quantity} from "@/helpers/calculePrice";
-import {useSelector} from "react-redux";
-import {getLocalstorageOrdering} from "@/helpers/localstorage-data";
+import {formatPrix} from "@/helpers/openingHours";
 
-
+/**
+ * La barre du haut : adresse de livraison a gauche, panier a droite.
+ *
+ * Elle faisait `if (!mounted) return null`, c'est-a-dire qu'elle n'existait pas
+ * au premier rendu. L'en-tete naissait donc court, puis grandissait d'une
+ * soixantaine de pixels apres l'hydratation, et toute la page sautait vers le
+ * bas. Elle se rend maintenant toujours : seuls les chiffres du panier — qui
+ * viennent du stockage local et ne peuvent pas etre connus du serveur —
+ * attendent le montage, a zero.
+ *
+ * Le bloc panier etait aussi peint en `#3C8744`, un vert qui n'appartient a
+ * aucune palette du produit.
+ */
 export default function TopBar() {
-  const { user } = useGetCurrentUser();
-  const [showPanier, setShowPanier] = useState(false);
-  const [mounted, setMounted] = useState(false);
+    const {user} = useGetCurrentUser();
+    const {cart: ordering} = useSelector((state) => state.shop);
 
-  const {cart:ordering} = useSelector((state) => state.shop)
+    const [monte, setMonte] = useState(false);
+    const [showPanier, setShowPanier] = useState(false);
 
+    /*
+     * Garde d'hydratation : les chiffres du panier viennent du stockage local,
+     * que le serveur ne peut pas connaitre. Les rendre au premier passage
+     * provoquerait une divergence entre le HTML du serveur et celui du client.
+     *
+     * React n'offre pas d'autre primitive pour « suis-je hydrate » : c'est le
+     * seul `setState` dans un effet qui reste ici, et il est voulu.
+     */
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => setMonte(true), []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+    useEffect(() => {
+        if (!showPanier) return;
 
-  // Gestion du scroll quand le popup est ouvert
-  useEffect(() => {
-    if (showPanier) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [showPanier]);
+        const precedent = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
 
-  const toggleShowPanier = () => {
-    setShowPanier(!showPanier);
-  };
+        return () => {
+            document.body.style.overflow = precedent;
+        };
+    }, [showPanier]);
 
-  // On ne rend rien tant que le composant n'est pas monté côté client
-  if (!mounted) return null;
+    const compte = user?.user;
+    const aUneAdresse = Boolean(compte?.street);
 
-  return (
-    <>
-      <div className="pl-2 sm:pl-5 bg-fourthColor shadow-sm sm:rounded-xl sm:rounded-t-none border flex items-center justify-between overflow-hidden">
-        <div className="hidden md:flex gap-3 items-center">
-          <div>🌟</div>
-          <p className="font-[400] text-secondaryColor text-xs md:text-sm">
-            Commander en toute sécurité,{" "}
-            <span className="text-primaryColor">Thalia-Eats</span>
-          </p>
-        </div>
+    /*
+     * Le message d'accueil tenait sur trois lignes sur un telephone et poussait
+     * l'en-tete a 169 px de haut, un cinquieme de l'ecran. Le tronquer donnait
+     * « Commander en t… », ce qui est pire qu'un vide. Il a donc deux versions :
+     * la phrase complete a partir de `sm`, une forme courte en dessous, toutes
+     * deux sur une seule ligne.
+     */
+    const adresse = aUneAdresse ? (
+        <span className="flex min-w-0 items-center gap-1.5">
+            <FaLocationDot className="shrink-0 text-brand-500" />
+            <span className="truncate text-caption text-secondaryColor">
+                {compte.street}, N°{compte.number_street}, C/ {compte.town_id?.title}
+            </span>
+        </span>
+    ) : (
+        <span className="flex min-w-0 items-center gap-2">
+            <span aria-hidden>🌟</span>
+            <span className="truncate text-caption text-secondaryColor">
+                <span className="hidden sm:inline">Commander en toute sécurité, </span>
+                <span className="text-primaryColor">Thalia&nbsp;Eats</span>
+            </span>
+        </span>
+    );
 
-        {/* Adresse visible sur les petits écrans */}
-        <div className="flex md:hidden gap-3 items-center">
-          {user ? (
-            <div className="flex items-center gap-1">
-              {user?.user?.street && (
-                <>
-                  <p className="text-xl">
-                    <FaLocationDot />
-                  </p>
-                  <p className="font-[400] block text-secondaryColor text-sm">
-                    {user?.user?.street}, N°{user?.user?.number_street}, C/
-                    {user?.user?.town_id?.title}
-                  </p>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex gap-3 items-center">
-              <div>🌟</div>
-              <p className="font-[400] text-secondaryColor text-xs md:text-sm">
-                Commander en toute sécurité,{" "}
-                <span className="text-primaryColor">Thalia-Eats</span>
-              </p>
-            </div>
-          )}
-        </div>
+    const quantite = monte ? calcul_quantity(ordering ?? []) : 0;
 
-        {/* Panier et Tracking */}
-        <div className="flex gap-8">
-          <div className="hidden md:flex gap-3 items-center">
-            {user && (
-              <div className="flex items-center gap-1">
-                {user?.user?.street && (
-                  <>
-                    <p className="text-xl">
-                      <FaLocationDot />
+    return (
+        <>
+            <div className="flex items-center justify-between gap-3 overflow-hidden border bg-fourthColor pl-3 shadow-sm sm:rounded-xl sm:rounded-t-none sm:pl-5">
+                <div className="min-w-0 flex-1">{adresse}</div>
+
+                <div className="flex shrink-0 items-center bg-secondaryColor sm:rounded-xl sm:rounded-t-none">
+                    <button
+                        type="button"
+                        onClick={() => setShowPanier(!showPanier)}
+                        aria-label={`Ouvrir le panier (${quantite} article${quantite > 1 ? "s" : ""})`}
+                        className="relative flex h-full items-center justify-center p-4 text-white"
+                    >
+                        <FaShoppingBag className="h-5 w-5" />
+                        <span className="pointer-events-none absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-pill bg-brand-500 text-caption font-bold text-ink-inverse">
+                            {quantite}
+                        </span>
+                    </button>
+
+                    <p className="border-l border-white/25 p-3 text-caption text-white md:p-4">
+                        {monte && ordering?.length
+                            ? formatPrix(
+                                  calcul_price(ordering),
+                                  ordering[0]?.product?.currency?.code
+                              )
+                            : "0"}
                     </p>
-                    <p className="font-[400] block text-secondaryColor text-sm">
-                      {user?.user?.street}, N°{user?.user?.number_street}, C/
-                      {user?.user?.town_id?.title}
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
 
-          <div className="bg-[#3C8744] sm:rounded-xl sm:rounded-t-none flex items-center">
-            {/* Bouton Panier */}
-            <button
-              className="relative p-4 h-full flex items-center justify-center text-white text-xl md:text-3xl"
-              onClick={toggleShowPanier}
-            >
-              <FaShoppingBag className="w-6 h-6" />
-              <span className="absolute top-[5px] right-[5px] bg-primaryColor h-5 w-5 text-xs rounded-full flex items-center justify-center pointer-events-none">
-                {ordering && ordering.length > 0 ? calcul_quantity(ordering) : 0}
-              </span>
-            </button>
+                    <Link
+                        href="/tracking"
+                        aria-label="Suivre ma commande"
+                        className="flex items-center justify-center border-l border-white/25 p-4 text-white"
+                    >
+                        <MdLocalShipping className="h-5 w-5" />
+                    </Link>
 
-            <p className="p-3 md:p-4 text-white border-l text-xs md:text-sm border-gray-300/65">
-              {ordering && ordering.length > 0
-                ? `${calcul_price(ordering ?? [])} ${ordering[0]?.product?.currency.code}`
-                : "0"}
-            </p>
-            {/* suivvre les commandes */}
+                    <Link
+                        href="/historique"
+                        aria-label="Historique de mes commandes"
+                        className="flex items-center justify-center border-l border-white/25 p-4 text-white"
+                    >
+                        <FaHistory className="h-5 w-5" />
+                    </Link>
+                </div>
+            </div>
 
-            <Link
-              href="/tracking"
-              className="p-4 text-white text-3xl border-l border-gray-300/65 flex items-center justify-center"
-            >
-              <MdLocalShipping className="w-6 h-6" />
-            </Link>
-            {/* afficher l'historique des commandes */}
-            <Link
-              href="/historique"
-              className="p-4 text-white text-3xl border-l border-gray-300/65 flex items-center justify-center"
-            >
-              <FaHistory className="w-6 h-6" />
-            </Link>
-
-          </div>
-        </div>
-      </div>
-
-      {showPanier && <Panier toggleShowPanier={toggleShowPanier} />}
-    </>
-  );
+            {showPanier ? <Panier toggleShowPanier={() => setShowPanier(false)} /> : null}
+        </>
+    );
 }

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-    let payload: any;
+    let payload: unknown;
     try {
         payload = await request.json();
     } catch {

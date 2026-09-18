@@ -1,19 +1,39 @@
 "use client"
 import { useEffect, useState } from "react";
 import { GoogleMap, Marker, useLoadScript, DirectionsRenderer } from "@react-google-maps/api";
-import {useQuery} from "@tanstack/react-query";
 import useReferentialData from "@/hooks/useQueryTanStack";
 import {Route} from "@/helpers/Route";
-import {Badge} from "rizzui";
 import useHookAddressToLnAndLat from "@/hooks/useHookAdressToLnAndLat";
 
-const containerStyle = { width: "100%", height: "500px" };
+const containerStyle = {width: "100%", height: "100%"};
+
+/**
+ * Le centre par defaut : le centre de Kinshasa.
+ *
+ * Sans lui, `center` valait `null` tant qu'aucune position n'etait connue, et
+ * Google Maps affichait le planisphere entier — une carte du monde a la place
+ * du suivi de livraison.
+ */
+const KINSHASA = {lat: -4.3217, lng: 15.3125};
+
+type PositionType = {lat: number; lng: number};
+
+type TrackType = {
+    location_customer?: PositionType;
+    location_delivery?: PositionType;
+};
 
 
-export default function TrackingPage({currentOrder}:{currentOrder:any}) {
+type CommandeSuivieType = {
+    uid?: string;
+    reference?: string;
+    user_delivery_complet_adress?: string;
+};
 
-    const {data,isLoading}=useReferentialData({
-        url:Route.get_track_uid(currentOrder?.uid),
+export default function TrackingPage({currentOrder}: {currentOrder?: CommandeSuivieType | null}) {
+
+    const {data} = useReferentialData<TrackType>({
+        url: Route.get_track_uid(currentOrder?.uid ?? ""),
         queryKey:"get-tracking-by-uuid",
         params:{uid:currentOrder?.uid},
         enabled:!!currentOrder?.uid,
@@ -23,7 +43,13 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
 
     const {converterAddressToLatLng}=useHookAddressToLnAndLat()
 
-    const [driverPosition, setDriverPosition] = useState<{ lat: number; lng: number } | null>(null);
+    /*
+     * La position du livreur n'est pas un etat : c'est ce que renvoie le suivi,
+     * interroge toutes les cinq secondes. La recopier dans un `useState` via un
+     * effet ajoutait un rendu supplementaire a chaque sondage, et une image de
+     * retard sur la position affichee.
+     */
+    const driverPosition = data?.location_delivery ?? null;
     const [clientPosition, setClientPosition] = useState<{ lat: number; lng: number } | null>(null);
 
     const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
@@ -40,10 +66,15 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
     useEffect(()=>{
 
         if(currentOrder?.user_delivery_complet_adress){
-            converterAddressToLatLng(currentOrder?.user_delivery_complet_adress).then((res)=>{
-                setClientPosition(res)
+            converterAddressToLatLng(currentOrder?.user_delivery_complet_adress).then((res) => {
+                if (res?.lat != null && res?.lng != null) {
+                    setClientPosition({lat: res.lat, lng: res.lng});
+                }
             })
         }
+        // `converterAddressToLatLng` est recree a chaque rendu du hook : l'ajouter
+        // aux dependances relancerait le geocodage en boucle.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[currentOrder])
 
 
@@ -56,11 +87,11 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
         directionsService.route(
             {
                 origin: driverPosition,
-                destination: data?.location_customer,
+                destination: data?.location_customer ?? clientPosition ?? KINSHASA,
                 travelMode: window.google.maps.TravelMode.DRIVING,
             },
             (result, status) => {
-                if (status === window.google.maps.DirectionsStatus.OK) {
+                if (status === window.google.maps.DirectionsStatus.OK && result) {
                     setDirections(result);
 
                     const leg = result.routes[0]?.legs[0];
@@ -69,33 +100,31 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
                 }
             }
         );
-    }, [driverPosition, isLoaded,currentOrder]);
-
-    
-    useEffect(() => {
-
-        if(data?.location_delivery){
-            setDriverPosition(data.location_delivery)
-        }
-    }, [data]);
+    }, [driverPosition, isLoaded, currentOrder, data, clientPosition]);
 
 
     return (
-        <div>
+        <div className="p-4 sm:p-5">
             {!isLoaded ? (
-                <div>Chargement de la carte…</div>
+                <div className="flex h-[320px] items-center justify-center rounded-card bg-surface-sunken text-body text-ink-muted">
+                    Chargement de la carte…
+                </div>
             ) : (
                 <>
-                    <div style={{marginBottom: 16, fontWeight: "bold"}}>
-                        {distance && duration && (
-                            <span>
-                           Commande : <span className={"font-semibold text-[#e24713]"}>#{currentOrder?.reference} </span> Distance restante : {distance} | Temps estimé : {duration}
-                        </span>
-                        )}
-                    </div>
+                    {distance && duration ? (
+                        <p className="mb-4 text-caption text-ink-muted">
+                            Commande{" "}
+                            <span className="font-bold text-secondaryColor">
+                                #{currentOrder?.reference}
+                            </span>{" "}
+                            · {distance} restants · environ {duration}
+                        </p>
+                    ) : null}
+
+                    <div className="h-[320px] overflow-hidden rounded-card sm:h-[420px] lg:h-[500px]">
                     <GoogleMap
                         mapContainerStyle={containerStyle}
-                        center={driverPosition || clientPosition}
+                        center={driverPosition ?? clientPosition ?? KINSHASA}
                         zoom={driverPosition ? 14 : 12}
                     >
                         {driverPosition && (
@@ -107,9 +136,9 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
                                 }}
                             />
                         )}
-                        <Marker
-                            position={data?.location_customer ?? clientPosition}
-                        />
+                        {data?.location_customer ?? clientPosition ? (
+                            <Marker position={(data?.location_customer ?? clientPosition)!} />
+                        ) : null}
                         {directions && (
                             <DirectionsRenderer
                                 directions={directions}
@@ -120,6 +149,7 @@ export default function TrackingPage({currentOrder}:{currentOrder:any}) {
                             />
                         )}
                     </GoogleMap>
+                    </div>
                 </>
 
             )}

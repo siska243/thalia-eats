@@ -1,77 +1,54 @@
 "use client";
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import useCurrentCommande from "@/hooks/useCurrentCommande";
-import { FetchData } from "@/helpers/FetchData";
-import { Route } from "@/helpers/Route";
-import Loader from "@/components/Loader/Loader";
-import { MdError } from "react-icons/md";
+
+import {useEffect, useRef} from "react";
 import {useDispatch} from "react-redux";
+import {MdError} from "react-icons/md";
+import EcranPaiement from "@/components/payement/EcranPaiement";
+import Loader from "@/components/Loader/Loader";
+import useCurrentCommande from "@/hooks/useCurrentCommande";
+import {FetchData} from "@/helpers/FetchData";
+import {Route} from "@/helpers/Route";
 import {fetchCurrentOrder} from "@/store/reducers/cartSlice";
 
-export default function ErrorPage() {
-    const router = useRouter();
-    const { currentCommande, isLoading } = useCurrentCommande();
-
-    const handlerCheckPayement = async (uid) => {
-        try {
-            const response = await FetchData.sendData(Route.check_paiement, { uid });
-
-            localStorage.removeItem("flex_pay_number_order_thalia_eats")
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    const dispatch=useDispatch()
+/**
+ * Retour d'un paiement en echec.
+ *
+ * La verification cote serveur partait a chaque changement de
+ * `currentCommande`, donc plusieurs fois : elle ne part plus qu'une fois.
+ * Comme pour l'abandon, la commande n'est pas annulee — un paiement rate n'est
+ * pas une renonciation.
+ */
+export default function PageEchecPaiement() {
+    const {currentCommande, isLoading} = useCurrentCommande();
+    const dispatch = useDispatch();
+    const dejaVerifie = useRef(false);
 
     useEffect(() => {
-        if (localStorage && typeof window !== "undefined") {
-            localStorage.removeItem("flex_pay_number_order_thalia_eats")
-
-            dispatch(fetchCurrentOrder())
-        }
-    }, [])
+        if (typeof window === "undefined") return;
+        localStorage.removeItem("flex_pay_number_order_thalia_eats");
+        dispatch(fetchCurrentOrder());
+    }, [dispatch]);
 
     useEffect(() => {
-        if (currentCommande?.uid) {
-            handlerCheckPayement(currentCommande.uid);
-        }
+        const uid = currentCommande?.uid;
+        if (!uid || dejaVerifie.current) return;
+
+        dejaVerifie.current = true;
+        FetchData.sendData(Route.check_paiement, {uid});
     }, [currentCommande]);
 
-    if (isLoading) {
-        return <Loader />;
-    }
+    if (isLoading) return <Loader />;
 
     return (
-        <div className="flex items-center justify-center h-screen pt-[150px] bg-gray-50 px-4 sm:px-6 lg:px-8">
-            <div data-aos="fade-left" className="bg-white box-shadow-custom rounded-lg p-6 sm:p-8 lg:p-10 max-w-xl w-full text-center">
-                <div data-aos="fade-left" className="flex justify-center mb-4 md:mb-6">
-                    {/* Icône d'erreur */}
-                    <MdError className="w-12 h-12 md:w-16 md:h-16 text-red-500" />
-                </div>
-                <h1 data-aos="fade-left" className="text-xl sm:text-2xl font-bold text-red-600 mb-4">
-                    Paiement échoué !
-                </h1>
-                <p data-aos="fade-left" className="text-sm sm:text-base text-gray-600 mb-6">
-                    Une erreur s'est produite lors du traitement de votre paiement.
-                    Veuillez réessayer ou nous contacter si le problème persiste.
-                </p>
-                <div data-aos="fade-left" className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button
-                        onClick={() => router.push("/ordering")}
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 sm:px-6 rounded-md transition duration-200 text-sm md:text-base shadow-md hover:shadow-lg"
-                    >
-                        Réessayer le paiement
-                    </button>
-                    <button
-                        onClick={() => router.push("/support")}
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-4 sm:px-6 rounded-md transition duration-200 text-sm md:text-base shadow-md hover:shadow-lg"
-                    >
-                        Contacter le support
-                    </button>
-                </div>
-            </div>
-        </div>
+        <EcranPaiement
+            ton="echec"
+            icone={<MdError className="h-9 w-9" />}
+            titre="Paiement échoué"
+            message="Le paiement n'a pas abouti. Votre commande est conservée : vous pouvez réessayer, ou nous écrire si le problème persiste."
+            actions={[
+                {href: "/ordering", label: "Réessayer le paiement"},
+                {href: "/support", label: "Contacter le support"},
+            ]}
+        />
     );
 }

@@ -1,23 +1,17 @@
-import React from "react";
-import ContactInfo from "./ContactInfo";
 import Map from "./Map";
-import Reviews from "./Reviews";
-import SectionPopularResto from "../home/SectionPopularResto";
 
-export default function BeforeFooterContent({ restaurant, infoResto }) {
-
-
-
-  const data = restaurant;
-  return (
-    <section className="py-4 md:py-12">
-      <div className="max-w-[1300px] mx-auto px-3 md:px-5">
-        {/* <ContactInfo /> */}
-        <Map data={data === undefined ? [] : data} infoResto={infoResto} />
-      </div>
-      {/* reviews */}
-      {/* <Reviews /> */}
-      {/* <SectionPopularResto /> */}
-    </section>
-  );
+/**
+ * Le bloc carte, sous la fiche restaurant.
+ *
+ * Il importait aussi ContactInfo, Reviews et SectionPopularResto, tous trois
+ * commentes dans le rendu : trois modules charges pour rien a chaque page.
+ */
+export default function BeforeFooterContent({restaurant, infoResto}) {
+    return (
+        <section className="py-4 md:py-12">
+            <div className="mx-auto max-w-[1300px] px-4 sm:px-5">
+                <Map data={restaurant ?? []} infoResto={infoResto} />
+            </div>
+        </section>
+    );
 }

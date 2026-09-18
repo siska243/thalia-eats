@@ -1,96 +1,118 @@
 import Link from "next/link";
+import Image from "next/image";
+import {MdOutlineMailOutline, MdOutlineWhatsapp} from "react-icons/md";
 import appleImg from "@/public/assets/images/apple-logo.jpg";
 import googleImg from "@/public/assets/images/google-logo.png";
-import Image from "next/image";
 
-import {MdOutlineMailOutline, MdOutlineWhatsapp} from "react-icons/md";
-
+/**
+ * Le pied de page.
+ *
+ * L'annee du copyright etait ecrite en dur (« 2025 ») : elle se perime toute
+ * seule, et personne ne pense a la corriger.
+ */
 export default function Footer() {
     return (
-        <footer className="bg-[#D9D9D9] w-full">
-            <section className="max-w-[1300px] mx-auto px-5 py-16 grid md:grid-cols-2 lg:grid-cols-3  gap-5">
-                {/* Colonne 1 */}
-                <div className="">
+        <footer className="w-full bg-surface-sunken">
+            <section className="mx-auto grid max-w-[1300px] gap-8 px-4 py-14 sm:px-5 md:grid-cols-2 lg:grid-cols-3">
+                <div>
                     <Link
                         href="/"
-                        className="text-secondaryColor text-2xl md:text-4xl font-bold"
+                        className="text-display font-extrabold text-secondaryColor"
                     >
-                        ThaliaEats
+                        Thalia Eats
                     </Link>
-                    <div className="flex gap-1 mt-4 flex-wrap sm:flex-nowrap">
+
+                    <p className="mt-3 max-w-xs text-caption leading-6 text-ink-muted">
+                        Les restaurants de Kinshasa, commandés en ligne et livrés chez vous.
+                    </p>
+
+                    <div className="mt-5 flex flex-wrap gap-2">
                         <Link
                             href="/"
-                            className="w-[120px] h-[40px] rounded-md overflow-hidden"
+                            className="h-10 w-[120px] overflow-hidden rounded-control"
                         >
-                            <Image src={appleImg} className="h-full" alt="logo AppStore"/>
+                            <Image src={appleImg} className="h-full w-full object-cover" alt="App Store" />
                         </Link>
+
                         <Link
                             href="/"
-                            className="w-[120px] h-[40px] rounded-md overflow-hidden"
+                            className="h-10 w-[120px] overflow-hidden rounded-control"
                         >
                             <Image
                                 src={googleImg}
-                                className="h-full"
-                                alt="logo Google PlayStore"
+                                className="h-full w-full object-cover"
+                                alt="Google Play"
                             />
                         </Link>
                     </div>
-                    {/* <p className="font-normal text-base text-black max-w-[300px] mt-4">
-            Entreprise # 490039-445, Enregistrée auprès de la Chambre des
-            entreprises.
-          </p> */}
                 </div>
 
-                {/* Colonne 2 */}
-                <div className="">
-                    <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
+                <nav>
+                    <h2 className="mb-4 text-body font-bold text-secondaryColor">
                         Pages légales
-                    </h5>
-                    <div className="flex flex-col gap-3">
-                        <Link href="/privacy" className="text-sm font-normal underline">
-                            Conditions d'utilisation
-                        </Link>
-                        <Link href="/privacy" className="text-sm font-normal underline">
-                            Confidentialité
-                        </Link>
-                    </div>
-                </div>
+                    </h2>
 
-                {/* Colonne 3 */}
-                <div className="">
-                    <h5 className="mb-4 my-8 md:my-0 md:mb-8 text-base font-semibold">
-                        Contact
-                    </h5>
-                    <div className="flex flex-col gap-3">
-                        <div className="flex gap-2 items-center">
-              <span className="text-xl">
-                <MdOutlineMailOutline/>
-              </span>
-                            <Link href="mailto:thaliaeat.original@gmail.com" className="text-base font-[500] underline">
-                                thaliaeat.original@gmail.com
+                    <ul className="flex flex-col gap-3">
+                        <li>
+                            <Link
+                                href="/privacy"
+                                className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                Conditions d&apos;utilisation
                             </Link>
-                        </div>
-                        <div className="flex gap-2 items-center">
-              <span className="text-xl">
-                <MdOutlineWhatsapp/>
-              </span>
-                            <Link href="https://wa.me/33605864276" className="text-base font-[500] underline">
+                        </li>
+                        <li>
+                            <Link
+                                href="/privacy"
+                                className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                Politique de confidentialité
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                href="/support"
+                                className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                Support
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div>
+                    <h2 className="mb-4 text-body font-bold text-secondaryColor">Contact</h2>
+
+                    <ul className="flex flex-col gap-3">
+                        <li>
+                            <a
+                                href="mailto:thaliaeat.original@gmail.com"
+                                className="flex items-center gap-2 text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                <MdOutlineMailOutline className="shrink-0 text-xl" />
+                                <span className="break-all">thaliaeat.original@gmail.com</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="https://wa.me/33605864276"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                <MdOutlineWhatsapp className="shrink-0 text-xl" />
                                 +33 6 05 86 42 76
-                            </Link>
-                        </div>
-
-                    </div>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </section>
 
-            {/* Section du bas */}
-            <section className="bg-secondaryColor ">
-                <div className="py-5 max-w-[1300px] mx-auto px-5">
-                    <p className="text-xs text-center text-gray-300">
-                        ThaliaEats Copyright 2025, Tous droits réservés.
-                    </p>
-                </div>
-            </section>
+            <div className="bg-secondaryColor">
+                <p className="mx-auto max-w-[1300px] px-4 py-5 text-center text-caption text-white/70 sm:px-5">
+                    Thalia Eats © {new Date().getFullYear()}, tous droits réservés.
+                </p>
+            </div>
         </footer>
     );
 }

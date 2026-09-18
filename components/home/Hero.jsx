@@ -1,160 +1,140 @@
 import Image from "next/image";
-import pizzaImage from "@/public/assets/images/pizza.png";
-import homeEatImage from "@/public/assets/images/homeEat.png";
 import Link from "next/link";
-import { FaArrowRight } from "react-icons/fa";
+import fondImage from "@/public/assets/images/homeEat.png";
+import {formatPrix} from "@/helpers/openingHours";
 
+/**
+ * Le hero, pleine page.
+ *
+ * Il tenait dans un cadre clair de 600 pixels, avec une pizza detouree et une
+ * forme orange. Rien n'y donnait faim : la photo etait un decor, pas le sujet.
+ *
+ * Ici la photo occupe tout, et le texte se pose dessus. Un voile degrade part
+ * du bleu nuit de la marque a gauche, la ou le texte doit se lire, et s'efface
+ * a droite pour laisser la nourriture visible. C'est ce degrade qui tient la
+ * lisibilite : sans lui, du blanc sur une photo est un pari.
+ *
+ * Les trois plats en bas sont ceux de l'API, avec leur restaurant et leur
+ * prix. Ils remplacent trois fausses notifications redigees en anglais —
+ * « We've Received your order! » — sur un site entierement francais.
+ *
+ * L'en-tete est `fixed` : il ne prend pas de place dans le flux, et la photo
+ * demarre donc a zero, derriere lui. C'est seulement le *contenu* du hero qui
+ * est decale vers le bas pour ne pas passer sous le menu. Decaler la section
+ * entiere, comme le font les neuf autres pages, laissait une bande blanche
+ * entre le menu et la photo.
+ *
+ * Pas de `placeholder="blur"` : `next.config.mjs` met `images.unoptimized` a
+ * `true`, donc le point d'entree /_next/image est desactive. L'image floutee
+ * de transition partait quand meme le chercher et recoltait un 404 a chaque
+ * chargement de page.
+ *
+ * La hauteur est en svh plutot qu'en vh : sur mobile, vh compte la barre
+ * d'adresse du navigateur et le bas du hero passait sous l'ecran.
+ */
+export default function Hero({previews = []}) {
+    const plats = previews.slice(0, 3);
 
-export default function Hero() {
-   return (
-      <section className="max-w-[1300px] mx-auto px-3 md:px-5">
-         <div className="bg-fourthColor rounded-xl grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-8 md:mb-12 overflow-hidden h-[400px] md:h-[600px] border w-full ">
-            {/* ********left content********* */}
-            <div className="w-full p-5 xl:p-10 relative" data-aos="fade-right">
-               <p className="text-sm text-center md:text-left md:text-[16px] leading-8 text-secondaryColor font-light mb-2">
-                  Commandez des plats de restaurant, à emporter ou des courses.
-               </p>
-               <h1 className="text-center md:text-left text-3xl md:text-4xl lg:text-5xl font-semibold text-secondaryColor mb-8">
-                  Régalez vos sens, <br />
-                  <span className="text-primaryColor">Rapide et frais</span>
-               </h1>
-
-               {/* bouton pour commencer les achats */}
-               <div className="flex justify-center md:justify-start">
-                  <Link
-                     href="/restaurant"
-                     className="w-full sm:w-auto lg:w-auto bg-primaryColor text-white text-base md:text-lg rounded-full py-5 md:py-4 px-5 sm:px-8 flex items-center justify-center gap-2 sm:gap-4 hover:bg-primaryColor/90 transition-all"
-                  >
-                     Commencez maintenant
-                     <span className="text-xl md:text-2xl sm:text-3xl">
-                        <FaArrowRight />
-                     </span>
-                  </Link>
-               </div>
-
-
-               <div className="flex justify-center items-center flex-col md:items-start gap-3 md:gap-0">
-                  {/* <p className="text-sm leading-8 text-secondaryColor font-light mb-2">
-                Entrez un code postal pour voir ce que nous livrons.
-              </p> */}
-                  {/* formulaire visible à partir de md */}
-                  {/* <form className="relative hidden md:flex">
-                <input
-                  className="p-4 outline-none border-2 rounded-full w-full lg:w-[300px] focus:border-primaryColor placeholder:text-sm text-[15px] text-gray-500 pr-16"
-                  type="text"
-                  placeholder="e.g. EC4R 3TE"
+    return (
+        <section className="relative">
+            <div className="relative min-h-[620px] overflow-hidden md:min-h-svh">
+                <Image
+                    src={fondImage}
+                    alt=""
+                    aria-hidden
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover object-center"
                 />
-                <button
-                  className="bg-primaryColor w-[150px] md:w-[200px] border-2 border-primaryColor text-white rounded-full p-4 absolute -right-36"
-                  type="submit"
-                >
-                  Search
-                </button>
-              </form> */}
 
-                  {/* formulaire visible sur mobile */}
-                  {/* <form className="relative md:hidden w-full max-w-[300px] mx-auto flex justify-center items-center">
-                <input
-                  className="p-3 outline-none border-2 rounded-full w-full  focus:border-primaryColor placeholder:text-sm text-[15px] text-gray-500 pr-16 "
-                  type="text"
-                  placeholder="e.g. EC4R 3TE"
+                {/*
+                  * Un fond uni sous le degrade : sur un ecran etroit la bande
+                  * droite du degrade horizontal devenait presque transparente,
+                  * et le texte se posait sur la photo sans contraste.
+                  */}
+                <div className="absolute inset-0 bg-secondaryColor/60 md:bg-transparent" aria-hidden />
+
+                <div
+                    className="absolute inset-0 bg-gradient-to-r from-secondaryColor via-secondaryColor/85 to-secondaryColor/20"
+                    aria-hidden
                 />
-                <button
-                  className=" border-primaryColor bg-primaryColor text-white rounded-full p-4 absolute bottom-0 right-0"
-                  type="submit"
-                >
-                  <IoIosArrowDroprightCircle />
-                </button>
-              </form> */}
-               </div>
-            </div>
+                <div
+                    className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-secondaryColor/90 to-transparent"
+                    aria-hidden
+                />
 
-            {/* ******** right content and images ********* */}
-            <div
-               className="relative w-full h-full hidden md:block"
-               data-aos="fade-left"
-            >
-               <Image
-                  className="absolute xl:-left-[150px] left-0 bottom-0 z-10 md:h-[80%] md:w-full  lg:w-[400px] lg:h-[500px] object-cover"
-                  src={pizzaImage}
-                  width={400}
-                  height={500}
-                  alt="pizza food"
-               />
-               <Image
-                  className="hidden xl:block absolute left-[80px] bottom-0 z-[1] w-[300px] h-[400px] rounded-md object-cover"
-                  src={homeEatImage}
-                  width={"100%"}
-                  height={"100%"}
-                  alt="food"
-               />
-               <div className="w-[80%] absolute bottom-0 right-0 h-[97%] bg-primaryColor rounded-l-full pt-10 lg:flex flex-col hidden">
-                  {/* **************** 1 ***************** */}
-                  <div className=" w-2/3 absolute left-28 pr-8 flex flex-col z-[9]">
-                     <p className="flex justify-end text-4xl w-full pr-3 font-bold -mb-2 text-stroke-white">
-                        1
-                     </p>
-                     <div className="bg-white p-3 rounded-xl shadow-md flex justify-between">
-                        <div>
-                           <h5 className="text-[14px] text-secondaryColor mb-2 font-medium">
-                              Thalia
-                              <span className="text-primaryColor">Eats</span>
-                           </h5>
-                           <p className="text-black font-semibold text-[13px]">
-                              We’ve Received your order!
-                           </p>
-                           <p className="text-gray-500 font-normal text-[12px]">
-                              Awaiting Restaurant acceptance
-                           </p>
+                <div className="relative mx-auto flex min-h-[620px] w-full max-w-7xl flex-col justify-center px-4 pb-14 pt-[var(--header-h)] sm:px-6 lg:px-8 md:min-h-svh">
+                    <div className="max-w-2xl">
+                        <p className="text-body text-brand-300">
+                            Restaurants de Kinshasa, livrés chez vous
+                        </p>
+
+                        <h1 className="mt-4 text-[38px] font-extrabold leading-[1.03] tracking-tight text-white sm:text-[54px] lg:text-[68px]">
+                            Qu&apos;est-ce qu&apos;on mange aujourd&apos;hui&nbsp;?
+                        </h1>
+
+                        <p className="mt-6 max-w-lg text-body leading-7 text-white/80">
+                            Choisissez un restaurant, composez votre commande, payez par mobile
+                            money. Un livreur s&apos;en charge.
+                        </p>
+
+                        <div className="mt-9 flex flex-wrap gap-3">
+                            <Link
+                                href="/restaurant"
+                                className="inline-flex items-center justify-center rounded-pill bg-brand-500 px-8 py-4 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
+                            >
+                                Voir les restaurants
+                            </Link>
+
+                            <Link
+                                href="/historique"
+                                className="inline-flex items-center justify-center rounded-pill border border-white/30 px-7 py-4 text-body font-semibold text-white backdrop-blur-sm transition-colors duration-150 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
+                            >
+                                Mes commandes
+                            </Link>
                         </div>
-                        <span className="text-[12px] text-gray-300">Now</span>
-                     </div>
-                  </div>
-                  {/* **************** 2 ***************** */}
-                  <div className=" w-2/3 absolute left-[35%] top-[40%] pr-8 flex flex-col z-[9]">
-                     <p className="flex justify-end text-4xl w-full pr-3 font-bold -mb-2 text-stroke-white">
-                        2
-                     </p>
-                     <div className="bg-white p-3 rounded-xl shadow-md flex justify-between">
-                        <div>
-                           <h5 className="text-[14px] text-secondaryColor mb-2 font-medium">
-                              Thalia
-                              <span className="text-primaryColor">Eats</span>
-                           </h5>
-                           <p className="text-black font-semibold text-[13px] ">
-                              We’ve Received your order!
-                           </p>
-                           <p className="text-gray-500 font-normal text-[12px]">
-                              Awaiting Restaurant acceptance
-                           </p>
-                        </div>
-                        <span className="text-[12px] text-gray-300">Now</span>
-                     </div>
-                  </div>
-                  {/* **************** 3 ***************** */}
-                  <div className=" w-2/3 absolute bottom-14 left-40 pr-8 flex flex-col z-[9]">
-                     <p className="flex justify-end text-4xl w-full pr-3 font-bold -mb-2 text-stroke-white">
-                        3
-                     </p>
-                     <div className="bg-white p-3 rounded-xl shadow-md flex justify-between">
-                        <div>
-                           <h5 className="text-[14px] text-secondaryColor mb-2 font-medium">
-                              Thalia
-                              <span className="text-primaryColor">Eats</span>
-                           </h5>
-                           <p className="text-black font-semibold text-[13px]">
-                              We’ve Received your order!
-                           </p>
-                           <p className="text-gray-500 font-normal text-[12px]">
-                              Awaiting Restaurant acceptance
-                           </p>
-                        </div>
-                        <span className="text-[12px] text-gray-300">Now</span>
-                     </div>
-                  </div>
-               </div>
+                    </div>
+
+                    {plats.length ? (
+                        <ul className="mt-14 grid gap-3 sm:grid-cols-3 lg:max-w-3xl">
+                            {plats.map((plat) => (
+                                <li key={plat.uid ?? plat.slug}>
+                                    <Link
+                                        href={`/restaurant/${plat.restaurant?.slug ?? ""}`}
+                                        className="flex h-full items-center gap-3 rounded-card bg-white/10 p-3 backdrop-blur-md ring-1 ring-white/20 transition-colors duration-200 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
+                                    >
+                                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-control">
+                                            <Image
+                                                src={plat.picture}
+                                                alt={plat.title}
+                                                fill
+                                                sizes="48px"
+                                                className="object-cover"
+                                            />
+                                        </div>
+
+                                        <div className="min-w-0 flex-1">
+                                            <p className="line-clamp-1 text-caption font-semibold text-white">
+                                                {plat.title}
+                                            </p>
+                                            <p className="line-clamp-1 text-caption text-white/60">
+                                                {plat.restaurant?.name}
+                                            </p>
+                                        </div>
+
+                                        {plat.price ? (
+                                            <span className="shrink-0 text-caption font-bold text-brand-300">
+                                                {formatPrix(plat.price, plat.currency?.code)}
+                                            </span>
+                                        ) : null}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : null}
+                </div>
             </div>
-         </div>
-      </section>
-   )
+        </section>
+    );
 }

@@ -1,78 +1,101 @@
-import Image from "next/image";
-import foodsImg from "@/public/assets/images/foodsImg.png";
-import restoImg3 from "@/public/assets/images/restoImg3.png";
-import restoImg4 from "@/public/assets/images/restoImg4.png";
-import clock from "@/public/assets/images/clock.png";
-import logo from "@/public/assets/logo-thalia.png";
+"use client";
+
+import ImagePlat from "@/components/ui/ImagePlat";
+import {enTexte} from "@/helpers/reponseApi";
+import fondParDefaut from "@/public/assets/images/foodsImg.png";
 import Loader from "../Loader/Loader";
+import {etatOuverture, libelleFermeture} from "@/helpers/openingHours";
 
+/**
+ * L'en-tete d'une fiche restaurant.
+ *
+ * Trois defauts corriges ici :
+ *
+ * 1. Quand `restaurant` etait absent, le composant rendait
+ *    `` sans l'avoir importe : ReferenceError, page
+ *    blanche. Le repli est desormais un vrai etat neutre.
+ * 2. `restaurant?.opens[0]` lisait l'indice 0 sans proteger `opens` lui-meme :
+ *    un restaurant sans horaires faisait planter la page. Les horaires passent
+ *    maintenant par `etatOuverture`, la meme fonction que celle du mobile, et
+ *    un restaurant ferme affiche son heure de reouverture plutot qu'un
+ *    « Fermé » suivi d'une plage horaire brute.
+ * 3. Le bandeau affichait « Commande minimum : 5 $ » et « Livraison : 20-30
+ *    minutes », deux valeurs ecrites en dur qu'aucune donnee ne garantit.
+ *    Remplacees par ce que l'API sait reellement : adresse et telephone.
+ */
+export default function BannerResto({restaurant, restaurantIsLoading}) {
+    if (restaurantIsLoading) {
+        return <Loader />;
+    }
 
-export default function BannerResto({ restaurant, restaurantIsLoading }) {
+    const horaire = etatOuverture(restaurant?.opens);
 
-  if (restaurantIsLoading) {
-    return <Loader />;
-  }
+    return (
+        <section className="mx-auto max-w-[1300px] px-4 pt-6 sm:px-5">
+            <div className="relative overflow-hidden rounded-card">
+                <ImagePlat
+                    src={restaurant?.image}
+                    repli={fondParDefaut}
+                    alt=""
+                    aria-hidden
+                    fill
+                    priority
+                    sizes="(max-width: 1300px) 100vw, 1300px"
+                    className="object-cover object-center"
+                />
 
+                <div
+                    className="absolute inset-0 bg-gradient-to-r from-secondaryColor via-secondaryColor/90 to-secondaryColor/40"
+                    aria-hidden
+                />
 
-if(!restaurant){
-  return (
-    <BannerRestaurantPage/>
-  )
-}
+                <div className="relative px-6 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-16">
+                    <span
+                        className={`inline-flex rounded-pill px-3 py-1 text-caption font-bold ${
+                            horaire.ouvert
+                                ? "bg-success-surface text-success"
+                                : "bg-white/90 text-ink-muted"
+                        }`}
+                    >
+                        {horaire.ouvert
+                            ? `Ouvert${horaire.creneau ? ` · ${horaire.creneau}` : ""}`
+                            : libelleFermeture(horaire)}
+                    </span>
 
-  return (
-    <section className="max-w-[1300px] mx-auto px-3 md:px-5 mb-20">
-      <div
-        className="relative w-full lg:h-[450px] rounded-xl md:p-16 p-10 box-shadow-custom bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `linear-gradient(rgba(3, 8, 31, 0.9), rgba(3, 8, 31, 0.9)), url(${restaurant?.image || logo.src})`
-        }}
-      >
-        {/* background image */}
-        {/* <Image
-          src={data?.image || restaurant?.image || logo}
-          className="absolute top-0 right-0 left-0 w-full h-full z-[-1] object-cover rounded-xl"
-          alt={data?.name || restaurant?.name || 'Thalia-Eats logo'}
-          width={800}
-          height={800}
-        /> */}
-        <div className="w-full flex lg:flex-row flex-col-reverse gap-5 lg-gap-0 justify-between items-end h-full">
-          <div data-aos="fade-right" className="w-full lg:w-[60%]">
-            <h6 className=" lg:text-left text-center text-base font-extralight mb-3 text-white">
-              {restaurant?.reference || "Aucune ref"}
-            </h6>
-            <h2 className="text-center lg:text-left text-primaryColor font-semibol text-2xl md:text-4xl md:mb-10 mb-5">
-              {restaurant?.name || 'THALIA EATS est une plateforme numérique qui connecte restaurants locaux et consommateurs pour faciliter la commande et la livraison de repas.'}
-            </h2>
-            <div className="flex gap-3 items-center justify-center lg:items-start lg:justify-start flex-col md:flex-row">
-              <p className="flex items-center gap-2 text-sm font-normal text-white border border-white py-2 px-6 rounded-full">
-                <Image src={restoImg3} width={30} alt="order" /> Commande minimum :
-                5 $
-              </p>
-              <p className="flex items-center text-sm gap-2 font-normal text-white border border-white py-2 px-6 rounded-full">
-                <Image src={restoImg4} width={30} alt="order" /> Livraison :
-                20-30 Minutes
-              </p>
+                    <h1 className="mt-4 max-w-2xl text-[28px] font-extrabold leading-tight tracking-tight text-white sm:text-[38px] lg:text-[46px]">
+                        {restaurant?.name ?? "Restaurant"}
+                    </h1>
+
+                    <dl className="mt-5 flex flex-col gap-2 text-body text-white/80 sm:flex-row sm:flex-wrap sm:gap-x-8">
+                        {restaurant?.adresse ? (
+                            <div className="flex gap-2">
+                                <dt className="sr-only">Adresse</dt>
+                                <dd>{restaurant.adresse}</dd>
+                            </div>
+                        ) : null}
+
+                        {restaurant?.phone ? (
+                            <div className="flex gap-2">
+                                <dt className="sr-only">Téléphone</dt>
+                                <dd>
+                                    <a
+                                        href={`tel:${restaurant.phone}`}
+                                        className="underline-offset-4 hover:underline"
+                                    >
+                                        {restaurant.phone}
+                                    </a>
+                                </dd>
+                            </div>
+                        ) : null}
+                    </dl>
+
+                    {enTexte(restaurant?.description) ? (
+                        <p className="mt-4 max-w-xl text-body leading-7 text-white/70">
+                            {enTexte(restaurant.description)}
+                        </p>
+                    ) : null}
+                </div>
             </div>
-          </div>
-          {/* ******image */}
-          <div data-aos="fade-left" className="w-[70%] text-center md:w-[60%] lg:w-[40%] overflow-hidden rounded-xl mx-auto h-full">
-            <Image
-              src={restaurant?.image || logo}
-              className="w-full h-full object-scale-down rounded-xl"
-              alt={restaurant?.name || 'Thalia-Eats logo'}
-              width={800}
-              height={800}
-            />
-          </div>
-          {/* *************** */}
-          <p data-aos="fade-right" className="absolute -bottom-7 z-20 bg-primaryColor flex items-center md:p-3 p-2 left-0 w-full sm:w-[400px] justify-center gap-2 md:gap-3 text-white text-xs sm:text-sm md:text-base sm:rounded-r-xl">
-            <Image src={clock} width={30} alt="clock" />
-            Ouvert :
-            {restaurant?.opens[0]?.startAt} - {restaurant?.opens[0]?.endAt}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    );
 }

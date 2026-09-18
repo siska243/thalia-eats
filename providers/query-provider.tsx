@@ -10,11 +10,13 @@ import {fetchCurrentOrder} from "@/store/reducers/cartSlice";
 export function ReactQueryProvider({ children }: React.PropsWithChildren) {
     const [client] = React.useState(new QueryClient());
 
-    const dispatch=useDispatch()
+    // Le magasin Redux est en JavaScript : son dispatch n'est pas type.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dispatch=useDispatch<any>()
 
     useEffect(() => {
-        dispatch(fetchCurrentOrder(null))
-    }, []);
+        dispatch(fetchCurrentOrder())
+    }, [dispatch]);
 
     return (
         <QueryClientProvider client={client}>

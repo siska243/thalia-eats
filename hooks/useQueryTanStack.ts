@@ -5,13 +5,10 @@ import { useQuery, UseQueryResult as ReactQueryResult } from '@tanstack/react-qu
 interface Props {
     url: string;
     queryKey: string;
-    params?: string;
-}
-
-interface UseQueryResult {
-    data?: any;
-    error: any;
-    isLoading: boolean;
+    /** Morceau supplementaire de cle de cache. */
+    params?: unknown;
+    /** Options react-query transmises telles quelles (enabled, refetchInterval...). */
+    [option: string]: unknown;
 }
 
 // Define `T` as a generic parameter for fetchData and useReferentialData

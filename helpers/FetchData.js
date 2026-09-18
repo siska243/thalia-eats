@@ -1,9 +1,34 @@
 import axios, { AxiosError } from "axios";
 import { getToken } from "@/server/manageToken";
+
+/**
+ * L'adresse de l'API.
+ *
+ * Elle etait figee sur la production dans les deux branches d'un ternaire —
+ * `NODE_ENV === 'production' ? prod : prod` — donc le site en developpement
+ * lisait et ecrivait dans la base de production. On comparait alors l'ecran web
+ * (production) au mobile (backend local via ngrok) en croyant regarder les
+ * memes commandes.
+ *
+ * Elle etait aussi recopiee ailleurs : le callback FlexPay de la page panier la
+ * reecrivait en dur, et pointait encore sur `thalia.cooceckivu.org`, l'ancien
+ * domaine. Un webhook de paiement envoye a la mauvaise machine ne revient
+ * jamais : la commande reste en attente de reglement pour toujours.
+ *
+ * `NEXT_PUBLIC_API_BASE_URL` a le dernier mot, pour viser un tunnel ngrok ou un
+ * autre port sans toucher au code — c'est la variable a poser dans `.env.local`
+ * quand `php artisan serve` ecoute ailleurs que sur 8000.
+ */
+const API_LOCALE = "http://127.0.0.1:8000/api";
+const API_PRODUCTION = "https://app.thaliaeats.com/api";
+
+export const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    (process.env.NODE_ENV === "development" ? API_LOCALE : API_PRODUCTION);
+
 class FetchData {
 
-    BASE_URL = () => process.env.NODE_ENV === 'production' ? "https://app.thaliaeats.com/api" :'https://app.thaliaeats.com/api';
-    //BASE_URL = () => process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" :'http://127.0.0.1:8000/api';
+    BASE_URL = () => API_BASE_URL;
 
     instance = (contentType) => {
         const http = axios.create({
@@ -55,7 +80,7 @@ class FetchData {
             }
 
             return response.data;
-        } catch (error) {
+        } catch {
 
             return error;
 
@@ -77,7 +102,7 @@ class FetchData {
                 return response;
             }
             return response.data;
-        } catch (error) {
+        } catch {
             return error;
         }
     }
@@ -93,7 +118,7 @@ class FetchData {
                 return response;
             }
             return response.data;
-        } catch (error) {
+        } catch {
             return error
         }
     }
@@ -109,7 +134,7 @@ class FetchData {
                 return response;
             }
             return response.data;
-        } catch (error) { }
+        } catch { }
     }
     static async putData(url, data, $token) {
         try {
@@ -123,7 +148,7 @@ class FetchData {
                 return response;
             }
             return response.data;
-        } catch (error) { }
+        } catch { }
     }
 }
 

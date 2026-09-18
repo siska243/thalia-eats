@@ -1,153 +1,138 @@
-import React, { useState } from "react";
+"use client";
+
+import {useState} from "react";
+import ChampTexte from "@/components/auth/ChampTexte";
 import Notify from "../toastify/Notify";
-import useReferentialData from "@/hooks/useQueryTanStack";
-import { Route } from "@/helpers/Route";
-import { FetchData } from "@/helpers/FetchData";
 import Spinner from "../Loader/Spinner";
+import useReferentialData from "@/hooks/useQueryTanStack";
+import {Route} from "@/helpers/Route";
+import {FetchData} from "@/helpers/FetchData";
 
+/**
+ * Mise a jour de l'adresse de livraison.
+ *
+ * L'erreur du serveur etait lue ainsi :
+ *
+ *     const {response: {data: {message, error}}} = response;
+ *     Notify(error, "error");
+ *
+ * Deux problemes. `message` etait extrait puis jamais utilise, et c'est `error`
+ * qui partait dans le toast — souvent absent de la reponse, donc un toast vide.
+ * Et sur une panne reseau il n'y a pas de `response.response` : la ligne levait
+ * une exception, attrapee par un `catch` vide. L'utilisateur ne voyait alors
+ * rien du tout.
+ */
 export default function UpdateAdresse() {
-  const { data, isLoading, isError, isFetched } = useReferentialData({
-    url: Route.default,
-    queryKey: "dafault",
-  });
-  const [town, setTown] = useState("");
-  const [street, setStreet] = useState("");
-  const [numberStreet, setNumberStreet] = useState("");
-  const [reference, setReference] = useState("");
-  const [loading, setLoading] = useState(false);
+    const {data} = useReferentialData({url: Route.default, queryKey: "dafault"});
 
-  console.log("Les odnnées sont bien chargées...", data);
+    const [town, setTown] = useState("");
+    const [street, setStreet] = useState("");
+    const [numberStreet, setNumberStreet] = useState("");
+    const [reference, setReference] = useState("");
+    const [loading, setLoading] = useState(false);
 
-  // fonction pour envoyer les données
-  const handlerSendData = async (e) => {
-    e.preventDefault();
-    if (!town || !street || !numberStreet || !reference) {
-      Notify("Veuillez remplir tous les champs", "error");
-      return;
-    }
-    try {
-      setLoading(true);
-      const formData = {
-        town,
-        street,
-        number_street: numberStreet,
-        principal_adresse: reference,
-      };
-      const response = await FetchData.sendData(Route.update_adresse, formData);
-      if (response.name === "AxiosError") {
-        const {
-          response: {
-            data: { message, error },
-          },
-        } = response;
-        Notify(error, "error");
-      } else {
-        Notify("Adresse mise à jour !", "success");
-        setTown("");
-        setStreet("");
-        setNumberStreet("");
-        setReference("");
-      }
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <div className=" w-full h-full rounded-xl  relative flex gap-8">
-      <div data-aos="fade-right" className="box-shadow-custom p-5 rounded-xl w-full bg-white">
-        <p className="mb-10 text-primaryColor uppercase text-base font-semibold ">
-          Mettre à jour votre adresse
-        </p>
-        <div className="  bg-white ">
-          <form className="w-full h-full space-y-6 " onSubmit={handlerSendData}>
-            {/* commune and quartier */}
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* commune select */}
-              <div className="flex flex-col">
-                <label htmlFor="commune" className="text-gray-700 mb-2">
-                  Commune
-                </label>
-                <select
-                  name=""
-                  id="commune"
-                  className="w-full py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  required
-                  onChange={(e) => setTown(e.target.value)}
+    const handlerSendData = async (e) => {
+        e.preventDefault();
+
+        if (!town || !street || !numberStreet || !reference) {
+            Notify("Veuillez remplir tous les champs", "error");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await FetchData.sendData(Route.update_adresse, {
+                town,
+                street,
+                number_street: numberStreet,
+                principal_adresse: reference,
+            });
+
+            if (response?.name === "AxiosError") {
+                const donnees = response.response?.data;
+                Notify(
+                    donnees?.message ?? donnees?.error ?? "Mise à jour impossible",
+                    "error"
+                );
+                return;
+            }
+
+            Notify("Adresse mise à jour", "success");
+            setTown("");
+            setStreet("");
+            setNumberStreet("");
+            setReference("");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+            <h2 className="mb-5 text-title font-bold text-secondaryColor">
+                Adresse de livraison
+            </h2>
+
+            <form className="flex flex-col gap-5" onSubmit={handlerSendData}>
+                <div className="grid gap-5 sm:grid-cols-2">
+                    <div className="flex flex-col">
+                        <label
+                            htmlFor="commune"
+                            className="mb-2 text-caption font-semibold text-ink"
+                        >
+                            Commune
+                        </label>
+                        <select
+                            id="commune"
+                            required
+                            value={town}
+                            onChange={(e) => setTown(e.target.value)}
+                            className="w-full rounded-control border border-surface-border bg-surface px-4 py-3 text-body text-ink outline-none transition-colors duration-150 focus:border-brand-500"
+                        >
+                            <option value="">Sélectionner la commune</option>
+                            {data?.town?.map((commune) => (
+                                <option value={commune.slug} key={commune.uid}>
+                                    {commune.title}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <ChampTexte
+                        label="Avenue"
+                        placeholder="Nom de votre avenue"
+                        value={street}
+                        onChange={(e) => setStreet(e.target.value)}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Numéro"
+                        placeholder="Numéro de l'avenue"
+                        value={numberStreet}
+                        onChange={(e) => setNumberStreet(e.target.value)}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Référence"
+                        placeholder="Un repère proche de chez vous"
+                        aide="Ce qui aide le livreur à vous trouver"
+                        value={reference}
+                        onChange={(e) => setReference(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-1 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
                 >
-                  <option value="" className="text-sm">
-                    Selectionner la commune
-                  </option>
-                  {data?.town?.map((town) => {
-                    return (
-                      <option value={town.slug} key={town.uid}>
-                        {town.title}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-              {/* avenue input */}
-              <div className="flex flex-col">
-                <label htmlFor="avenue" className="text-gray-700 mb-2">
-                  Avenue
-                </label>
-                <input
-                  type="text"
-                  id="avenue"
-                  required
-                  className="w-full py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="Quelle est votre Avenue"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* numero avaenue and la reférence de l'avenue  */}
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* numero avenue */}
-
-              <div className="flex flex-col">
-                <label htmlFor="numero" className="text-gray-700 mb-2">
-                  Numéro de l'avenue
-                </label>
-                <input
-                  type="text"
-                  id="numero"
-                  required
-                  className="w-full py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="Le numéro de votre avenue"
-                  value={numberStreet}
-                  onChange={(e) => setNumberStreet(e.target.value)}
-                />
-              </div>
-              {/* la reférence de l'avenue */}
-              <div className="flex flex-col">
-                <label htmlFor="ref" className="text-gray-700 mb-2">
-                  Reférence
-                </label>
-                <input
-                  type="text"
-                  id="ref"
-                  required
-                  className="w-full py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="la Reférence proche de votre domicile"
-                  value={reference}
-                  onChange={(e) => setReference(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 text-sm sm:text-base sm:py-4 bg-secondaryColor text-white rounded-lg font-semibold hover:bg-secondaryColor/90 focus:ring-2 focus:ring-secondaryColor focus:ring-opacity-50"
-            >
-              {loading ? <Spinner /> : "Mise à jour"}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+                    {loading ? <Spinner /> : "Enregistrer l'adresse"}
+                </button>
+            </form>
+        </section>
+    );
 }

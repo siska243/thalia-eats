@@ -11,7 +11,17 @@ class Route
     // static menu_product_restaurant=(slugRestaurant:string,slugProduct:string)=>`menu/${slugRestaurant}/${slugProduct}`
     static default="default"
     static produits_a_la_une="default/preview"
+    // chiffrage serveur : plat + livraison + service
+    static quote="quote"
+    static products_search="products/search"
+    static budget_suggestions="budget-suggestions"
     static send_expo_token=`${this.user}/update/expo/token`
+
+    // Assistants connectes (Claude, ChatGPT...). Le client les liste et les
+    // revoque depuis son compte : un acces qu'on ne peut pas retirer n'est pas
+    // un acces qu'on accorde volontiers.
+    static assistants=`${this.user}/assistants`
+    static assistant_delete=(uid:string):string=>`${this.user}/assistants/${uid}`
   
     static logout = "auth/logout"
     // mise à jour des informations de l'utilisateur
@@ -23,7 +33,7 @@ class Route
     static current_commande =`${this.user}/commande/current`
     static valide_commande = `${this.user}/commande/valide`
     static check_paiement =`${this.user}/commande/check-paiement`
-    static cancel_paiement=`${this.user}/commande/cancel`
+    static cancel_commande=`${this.user}/commande/cancel`
     // pour suivre mes commandes
     static traitement_commande =`${this.user}/commande/traitement`
 

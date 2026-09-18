@@ -3,7 +3,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import Settings from "./Settings";
 import { useState } from "react";
 
-export default function account({ account, isMobile }) {
+export default function Account({ account, isMobile }) {
   const [isSettingOpen, setIsSettingOpen] = useState(false);
   const { user } = account;
   const handlerSetting = () => {

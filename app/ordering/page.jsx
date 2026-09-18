@@ -1,140 +1,82 @@
-"use client"
-import BannerResto from "@/components/commons/BannerResto";
-import Image from "next/image";
-import React, {useEffect, useState} from "react";
-import searchLogo from "@/public/assets/images/search.png";
-import BeforeFooterContent from "@/components/commons/BeforeFooterContent";
-import SideMenu from "@/components/ordering/SideMenu";
-import MainContent from "@/components/ordering/MainContent";
-import Order from "@/components/ordering/Order";
-import cookImg from "@/public/assets/images/cook.png";
-import useCreateOrdering from "@/hooks/useCreateOrdering";
-import Loader from "@/components/Loader/Loader";
+"use client";
+
 import Link from "next/link";
 import {useSelector} from "react-redux";
+import BannerResto from "@/components/commons/BannerResto";
+import BeforeFooterContent from "@/components/commons/BeforeFooterContent";
+import MainContent from "@/components/ordering/MainContent";
+import Order from "@/components/ordering/Order";
+import EmptyState from "@/components/ui/EmptyState";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
-import BannerRestaurantPage from "@/components/restaurants/BannerRestaurantPage";
 import useCart from "@/hooks/useCart";
 
-
-export default function page() {
-
-    const [infoResto, setInfoResto] = useState({});
-    const [loading, setLoading] = useState(true);
-
-    const {handleRemoveProduct} = useCart()
-
-    const {cart: ordering} = useSelector((state) => state.shop)
+/**
+ * Le panier et la validation de commande.
+ *
+ * La page portait un ecran de chargement plein cadre pilote par un `loading`
+ * qui ne servait qu'a recopier le restaurant du premier article du panier :
+ * une lecture synchrone en memoire, presentee comme un appel reseau. Elle
+ * affichait donc un spinner avant chaque rendu, sans rien attendre.
+ *
+ * Elle trainait aussi trois blocs de balisage commentes — un menu deroulant de
+ * categories, une barre de recherche, un panneau lateral — et les imports qui
+ * allaient avec, charges a chaque visite.
+ */
+export default function PagePanier() {
+    const {cart: ordering} = useSelector((state) => state.shop);
     const {user} = useGetCurrentUser();
+    const {handleRemoveProduct} = useCart();
 
-    const loadData = () => {
-        try {
-            setLoading(true)
-            if (ordering.length > 0) {
-                setInfoResto(ordering[0]?.restaurant);
-            }
-        } catch (e) {
-            //console.log(e)
-        } finally {
-            setLoading(false)
+    // Le restaurant n'est pas un etat : c'est une lecture du panier. Le
+    // stocker et le recopier dans un effet imposait un rendu supplementaire a
+    // chaque changement de panier, pour une valeur deja disponible.
+    const restaurant = ordering?.[0]?.restaurant ?? null;
 
-        }
-    }
-
-
-    useEffect(() => {
-        loadData()
-    }, [ordering]);
-
-
-    if (loading) {
-        return <Loader/>;
-    }
-
-    // 1. Vérification de la connexion en premier
     if (!user) {
         return (
-            <div
-                className="max-w-[1300px] mx-auto px-3 md:px-5 flex items-center justify-center min-h-screen flex-col gap-5">
-                <p data-aos="fade-up" className="text-center text-primaryColor text-base md:text-lg font-semibold">
-                    Veuillez vous connecter pour accéder à vos commandes.
-                </p>
-                <Link
-                    data-aos="fade-up"
-                    href="/login" // Adapte le chemin selon ta route de connexion
-                    className="py-3 px-6 bg-primaryColor text-white rounded-full shadow-lg hover:bg-secondaryColor transition-colors"
-                >
-                    Se connecter
-                </Link>
+            <div className="min-h-svh bg-surface-sunken pt-[var(--header-h)]">
+                <EmptyState
+                    title="Connectez-vous pour commander"
+                    message="Votre panier vous attend, il suffit de vous identifier."
+                    action={
+                        <Link
+                            href="/login"
+                            className="inline-flex rounded-pill bg-brand-500 px-7 py-3 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600"
+                        >
+                            Se connecter
+                        </Link>
+                    }
+                />
             </div>
-        )
+        );
     }
 
     return (
-        <div className="pt-[220px] md:pt-[230px]">
-            {/* Affiche BannerResto si infoResto contient des données */}
-            {ordering?.length > 0 ? (
-                <BannerResto restaurant={infoResto} restaurantIsLoading={loading}/>
-            ) : (
-                // Affiche BannerRestaurantPage si infoResto est vide
-                <BannerRestaurantPage/>
-            )}
-            {/* <section className="mb-10">
-        <div className="max-w-[1300px] mx-auto px-5 flex flex-col gap-3 items-center justify-between sm:flex-row">
-          <p className="text-base lg:text-lg font-semibold">
-            All Offers from McDonald’s East London
-          </p>
-          <form className="flex  items-center gap-4 rounded-full border border-secondaryColor py-2 px-4 md:py-3 md:px-6">
-            <Image src={searchLogo} width={20} alt="search logo" />
-            <input
-              className="border-none outline-none"
-              type="search"
-              name=""
-              id=""
-              placeholder="Search from menu..."
-            />
-          </form>
-        </div>
-      </section> */}
-            <section className="max-w-[1300px] mx-auto px-3 md:px-5">
-                {/* choix du menu uniquement visible sur le mobile */}
-                {/* <div className="lg:hidden py-5 border rounded-lg border-[#BCBCBC] bg-[#FBFBFB] overflow-hidden mb-4 flex justify-between">
-          <div className="flex gap-3 pl-5 items-center">
-            <Image src={cookImg} width={30} height={20} alt="food" />
-            <h3 className="text-2xl font-semibold text-black">Menu</h3>
-          </div>
-          <form className="mr-4">
-            <select className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 ease-in-out ">
-              <option value="">Choose an option</option>
-              {menu.map((item, index) => (
-                <option key={index} value={item.name}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </form>
-        </div> */}
-                {/* ************* */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {/* SideMenu occupe 1/4 de la largeur totale */}
-                    {/* <div className="col-span-1 hidden lg:block">
-            <SideMenu />
-          </div> */}
+        <div className="min-h-svh bg-surface-sunken pt-[var(--header-h)]">
+            {restaurant ? <BannerResto restaurant={restaurant} /> : null}
 
-                    {/* MainContent occupe 1/2 de la largeur totale */}
-                    <div className=" bg-white lg:col-span-2">
-                        <MainContent/>
+            <section className="mx-auto max-w-[1300px] px-4 py-8 sm:px-5">
+                <h1 className="mb-6 text-display font-extrabold text-secondaryColor">
+                    Votre commande
+                </h1>
+
+                {/*
+                  * Le panier passe au-dessus des informations sur mobile : c'est ce
+                  * qu'on vient verifier en premier. Sur grand ecran il reprend sa
+                  * place a droite.
+                  */}
+                <div className="grid gap-6 lg:grid-cols-3">
+                    <div className="order-2 lg:order-1 lg:col-span-2">
+                        <MainContent />
                     </div>
 
-                    {/* Order occupe 1/4 de la largeur totale */}
-                    <div className="">
-                        <Order ordering={ordering || []} removeProduct={handleRemoveProduct}/>
+                    <div className="order-1 lg:order-2">
+                        <Order ordering={ordering ?? []} removeProduct={handleRemoveProduct} />
                     </div>
                 </div>
             </section>
 
-            {/* beforefootercontent section */}
-            <BeforeFooterContent infoResto={infoResto || []}/>
+            <BeforeFooterContent infoResto={restaurant ?? []} />
         </div>
     );
 }

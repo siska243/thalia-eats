@@ -21,7 +21,7 @@ export const dateTimeFormat=(date)=>{
         return date
     }
 
-    return dayjs(new Date(date)).format('DD/MM/YYYY H:m:s')
+    return dayjs(new Date(date)).format('DD/MM/YYYY [à] HH:mm')
 
 }
 

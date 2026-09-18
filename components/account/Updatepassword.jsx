@@ -1,180 +1,105 @@
 "use client";
-import { useState } from "react";
+
+import {useState} from "react";
+import ChampTexte from "@/components/auth/ChampTexte";
 import Notify from "../toastify/Notify";
-import { Route } from "@/helpers/Route";
-import { FetchData } from "@/helpers/FetchData";
 import Spinner from "../Loader/Spinner";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {Route} from "@/helpers/Route";
+import {FetchData} from "@/helpers/FetchData";
 
+/** Changement de mot de passe. */
 export default function UpdatePassword() {
-  const [password, setPassword] = useState("");
-  const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [current_password, setCurrentPassword] = useState("");
+    const [current_password, setCurrentPassword] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const [loading, setLoading] = useState(false);
 
-  //   rendre visibles les mots de passe
+    const handleUpdatePassword = async (e) => {
+        e.preventDefault();
 
-  const [showCurrentPassWord, setShowCurrentPassWord] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] =
-    useState(false);
-  const [loading, setLoading] = useState(false);
+        if (!current_password || !password || !passwordConfirmation) {
+            Notify("Veuillez remplir tous les champs", "error");
+            return;
+        }
 
-  // Fonction pour valider et envoyer les données
-  const handleUpdatePassword = async (e) => {
-    e.preventDefault();
+        if (password !== passwordConfirmation) {
+            Notify("Les deux mots de passe ne correspondent pas", "error");
+            return;
+        }
 
-    if (!password || !passwordConfirmation) {
-      Notify("Veuillez remplir tous les champs", "error");
-      return;
-    }
+        setLoading(true);
 
-    if (password !== passwordConfirmation) {
-      Notify("Les mots de passe ne correspondent pas", "error");
-      return;
-    }
+        try {
+            const response = await FetchData.sendData(Route.update_password, {
+                password,
+                confirm_password: passwordConfirmation,
+                current_password,
+            });
 
-    try {
-      setLoading(true);
-      const formData = {
-        password,
-        confirm_password: passwordConfirmation,
-        current_password,
-      };
-      const response = await FetchData.sendData(
-        Route.update_password,
-        formData
-      );
+            if (response?.name === "AxiosError") {
+                Notify(
+                    response.response?.data?.message ?? "Mise à jour impossible",
+                    "error"
+                );
+                return;
+            }
 
-      if (response.name === "AxiosError") {
-        const {
-          response: {
-            data: { message },
-          },
-        } = response;
-        Notify(message || "Erreur lors de la mise à jour", "error");
-      } else {
-        Notify("Mot de passe mis à jour avec succès !", "success");
-        setPassword("");
-        setPasswordConfirmation("");
-        setCurrentPassword("");
-      }
-    } catch (error) {
-      Notify("Une erreur inattendue s'est produite", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+            Notify("Mot de passe mis à jour", "success");
+            setCurrentPassword("");
+            setPassword("");
+            setPasswordConfirmation("");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <div className="w-full h-full rounded-xl relative flex gap-8">
-      <div data-aos="fade-left" className="box-shadow-custom p-5 rounded-xl w-full bg-white">
-        <p className="mb-10 text-primaryColor uppercase text-base font-semibold">
-          Mettre à jour votre mot de passe
-        </p>
-        <form
-          className="w-full h-full space-y-6"
-          onSubmit={handleUpdatePassword}
-        >
-          {/* Nouveau mot de passe */}
-          <div className="flex flex-col relative">
-            <label htmlFor="current-password" className="text-gray-700 mb-2">
-              Mot de passe
-            </label>
-            <input
-              type={showCurrentPassWord ? "text" : "password"}
-              id="current-password"
-              className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor placeholder:text-sm pr-10"
-              placeholder="Votre mot de passe"
-              value={current_password}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              aria-label={
-                showCurrentPassWord
-                  ? "Cacher le mot de passe"
-                  : "Afficher le mot de passe"
-              }
-              className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
-              onClick={() => setShowCurrentPassWord(!showCurrentPassWord)}
-            >
-              {showCurrentPassWord ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
+    return (
+        <section className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+            <h2 className="mb-5 text-title font-bold text-secondaryColor">
+                Mot de passe
+            </h2>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* Nouveau mot de passe */}
-            <div className="flex flex-col relative">
-              <label htmlFor="password" className="text-gray-700 mb-2">
-                Nouveau mot de passe
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor placeholder:text-sm pr-16"
-                placeholder="Votre nouveau mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <form className="flex flex-col gap-5" onSubmit={handleUpdatePassword}>
+                <ChampTexte
+                    label="Mot de passe actuel"
+                    motDePasse
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    value={current_password}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                />
 
-              <button
-                type="button"
-                aria-label={
-                  showPassword
-                    ? "Cacher le mot de passe"
-                    : "Afficher le mot de passe"
-                }
-                className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
+                <ChampTexte
+                    label="Nouveau mot de passe"
+                    motDePasse
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    minLength={8}
+                    aide="8 caractères minimum"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
 
-            {/* Confirmation du mot de passe */}
-            <div className="flex flex-col relative">
-              <label
-                htmlFor="passwordConfirmation"
-                className="text-gray-700 mb-2"
-              >
-                Confirmer le mot de passe
-              </label>
-              <input
-                type={showPasswordConfirmation ? "text" : "password"}
-                id="passwordConfirmation"
-                className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor placeholder:text-sm pr-16"
-                placeholder="Confirmez votre mot de passe"
-                value={passwordConfirmation}
-                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                aria-label={
-                  showPasswordConfirmation
-                    ? "Cacher le mot de passe"
-                    : "Afficher le mot de passe"
-                }
-                className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
-                onClick={() =>
-                  setShowPasswordConfirmation(!showPasswordConfirmation)
-                }
-              >
-                {showPasswordConfirmation ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
+                <ChampTexte
+                    label="Confirmer le nouveau mot de passe"
+                    motDePasse
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                    value={passwordConfirmation}
+                    onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    required
+                />
 
-          <button
-            type="submit"
-            className="w-full py-3 text-sm sm:text-base sm:py-4 bg-secondaryColor text-white rounded-lg font-semibold hover:bg-secondaryColor/90 focus:ring-2 focus:ring-secondaryColor focus:ring-opacity-50"
-          >
-            {loading ? <Spinner /> : "Mettre à jour"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-1 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
+                >
+                    {loading ? <Spinner /> : "Changer le mot de passe"}
+                </button>
+            </form>
+        </section>
+    );
 }

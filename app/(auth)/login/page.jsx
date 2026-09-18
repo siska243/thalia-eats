@@ -1,138 +1,121 @@
 "use client";
-import React, {useState} from "react";
+
+import {useState} from "react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
+import {useDispatch} from "react-redux";
+import CarteAuth from "@/components/auth/CarteAuth";
+import ChampTexte from "@/components/auth/ChampTexte";
+import Spinner from "@/components/Loader/Spinner";
+import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {setToken} from "@/server/manageToken";
-import {loginRedirect} from "@/server/server-redirect";
-import Spinner from "@/components/Loader/Spinner";
-import Notify from "@/components/toastify/Notify";
-import {FaEye, FaEyeSlash} from "react-icons/fa";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {fetchAccountData} from "@/store/reducers/account";
-import {useDispatch} from "react-redux";
 
-export default function page() {
+/**
+ * Connexion.
+ *
+ * Le champ mot de passe n'avait pas de `value` : il etait non controle, donc
+ * le vider par le code — apres un echec, par exemple — ne faisait rien a
+ * l'ecran.
+ *
+ * L'erreur etait aussi lue par destructuration profonde
+ * (`response.response.data.message`) puis jetee : sur une panne reseau il n'y
+ * a pas de `response.response`, et la ligne levait une seconde exception a la
+ * place du message. Le message du serveur est desormais affiche quand il
+ * existe.
+ */
+export default function PageConnexion() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const { refetch } = useGetCurrentUser();
 
-    const dispatch=useDispatch()
+    const {refetch} = useGetCurrentUser();
+    const dispatch = useDispatch();
+    const router = useRouter();
 
     const handlerSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         try {
-            setLoading(true);
-            const data = {
-                email,
-                password,
-            };
-            const response = await FetchData.sendData(Route.login, data);
+            const response = await FetchData.sendData(Route.login, {email, password});
 
-            if (response.name === "AxiosError") {
-
-                const {response: {data: {message}}} = response;
-                Notify("Email ou mot de passe incorrecte","error" );
-
-            } else {
-
-                const {token} = response;
-
-                if (token) {
-                    await refetch()
-                    dispatch(fetchAccountData())
-                    Notify("Connexion réussie", "success");
-                    await setToken(token)
-                    await refetch()
-
-                    window.location.href="/"
-                    //await loginRedirect({token, url: "/"});
-
-                }
+            if (response?.name === "AxiosError") {
+                Notify(
+                    response.response?.data?.message ?? "Email ou mot de passe incorrect",
+                    "error"
+                );
+                return;
             }
-        } catch (error) {
-            console.log(error);
 
+            if (!response?.token) {
+                Notify("Connexion impossible pour le moment", "error");
+                return;
+            }
+
+            await setToken(response.token);
+            await refetch();
+            dispatch(fetchAccountData());
+            Notify("Connexion réussie", "success");
+
+            // Le jeton est pose dans un cookie serveur : les pages rendues
+            // cote serveur doivent le relire. `refresh()` les regenere sans
+            // recharger l'application — `window.location.href` reconstruisait
+            // tout depuis zero, panier Redux et cache TanStack Query compris.
+            router.replace("/");
+            router.refresh();
         } finally {
             setLoading(false);
         }
     };
+
     return (
-        <div className="min-h-screen bg-[#F3F4F6] h-full pt-[220px] md:pt-[230px]  flex items-center justify-center"
-        >
-            <section className="w-full max-w-lg mx-auto px-5  h-full flex justify-center items-center mb-10 py-5">
-                {/* formulaire d'inscription */}
-                <div className=" bg-white rounded-2xl shadow-xl overflow-hidden w-full">
-                    <form
-                        className="w-full h-full space-y-6 md:p-10 px-4 py-6 sm:p-6"
-                        onSubmit={handlerSubmit}
+        <CarteAuth
+            titre="Connexion"
+            sousTitre="Retrouvez vos commandes et vos adresses."
+            bas={
+                <>
+                    Vous n&apos;avez pas de compte ?{" "}
+                    <Link
+                        href="/signup"
+                        className="font-semibold text-brand-600 underline-offset-4 hover:underline"
                     >
-                        <h2 className="text-xl md:text-3xl font-semibold text-center text-gray-900 mb-8">
-                            Connexion
-                        </h2>
+                        Inscrivez-vous
+                    </Link>
+                </>
+            }
+        >
+            <form className="flex flex-col gap-5" onSubmit={handlerSubmit}>
+                <ChampTexte
+                    label="Identifiant"
+                    placeholder="Votre email ou numéro de téléphone"
+                    autoComplete="username"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
 
-                        <div className="flex flex-col">
-                            <label htmlFor="email" className="text-gray-700 mb-2">
-                                Identifiant
-                            </label>
-                            <input
+                <ChampTexte
+                    label="Mot de passe"
+                    motDePasse
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
 
-                                id="email"
-                                className="py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                                placeholder="Votre email ou numéro de téléphone"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="flex flex-col relative">
-                            <label htmlFor="password" className="text-gray-700 mb-2">
-                                Mot de passe
-                            </label>
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                id="password"
-                                required
-                                className="py-2 px-4 sm:py-3  rounded-lg border-2 border-gray-300 focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor focus:outline-none"
-                                placeholder="••••••••"
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                aria-label={showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
-                                className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <FaEyeSlash/> : <FaEye/>}
-                            </button>
-                        </div>
-
-                        <button
-                            disabled={loading}
-                            type="submit"
-                            className="w-full py-3 text-sm sm:text-base sm:py-4 bg-secondaryColor text-white rounded-lg font-semibold hover:bg-secondaryColor/90 focus:ring-2 focus:ring-secondaryColor focus:ring-opacity-50"
-                        >
-                            {
-                                loading ? (<Spinner/>) : "Se connecter"
-                            }
-                        </button>
-
-                        <p className="text-center text-gray-500 mt-4 md:text-base text-sm">
-                            Vous n'avez pas de compte ?{" "}
-                            <Link
-                                href="/signup"
-                                className="text-primaryColor hover:underline"
-                            >
-                                Inscrivez-vous
-                            </Link>
-                        </p>
-                    </form>
-                </div>
-            </section>
-        </div>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
+                >
+                    {loading ? <Spinner /> : "Se connecter"}
+                </button>
+            </form>
+        </CarteAuth>
     );
 }
