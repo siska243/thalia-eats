@@ -5,9 +5,6 @@ import { Route } from "@/helpers/Route";
 import { FetchData } from "@/helpers/FetchData";
 import Notify from "@/components/toastify/Notify";
 
-type Props={
-    orderNumber?:string
-}
 const fetchPaymentStatus = async (orderNumber:string|null) => {
     if (!orderNumber) return null;
     const response = await FetchData.getData(Route.swr_check_paiement(orderNumber));

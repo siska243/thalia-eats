@@ -37,7 +37,7 @@ const accountSlice = createSlice({
         token: null
     },
     reducers: {
-        getAccount: (state, action) => {
+        getAccount: (state) => {
             return state;
         },
         updateAccount: (state, action) => {

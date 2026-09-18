@@ -1,6 +1,5 @@
 import React from "react";
 import CardPartner from "./CardPartner";
-import partnerImg from "@/public/assets/images/partner.png";
 import thalia1 from "@/public/assets/images/resto-image.jpeg";
 import thalia2 from "@/public/assets/thalia2.jpg";
 // import thalia2 from "@/public/assets/images/thalia2.jpeg";

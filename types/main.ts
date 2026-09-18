@@ -1,8 +1,25 @@
+/**
+ * L'adresse de livraison choisie pour une commande.
+ *
+ * Elle etait declaree `adresse?: string` dans OrderType, alors que le code y
+ * range un objet depuis toujours : `price_delivrery` lit `town?.slug`, et le
+ * panier fait `JSON.parse` du contenu du stockage local. Le type mentait, et
+ * chaque fichier qui le consommait devait le contourner — d'ou une partie des
+ * erreurs de types accumulees.
+ */
+export type AdresseLivraisonType = {
+    adresse?: string,
+    town?: CommuneType,
+    reference?: string,
+    street?: string,
+    number_street?: string
+}
+
 export type OrderType = {
     products: {
         uid: string, quantity: number
     }[],
-    adresse?: string,
+    adresse?: AdresseLivraisonType,
     pricing: {
         frais_livraison?: number,
         service_price?: number,
@@ -69,4 +86,16 @@ export type CurrencyType = {
     "slug": string,
     "is_active": number | string,
 
+}
+/** Ce que renvoie `GET /api/default` : communes et grille tarifaire. */
+export type DefaultDataType = {
+    town?: CommuneType[],
+    delivrery_price?: {
+        town: CommuneType,
+        interval_pricing: number,
+        interval_max_price: number,
+        frais_livraison: number,
+        service_price: number,
+        currency: CurrencyType
+    }[]
 }

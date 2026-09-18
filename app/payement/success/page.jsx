@@ -1,75 +1,74 @@
-"use client"
-import useCurrentCommande from '@/hooks/useCurrentCommande'
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Route } from '@/helpers/Route'
-import { FetchData } from "@/helpers/FetchData";
-import Loader from '@/components/Loader/Loader'
-import { MdCheckCircle } from "react-icons/md";
+"use client";
+
+import {useEffect, useRef} from "react";
+import {useDispatch} from "react-redux";
+import {MdCheckCircle} from "react-icons/md";
+import EcranPaiement from "@/components/payement/EcranPaiement";
+import Loader from "@/components/Loader/Loader";
 import Notify from "@/components/toastify/Notify";
-import {fetchCurrentOrder, setCurrentOrder} from "@/store/reducers/cartSlice";
-import {useDispatch, useSelector} from "react-redux";
+import useCurrentCommande from "@/hooks/useCurrentCommande";
+import {FetchData} from "@/helpers/FetchData";
+import {Route} from "@/helpers/Route";
+import {fetchCurrentOrder} from "@/store/reducers/cartSlice";
 import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 
-export default function SuccessPage() {
-    const { currentCommande, isLoading, isError, isFetched } = useCurrentCommande()
-    const router = useRouter()
-    const dispatch=useDispatch()
-
-    const handlerCheckPayement = async (uid) => {
-        try {
-            const response = await FetchData.sendData(Route.check_paiement, { uid })
-
-            dispatch(fetchCurrentOrder())
-            if(response?.name==="AxiosError"){
-                Notify(response?.response?.data?.title,'error',response?.response?.data?.message)
-            }
-            else{
-
-                if(localStorage.getItem("flex_pay_number_order_thalia_eats")){
-                    clearLocalStorageOrdering()
-                    localStorage.removeItem("flex_pay_number_order_thalia_eats")
-                    Notify(response.title,'success',response.message)
-                }
-
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    }
+/**
+ * Retour d'un paiement reussi.
+ *
+ * Le bug principal etait a l'appel : `handlerCheckPayement()` etait invoque
+ * sans argument, alors qu'il attend un `uid`. La requete partait donc avec
+ * `{uid: undefined}` et le paiement n'etait jamais confirme cote serveur.
+ * L'effet ne dependait en plus que du montage, donc il partait avant meme que
+ * la commande courante soit chargee.
+ *
+ * La verification attend maintenant l'uid, et ne part qu'une fois : sans le
+ * garde-fou, chaque nouveau rendu de la commande relancait la confirmation.
+ */
+export default function PageSuccesPaiement() {
+    const {currentCommande, isLoading} = useCurrentCommande();
+    const dispatch = useDispatch();
+    const dejaVerifie = useRef(false);
 
     useEffect(() => {
-        if(typeof window !=="undefined" && localStorage.getItem("flex_pay_number_order_thalia_eats")){
-            handlerCheckPayement()
-        }
+        const uid = currentCommande?.uid;
+        if (!uid || dejaVerifie.current) return;
+        if (typeof window === "undefined") return;
+        if (!localStorage.getItem("flex_pay_number_order_thalia_eats")) return;
 
-    }, [])
+        dejaVerifie.current = true;
 
-    if (isLoading) {
-        return (
-            <Loader />
-        )
-    }
+        (async () => {
+            const reponse = await FetchData.sendData(Route.check_paiement, {uid});
+
+            // FetchData retourne les erreurs axios au lieu de les lever.
+            if (reponse?.name === "AxiosError") {
+                Notify(
+                    reponse.response?.data?.title,
+                    "error",
+                    reponse.response?.data?.message
+                );
+                return;
+            }
+
+            clearLocalStorageOrdering();
+            localStorage.removeItem("flex_pay_number_order_thalia_eats");
+            dispatch(fetchCurrentOrder());
+            Notify(reponse?.title, "success", reponse?.message);
+        })();
+    }, [currentCommande, dispatch]);
+
+    if (isLoading) return <Loader />;
 
     return (
-        <div className="flex items-center justify-center  h-screen pt-[150px] bg-gray-50 px-4 sm:px-6 lg:px-8">
-            <div data-aos="fade-left" className="bg-white box-shadow-custom rounded-lg p-8 max-w-md text-center">
-                <div className="flex justify-center mb-4 md:mb-6 ">
-                    {/* Icone de succès */}
-                    <MdCheckCircle data-aos="fade-left" className="w-12 h-12 md:w-16 md:h-16 text-green-500" />
-                </div>
-                <h2 data-aos="fade-left" className=" text-xl md:text-2xl font-bold text-gray-800 mb-2">Paiement réussi !</h2>
-                <p data-aos="fade-left" className="text-sm md:text-base text-gray-600 mb-6">
-                    Votre commande a été confirmée avec succès. Vous pouvez suivre son statut à tout moment.
-                </p>
-                {/* Bouton de redirection */}
-                <button data-aos="fade-left"
-                    onClick={() => router.push('/tracking')}
-                    className="text-sm md:text-base bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-md transition duration-200"
-                >
-                    Suivre ma commande
-                </button>
-            </div>
-        </div>
-    )
+        <EcranPaiement
+            ton="succes"
+            icone={<MdCheckCircle className="h-9 w-9" />}
+            titre="Paiement réussi"
+            message="Votre commande est confirmée. Vous pouvez suivre sa préparation et sa livraison à tout moment."
+            actions={[
+                {href: "/tracking", label: "Suivre ma commande"},
+                {href: "/restaurant", label: "Commander autre chose"},
+            ]}
+        />
+    );
 }

@@ -3,36 +3,23 @@
 import {btoa} from "node:buffer";
 
 
-export const encode_data = async (string: string) => {
-    try {
-        return btoa(string)
-    }
-    catch (e){
-
-    }
-
+/*
+ * `encode_data` avalait son erreur sans rien renvoyer : en cas d'echec elle
+ * retournait `undefined`, et l'appelant posait alors un cookie de session
+ * valant « undefined ». L'utilisateur se retrouvait connecte avec un jeton
+ * vide, sans message. Un encodage qui echoue doit echouer franchement.
+ */
+export const encode_data = async (string: string): Promise<string> => {
+    return btoa(string)
 }
 export const decode_data = async (string: string) => {
 
     try {
         return atob(string)
     }
-    catch (e){
+    catch {
        return '[]'
     }
 
 
-}
-
-export const dataUrlBase64 = async (file:any) => {
-
-    const fs = require('fs');
-    try {
-        const fileData = fs.readFileSync(file); // Lire le fichier
-        return fileData.toString('base64'); // Convertir en Base64
-
-    } catch (error) {
-        console.error('Erreur lors de la lecture du fichier:', error);
-        throw error;
-    }
 }

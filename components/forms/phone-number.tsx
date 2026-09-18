@@ -89,7 +89,8 @@ export interface PhoneNumberProps
     size?: keyof typeof inputStyles.size;
     rounded?: keyof typeof inputStyles.rounded;
     variant?: keyof typeof inputStyles.variant;
-    color?: keyof (typeof inputStyles.variant)["active"]["color"];
+    // `inputStyles.variant` expose flat/outline/text, jamais `active`.
+    color?: string;
     clearable?: boolean;
     enableSearch?: boolean;
     onClear?: (event: React.MouseEvent) => void;
@@ -150,9 +151,9 @@ const PhoneNumber = ({
                 buttonClass={cn(
                     buttonStyles.base,
                     buttonStyles.size[size],
-                    // @ts-ignore
+                    // @ts-expect-error react-phone-input-2 ne type pas inputProps
                     props.inputProps?.disabled && "pointer-events-none",
-                    // @ts-ignore
+                    // @ts-expect-error react-phone-input-2 ne type pas inputProps
                     props.inputProps?.readOnly && "pointer-events-none",
                     buttonClassName
                 )}

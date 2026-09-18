@@ -1,6 +1,4 @@
-import {createAsyncThunk} from "@reduxjs/toolkit";
-
-const {createSlice} = require("@reduxjs/toolkit");
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {getLocalstorageOrdering, setLocalStorageOrdering} from "@/helpers/localstorage-data"
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
@@ -203,48 +201,32 @@ const cartSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchCurrentOrder.pending, (state) => {
-
-            })
+            .addCase(fetchCurrentOrder.pending, () => {})
             .addCase(fetchCurrentOrder.fulfilled,(state,action)=>{
                 state.currentOrder=action.payload
 
             })
-            .addCase(fetchCurrentOrder.rejected,(state,action)=>{
-
-            })
-            .addCase(sendCurrentOrder.pending, (state) => {
-
-            })
+            .addCase(fetchCurrentOrder.rejected,() => {})
+            .addCase(sendCurrentOrder.pending, () => {})
             .addCase(sendCurrentOrder.fulfilled,(state,action)=>{
                 state.currentOrder=action.payload
 
             })
-            .addCase(sendCurrentOrder.rejected,(state,action)=>{
+            .addCase(sendCurrentOrder.rejected,() => {})
 
-            })
-
-            .addCase(removeProductCurrentOrder.pending, (state) => {
-
-            })
+            .addCase(removeProductCurrentOrder.pending, () => {})
             .addCase(removeProductCurrentOrder.fulfilled,(state,action)=>{
                 state.currentOrder=action.payload
 
             })
-            .addCase(removeProductCurrentOrder.rejected,(state,action)=>{
+            .addCase(removeProductCurrentOrder.rejected,() => {})
 
-            })
-
-            .addCase(updateAddresseCurrentOrder.pending, (state) => {
-
-            })
+            .addCase(updateAddresseCurrentOrder.pending, () => {})
             .addCase(updateAddresseCurrentOrder.fulfilled,(state,action)=>{
                 state.currentOrder=action.payload
 
             })
-            .addCase(updateAddresseCurrentOrder.rejected,(state,action)=>{
-
-            })
+            .addCase(updateAddresseCurrentOrder.rejected,() => {})
     }
 });
 

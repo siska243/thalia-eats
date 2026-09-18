@@ -1,6 +1,6 @@
 "use client"
 
-import {OrderType, ProductType, ShopType} from "@/types/main";
+import {CommuneType, DefaultDataType, OrderType, ProductType, ShopType} from "@/types/main";
 import {useDispatch, useSelector} from "react-redux";
 import {setOrderCart, setShopCart} from "@/store/reducers/shopSlice";
 import {clearLocalStorageOrdering, setLocalStorageOrdering} from "@/helpers/localstorage-data";
@@ -18,7 +18,7 @@ const useCart = () => {
 
     const {cart} = useSelector((state: {
         shop: {
-            cart: any, order: {
+            cart: ShopType[], order: {
                 data: OrderType,
                 is_passed: boolean
             }
@@ -26,27 +26,8 @@ const useCart = () => {
     }) => state.shop)
 
 
-    const {data:townData,refetch}=useReferentialData({url: Route.default, queryKey: 'query-default-data-account-user'});
+    const {data: townData, refetch} = useReferentialData<DefaultDataType>({url: Route.default, queryKey: 'query-default-data-account-user'});
 
-
-    const updatePriccing=(custom_cart=null)=>{
-        if (townData) {
-            const delivery_address = localStorage.getItem("thalia_eat_order_delivery_address")
-
-            if (typeof delivery_address === "string") {
-                const my_town = JSON.parse(delivery_address)?.town
-
-                handleCustomOrder(my_town,custom_cart)
-            }
-        }
-    }
-
-    useEffect(() => {
-        if (typeof window !== "undefined" && localStorage.getItem("thalia_eat_order_delivery_address")) {
-            refetch()
-           updatePriccing()
-        }
-    }, [townData]);
 
     const dispatch = useDispatch()
 
@@ -154,7 +135,7 @@ const useCart = () => {
         updatePriccing()
     }
 
-    const handleCustomOrder = (town: string,custom_cart=null) => {
+    const handleCustomOrder = (town?: CommuneType, custom_cart: ShopType[] | null = null) => {
 
         const livraisonPrix = price_delivrery(calcul_price(custom_cart ?? cart), townData?.delivrery_price, town)
 
@@ -182,6 +163,46 @@ const useCart = () => {
             is_passed: false
         }))
     }
+
+    /**
+     * Rechiffre la commande a partir de l'adresse deja choisie.
+     *
+     * Cette fonction etait declaree *avant* `handleCustomOrder`, qu'elle
+     * appelle. Comme les deux sont des `const`, l'appeler avant que la seconde
+     * soit initialisee leve un ReferenceError : elle ne tenait que parce que
+     * son seul appelant est un `useEffect`, execute apres le rendu. Toute
+     * autre invocation — un gestionnaire d'evenement, un appel direct — aurait
+     * casse. Elle est desormais declaree apres sa dependance.
+     */
+    const updatePriccing = (custom_cart: ShopType[] | null = null) => {
+        if (!townData) return
+
+        const delivery_address = localStorage.getItem("thalia_eat_order_delivery_address")
+
+        if (typeof delivery_address !== "string") return
+
+        handleCustomOrder(JSON.parse(delivery_address)?.town, custom_cart)
+    }
+
+    /*
+     * Rechiffre la commande des que la grille tarifaire arrive, si une adresse
+     * a deja ete choisie.
+     *
+     * Volontairement declare ici, sous les fonctions qu'il appelle : place plus
+     * haut, il les referencait avant leur initialisation. Seul le fait qu'un
+     * effet s'execute apres le rendu empechait le ReferenceError.
+     */
+    useEffect(() => {
+        if (typeof window === "undefined") return
+        if (!localStorage.getItem("thalia_eat_order_delivery_address")) return
+
+        refetch()
+        updatePriccing()
+        // `updatePriccing` et `refetch` sont recrees a chaque rendu : les
+        // suivre relancerait le chiffrage en boucle. Seule l'arrivee de la
+        // grille tarifaire doit le declencher.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [townData]);
 
 
     return {

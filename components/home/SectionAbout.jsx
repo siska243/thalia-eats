@@ -2,8 +2,6 @@
 import { useState } from "react";
 import { Collapse } from "react-collapse";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import CardAbout from "./CardAbout";
-import aboutImg from "@/public/assets/images/aboutImg.png";
 
 export default function SectionAbout() {
   const [activeTab, setActiveTab] = useState("about");
@@ -98,12 +96,12 @@ export default function SectionAbout() {
 
     partner: (
       <p className="text-sm  text-secondaryColor leading-8">
-        Rejoignez notre programme partenaire et développez votre entreprise avec nous. Accédez à une large gamme de clients, d'outils et d'informations pour maximiser votre potentiel.
+        Rejoignez notre programme partenaire et développez votre entreprise avec nous. Accédez à une large gamme de clients, d&apos;outils et d&apos;informations pour maximiser votre potentiel.
       </p>
     ),
     support: (
       <p className="text-sm  text-secondaryColor leading-8">
-        Besoin d'assistance ? Notre équipe de support est là pour vous aider. Contactez-nous sur <a href="mailto:thaliaeat.original@gmail.com" className="text-primaryColor font-semibold">thaliaeat.original@gmail.com</a> et sur whatsApp <a target="_blank" className="text-primaryColor font-semibold" href="https://wa.me/33627758753">+33 6 27 75 87 53</a>.
+        Besoin d&apos;assistance ? Notre équipe de support est là pour vous aider. Contactez-nous sur <a href="mailto:thaliaeat.original@gmail.com" className="text-primaryColor font-semibold">thaliaeat.original@gmail.com</a> et sur whatsApp <a target="_blank" className="text-primaryColor font-semibold" href="https://wa.me/33627758753">+33 6 27 75 87 53</a>.
       </p>
     ),
   };

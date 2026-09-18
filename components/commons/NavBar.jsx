@@ -1,116 +1,159 @@
 "use client";
+
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {MdAccountCircle} from "react-icons/md";
 import {HiMiniBars3CenterLeft} from "react-icons/hi2";
 import {IoMdClose} from "react-icons/io";
-import {useState} from "react";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Account from "../account/Account";
 
+/**
+ * La navigation principale.
+ *
+ * Trois corrections :
+ *
+ * - deux entrees etaient restees en anglais sur un site francais : « Cart »
+ *   pour le panier, et « Login/SignUp » pour la connexion.
+ * - le panneau mobile n'avait pas de `md:hidden` : il restait monte sur
+ *   desktop, simplement pousse hors cadre par une translation. Ouvert par un
+ *   raccourci clavier ou un changement de largeur, il recouvrait la page.
+ * - il mesurait `h-screen`, donc `100vh`. Sur mobile, `vh` compte la barre
+ *   d'adresse du navigateur : le bas du menu passait sous l'ecran, et le
+ *   dernier lien devenait inatteignable. `svh` mesure la hauteur reellement
+ *   visible.
+ *
+ * Le defilement de la page est aussi bloque pendant que le menu est ouvert :
+ * sans ca, faire glisser le menu faisait defiler la page derriere lui.
+ */
 export default function NavBar() {
     const {user} = useGetCurrentUser();
-
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+    const pathname = usePathname();
 
     const links = [
         {path: "/", name: "Accueil"},
-        {path: "/restaurant", name: "Restaurant"},
-        {path: "/ordering", name: "Cart"},
+        {path: "/restaurant", name: "Restaurants"},
+        {path: "/ordering", name: "Panier"},
         {path: "/tracking", name: "Ma commande"},
+        {path: "/historique", name: "Historique"},
     ];
 
-    const pathname = usePathname();
+    useEffect(() => {
+        if (!isMenuOpen) return;
+
+        const precedent = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = precedent;
+        };
+    }, [isMenuOpen]);
+
+    /*
+     * Naviguer ferme le menu : sans ca il restait ouvert sur la page suivante.
+     *
+     * Ajuste pendant le rendu plutot que dans un effet — c'est le motif que
+     * React documente pour reagir au changement d'une valeur. Dans un effet,
+     * la page suivante s'affichait une fraction de seconde avec le menu encore
+     * ouvert par-dessus, avant le second rendu qui le refermait.
+     */
+    const [pathnamePrecedent, setPathnamePrecedent] = useState(pathname);
+
+    if (pathname !== pathnamePrecedent) {
+        setPathnamePrecedent(pathname);
+        setIsMenuOpen(false);
+    }
 
     return (
         <>
-            {/* Menu pour grand écran */}
-            <nav className="hidden md:flex items-center md:gap-4 lg:gap-6">
-                <ul className="flex gap-6">
-                    {links.map(({path, name}, index) => (
-                        <Link
-                            key={index}
-                            href={path}
-                            className={`link-animation text-secondaryColor ${path === pathname &&
-                            "before:bg-primaryColor text-white before:h-full"
-                            }`}
-                        >
-                            {name}
-                        </Link>
+            <nav className="hidden items-center md:flex md:gap-4 lg:gap-6">
+                <ul className="flex gap-5 lg:gap-6">
+                    {links.map(({path, name}) => (
+                        <li key={path}>
+                            <Link
+                                href={path}
+                                aria-current={path === pathname ? "page" : undefined}
+                                className={`link-animation text-secondaryColor ${
+                                    path === pathname
+                                        ? "before:bg-primaryColor text-white before:h-full"
+                                        : ""
+                                }`}
+                            >
+                                {name}
+                            </Link>
+                        </li>
                     ))}
                 </ul>
+
                 {!user ? (
                     <Link
                         href="/login"
-                        className="py-3 px-6 rounded-full bg-secondaryColor border border-secondaryColor"
+                        className="flex items-center gap-2 rounded-pill border border-secondaryColor bg-secondaryColor px-6 py-3 transition-opacity duration-150 hover:opacity-90"
                     >
-                        {/* bouton login and sign up */}
-                        <button className="flex gap-2 items-center">
-                            <MdAccountCircle className="text-primaryColor text-xl"/>
-                            <span className="text-thirdColor">Login/SignUp</span>
-                        </button>
+                        <MdAccountCircle className="text-xl text-primaryColor" />
+                        <span className="text-thirdColor">Connexion</span>
                     </Link>
                 ) : (
-                    <Account account={user} isMobile={false}/>
+                    <Account account={user} isMobile={false} />
                 )}
             </nav>
-            {/* *************************$ */}
-            {/* Bouton mobile */}
+
             <button
-                className="md:hidden border p-3 rounded-xl bg-secondaryColor text-primaryColor"
-                onClick={toggleMenu}
+                type="button"
+                onClick={() => setIsMenuOpen(true)}
+                aria-label="Ouvrir le menu"
+                aria-expanded={isMenuOpen}
+                className="rounded-control border bg-secondaryColor p-3 text-primaryColor md:hidden"
             >
-                <HiMiniBars3CenterLeft
-                    className={`text-xl ${isMenuOpen ? "opacity-0" : "opacity-100"}`}
-                />
+                <HiMiniBars3CenterLeft className="text-xl" />
             </button>
 
-            {/* ***************** */}
-            {/* Menu mobile */}
             <div
-                className={`fixed top-0 right-0 w-full h-screen  z-[9999] transform transition-transform duration-500 ease-in-out ${isMenuOpen ? "translate-x-0" : "translate-x-full"
-                } bg-secondaryColor/80 backdrop-blur-md `}
+                className={`fixed right-0 top-0 z-[9999] h-svh w-full overflow-y-auto bg-secondaryColor/95 backdrop-blur-md transition-transform duration-300 ease-in-out md:hidden ${
+                    isMenuOpen ? "translate-x-0" : "pointer-events-none translate-x-full"
+                }`}
+                aria-hidden={!isMenuOpen}
             >
-                {/* Bouton de fermeture dans le menu mobile */}
                 <button
-                    className="absolute top-10 right-10 text-primaryColor text-2xl"
+                    type="button"
                     onClick={() => setIsMenuOpen(false)}
+                    aria-label="Fermer le menu"
+                    className="absolute right-6 top-8 p-2 text-2xl text-primaryColor"
                 >
-                    <IoMdClose/>
+                    <IoMdClose />
                 </button>
-                {/* ********************* */}
-                {/* Liens du menu mobile */}
-                <ul className="flex flex-col items-center gap-6 mt-20">
-                    {links.map(({path, name}, index) => (
-                        <Link
-                            key={index}
-                            href={path}
-                            className={`link-animation  text-2xl text-white py-2 px-6 block ${path === pathname && "before:bg-primaryColor  before:h-full"
-                            }`}
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            {name}
-                        </Link>
+
+                <ul className="mt-24 flex flex-col items-center gap-5">
+                    {links.map(({path, name}) => (
+                        <li key={path}>
+                            <Link
+                                href={path}
+                                aria-current={path === pathname ? "page" : undefined}
+                                className={`link-animation block px-6 py-2 text-2xl text-white ${
+                                    path === pathname ? "before:h-full before:bg-primaryColor" : ""
+                                }`}
+                            >
+                                {name}
+                            </Link>
+                        </li>
                     ))}
                 </ul>
 
-                {/* Bouton Login/SignUp dans le menu mobile */}
-                {!user ? (
-                    <Link
-                        onClick={() => setIsMenuOpen(false)}
-                        href="/login"
-                        className="py-4 px-6 rounded-full bg-secondaryColor border border-secondaryColor  flex justify-center items-center mt-5 md:px-5 mx-auto  max-w-[60%]"
-                    >
-                        {/* bouton login and sign up */}
-                        <button className="flex gap-2 items-center">
-                            <MdAccountCircle className="text-primaryColor text-xl"/>
-                            <span className="text-thirdColor">Login/SignUp</span>
-                        </button>
-                    </Link>
-                ) : (
-                    <Account account={user} isMobile={true}/>
-                )}
+                <div className="mt-8 px-6 pb-12">
+                    {!user ? (
+                        <Link
+                            href="/login"
+                            className="mx-auto flex max-w-xs items-center justify-center gap-2 rounded-pill border border-primaryColor px-6 py-4"
+                        >
+                            <MdAccountCircle className="text-xl text-primaryColor" />
+                            <span className="text-thirdColor">Connexion</span>
+                        </Link>
+                    ) : (
+                        <Account account={user} isMobile={true} />
+                    )}
+                </div>
             </div>
         </>
     );

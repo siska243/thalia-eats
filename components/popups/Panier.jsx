@@ -1,73 +1,104 @@
-import { FaCircleArrowRight } from "react-icons/fa6";
+"use client";
 
+import Link from "next/link";
+import {useSelector} from "react-redux";
+import {FaCircleArrowRight} from "react-icons/fa6";
+import Modal from "./Modal";
 import PanierItems from "./PanierItems";
 import useCreateOrdering from "@/hooks/useCreateOrdering";
-import Modal from "./Modal"
-import Link from "next/link";
 import useCart from "@/hooks/useCart";
-import {useSelector} from "react-redux";
+import {formatPrix} from "@/helpers/openingHours";
 
-export default function Panier({ toggleShowPanier }) {
+/**
+ * Le panier en surcouche.
+ *
+ * La liste des plats etait haute de `h-[200px] md:[300px]`. La seconde classe
+ * n'existe pas — il manque la propriete, Tailwind ne genere rien — donc la
+ * liste restait bloquee a 200 pixels sur tous les ecrans, y compris sur un
+ * moniteur de bureau.
+ *
+ * Trois conteneurs imbriques portaient `overflow-y-scroll`, qui affiche une
+ * barre de defilement meme quand il n'y a rien a faire defiler : on voyait
+ * jusqu'a trois barres empilees pour un seul plat. `overflow-y-auto` ne
+ * l'affiche que lorsqu'elle sert.
+ */
+export default function Panier({toggleShowPanier}) {
+    const {calculateTotalPrice} = useCreateOrdering();
+    const {cart: ordering} = useSelector((state) => state.shop);
+    const {handleAddProductCart, handleRemoveProduct} = useCart();
 
-  const { calculateTotalPrice } = useCreateOrdering()
+    if (!ordering?.length) {
+        return (
+            <Modal toggleModal={toggleShowPanier}>
+                <div className="px-6 py-10 text-center">
+                    <p className="text-body text-ink-muted">Votre panier est vide.</p>
 
-  const {cart:ordering} = useSelector((state) => state.shop)
-  const {handleAddProductCart,handleRemoveProduct}=useCart()
-  
-
-  return (
-    <Modal toggleModal={toggleShowPanier}>
-      {
-        ordering && ordering.length > 0 ?
-          <div className="w-full h-full bg-white overflow-y-scroll rounded-xl">
-            <div className="py-4 px-6 h-[200px] md:[300px] overflow-y-scroll">
-              {/* panier items */}
-              <p className="mb-5 text-sm md:text-base text-primaryColor uppercase font-semibold">
-                Les plats dans votre Panier
-              </p>
-              <div className="flex flex-col gap-4 overflow-y-scroll">
-                {ordering.map((item, index) => {
-                  return <PanierItems key={index} item={item}
-                    handleDecrement={() => handleRemoveProduct(item.product)}
-                    handleIncrement={() => handleAddProductCart(item.product)}
-                  />;
-                })}
-              </div>
-            </div>
-            {/* le prix et la commande */}
-
-            <div className="p-5 border-t border-gray-200">
-              <div className="flex items-center  gap-3 md:gap-5 justify-between flex-col md:flex-row">
-                <div className="bg-primaryColor py-3 px-5 rounded-md text-white flex items-center gap-4 flex-shrink-0">
-                  <p className="">
-                    Total: <span className="font-medium text-base md:text-lg">{calculateTotalPrice(ordering)} </span>
-                  </p>
-                  <p>{ordering[0]?.currency?.code}</p>
+                    <Link
+                        href="/restaurant"
+                        onClick={toggleShowPanier}
+                        className="mt-5 inline-flex rounded-pill bg-brand-500 px-7 py-3 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600"
+                    >
+                        Voir les restaurants
+                    </Link>
                 </div>
-                <p className="text-sm text-gray-600 font-medium text-center md:text-left">
-                  La livraison et les taxes seront calculées à l'étape suivante.
-                </p>
-              </div>
-              {/* **************** */}
-              <div className="mt-5 flex items-center gap-3 flex-col md:flex-row md:gap-5 justify-end">
-                <button className="text-sm underline text-gray-600" onClick={toggleShowPanier}>Retour</button>
-                <Link href="/ordering" className="flex gap-2 md:gap-5 items-center bg-green-700 text-sm md:text-base text-white px-5 py-3 md:px-9 rounded-md" onClick={toggleShowPanier}>
-                  <FaCircleArrowRight />
-                  <span> Etape suivante</span>
-                </Link>
-              </div>
+            </Modal>
+        );
+    }
+
+    const devise = ordering[0]?.product?.currency?.code ?? ordering[0]?.currency?.code;
+
+    return (
+        <Modal toggleModal={toggleShowPanier}>
+            <div className="flex max-h-[85svh] w-full flex-col rounded-card bg-surface">
+                <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+                    <h2 className="mb-4 text-title font-bold text-secondaryColor">
+                        Les plats dans votre panier
+                    </h2>
+
+                    <div className="flex flex-col gap-4">
+                        {ordering.map((item, index) => (
+                            <PanierItems
+                                key={index}
+                                item={item}
+                                handleDecrement={() => handleRemoveProduct(item.product)}
+                                handleIncrement={() => handleAddProductCart(item.product)}
+                            />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="border-t border-surface-border p-5 sm:px-6">
+                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="rounded-control bg-brand-500 px-5 py-3 text-body font-semibold text-ink-inverse">
+                            Total&nbsp;: {formatPrix(calculateTotalPrice(ordering), devise)}
+                        </p>
+
+                        <p className="text-caption text-ink-muted">
+                            La livraison et les frais de service sont calculés à l&apos;étape
+                            suivante.
+                        </p>
+                    </div>
+
+                    <div className="mt-5 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+                        <button
+                            type="button"
+                            onClick={toggleShowPanier}
+                            className="text-caption font-semibold text-ink-muted underline underline-offset-4 sm:px-4"
+                        >
+                            Continuer mes achats
+                        </button>
+
+                        <Link
+                            href="/ordering"
+                            onClick={toggleShowPanier}
+                            className="flex items-center justify-center gap-2 rounded-pill bg-secondaryColor px-7 py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90"
+                        >
+                            <FaCircleArrowRight />
+                            Étape suivante
+                        </Link>
+                    </div>
+                </div>
             </div>
-          </div>
-          : <div className="py-4 px-6 ">
-            {/* panier items */}
-            <p className="mb-5 text-sm text-gray-500">
-              Votre panier est vide
-            </p>
-          </div>
-      }
-
-    </Modal>
-
-  );
-
+        </Modal>
+    );
 }

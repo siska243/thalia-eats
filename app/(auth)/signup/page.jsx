@@ -1,246 +1,170 @@
 "use client";
-import React, { useState } from "react";
 
+import {useState} from "react";
 import Link from "next/link";
-import { FetchData } from "@/helpers/FetchData";
-import { Route } from "@/helpers/Route";
+import {useRouter} from "next/navigation";
+import CarteAuth from "@/components/auth/CarteAuth";
+import ChampTexte from "@/components/auth/ChampTexte";
 import Spinner from "@/components/Loader/Spinner";
-import logo from "@/public/assets/logo-thalia.png";
 import Notify from "@/components/toastify/Notify";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {FetchData} from "@/helpers/FetchData";
+import {Route} from "@/helpers/Route";
 
-export default function Signup() {
-  const [name, setName] = useState("");
-  const [last_name, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] =
-    useState(false);
+const CHAMPS_VIDES = {
+    name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+};
 
-  // fonction pour vider les champs
-  const viderChamps = () => {
-    setName("");
-    setLastName("");
-    setEmail("");
-    setPhone("");
-    setPassword("");
-    setConfirmPassword("");
-  };
+/**
+ * Inscription.
+ *
+ * Trois defauts corriges :
+ *
+ * - le champ telephone declarait `type="phone"`, qui n'existe pas : le
+ *   navigateur retombait sur du texte, et le telephone n'ouvrait donc pas le
+ *   clavier numerique. Le type valide est `tel`.
+ * - la comparaison des deux mots de passe etait ecrite deux fois de suite,
+ *   a l'identique.
+ * - apres une inscription reussie, la page vidait le formulaire et s'arretait
+ *   la : aucune redirection, aucun pas suivant. On restait devant un
+ *   formulaire vierge sans savoir si le compte existait. Elle mene maintenant
+ *   a la connexion.
+ */
+export default function PageInscription() {
+    const [champs, setChamps] = useState(CHAMPS_VIDES);
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-  // fonction pour envoyer les données
-  const handlerSubmit = async (e) => {
-    e.preventDefault();
-    // Vérification des champs directement sans utiliser `champsVide`
-    if (
-      !name ||
-      !last_name ||
-      !email ||
-      !phone ||
-      !password ||
-      !confirmPassword
-    ) {
-      Notify("Veuillez remplir tous les champs", "info");
-      return;
-    }
+    const modifier = (cle) => (e) =>
+        setChamps((precedent) => ({...precedent, [cle]: e.target.value}));
 
-    // Vérification des mots de passe
-    if (password !== confirmPassword) {
-      Notify("Veuillez entrer le même mot de passe", "info");
-      return;
-    }
+    const handlerSubmit = async (e) => {
+        e.preventDefault();
 
-    if (password !== confirmPassword) {
-      Notify("Veuillez entrer le même mot de passe", "info");
-      return;
-    }
-    try {
-      setLoading(true);
-      const data = {
-        name,
-        last_name,
-        email,
-        phone,
-        password,
-      };
-      const response = await FetchData.sendData(Route.register, data);
-      if (response.name === "AxiosError") {
-        console.error(response);
-        const {
-          response: {
-            data: { message },
-          },
-        } = response;
-        Notify(message, "error");
-      } else {
-        viderChamps();
-        Notify("Inscription réussie", "success");
-      }
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <div className="min-h-screen h-full pt-[220px] md:pt-[200px]  flex items-center justify-center bg-[#F3F4F6]">
-      <section className="max-w-[1300px] mx-auto px-4 md:px-5 h-full w-full flex justify-center items-center mb-10 py-5">
-        {/* Formulaire d'inscription */}
-        <div className="bg-white md:w-[900px] rounded-2xl shadow-xl overflow-hidden w-full">
-          <form
-            className="w-full h-full md:p-10 space-y-6 px-4 py-6 sm:p-6"
-            onSubmit={handlerSubmit}
-          >
-            <h2 className="text-xl md:text-3xl font-semibold text-center text-gray-900 mb-8">
-              Inscription
-            </h2>
+        if (champs.password !== champs.confirmPassword) {
+            Notify("Les deux mots de passe ne correspondent pas", "info");
+            return;
+        }
 
-            {/* Nom et Prénom */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="flex flex-col">
-                <label htmlFor="firstName" className="text-gray-700 mb-2">
-                  Prénom
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="ex: thialia-eat"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
+        setLoading(true);
 
-              <div className="flex flex-col">
-                <label htmlFor="lastName" className="text-gray-700 mb-2">
-                  Nom
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="ex: thialia-eat"
-                  required
-                  value={last_name}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
-            </div>
+        try {
+            // Le champ de confirmation ne sert qu'a la verification locale :
+            // il n'a rien a faire dans le corps envoye a l'API.
+            const donnees = {...champs};
+            delete donnees.confirmPassword;
 
-            {/* Email et Téléphone */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="flex flex-col">
-                <label htmlFor="email" className="text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="exemple@email.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
+            const response = await FetchData.sendData(Route.register, donnees);
 
-              <div className="flex flex-col">
-                <label htmlFor="phone" className="text-gray-700 mb-2">
-                  Téléphone
-                </label>
-                <input
-                  type="phone"
-                  id="phone"
-                  className="py-2 w-full px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  required
-                  placeholder="ex:+24382********"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-            </div>
+            if (response?.name === "AxiosError") {
+                Notify(
+                    response.response?.data?.message ?? "Inscription impossible",
+                    "error"
+                );
+                return;
+            }
 
-            {/* Mot de passe et Confirmation */}
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="flex flex-col relative">
-                <label htmlFor="password" className="text-gray-700 mb-2">
-                  Mot de passe
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  className="pr-12 w-full py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="••••••••"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+            setChamps(CHAMPS_VIDES);
+            Notify("Inscription réussie, connectez-vous", "success");
+            router.push("/login");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <CarteAuth
+            large
+            titre="Créer un compte"
+            sousTitre="Pour commander et suivre vos livraisons à Kinshasa."
+            bas={
+                <>
+                    Vous avez déjà un compte ?{" "}
+                    <Link
+                        href="/login"
+                        className="font-semibold text-brand-600 underline-offset-4 hover:underline"
+                    >
+                        Connectez-vous
+                    </Link>
+                </>
+            }
+        >
+            <form className="flex flex-col gap-5" onSubmit={handlerSubmit}>
+                <div className="grid gap-5 sm:grid-cols-2">
+                    <ChampTexte
+                        label="Prénom"
+                        placeholder="Votre prénom"
+                        autoComplete="given-name"
+                        value={champs.name}
+                        onChange={modifier("name")}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Nom"
+                        placeholder="Votre nom"
+                        autoComplete="family-name"
+                        value={champs.last_name}
+                        onChange={modifier("last_name")}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Email"
+                        type="email"
+                        placeholder="exemple@email.com"
+                        autoComplete="email"
+                        value={champs.email}
+                        onChange={modifier("email")}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Téléphone"
+                        type="tel"
+                        inputMode="tel"
+                        placeholder="+243 82 000 0000"
+                        autoComplete="tel"
+                        value={champs.phone}
+                        onChange={modifier("phone")}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Mot de passe"
+                        motDePasse
+                        placeholder="••••••••"
+                        autoComplete="new-password"
+                        minLength={8}
+                        aide="8 caractères minimum"
+                        value={champs.password}
+                        onChange={modifier("password")}
+                        required
+                    />
+
+                    <ChampTexte
+                        label="Confirmer le mot de passe"
+                        motDePasse
+                        placeholder="••••••••"
+                        autoComplete="new-password"
+                        value={champs.confirmPassword}
+                        onChange={modifier("confirmPassword")}
+                        required
+                    />
+                </div>
+
                 <button
-                  type="button"
-                  aria-label={
-                    showPassword
-                      ? "Cacher le mot de passe"
-                      : "Afficher le mot de passe"
-                  }
-                  className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
-                  onClick={() => setShowPassword(!showPassword)}
+                    type="submit"
+                    disabled={loading}
+                    className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {loading ? <Spinner /> : "Créer mon compte"}
                 </button>
-              </div>
-
-              <div className="flex flex-col relative">
-                <label htmlFor="confirmPassword" className="text-gray-700 mb-2">
-                  Confirmer le mot de passe
-                </label>
-                <input
-                  type={showPasswordConfirmation ? "text" : "password"}
-                  id="confirmPassword"
-                  className="pr-12 w-full py-2 px-4 sm:py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-primaryColor valid:border-primaryColor valid:text-primaryColor"
-                  placeholder="••••••••"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  aria-label={
-                    showPasswordConfirmation 
-                      ? "Cacher le mot de passe"
-                      : "Afficher le mot de passe"
-                  }
-                  className="absolute right-3 top-12 text-xl text-gray-400 hover:text-gray-600 transition-colors cursor-pointer no-select"
-                  onClick={() =>
-                    setShowPasswordConfirmation(!showPasswordConfirmation)
-                  }
-                >
-                  {showPasswordConfirmation ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
-
-            {/* Bouton d'inscription */}
-            <button
-              disabled={loading}
-              type="submit"
-              className="w-full py-3 text-sm sm:text-base sm:py-4 bg-secondaryColor text-white rounded-lg font-semibold hover:bg-secondaryColor/90 focus:ring-2 focus:ring-secondaryColor focus:ring-opacity-50"
-            >
-              {loading ? <Spinner /> : "S'inscrire"}
-            </button>
-
-            <p className="text-center text-gray-500 mt-4">
-              Vous avez déjà un compte ?{" "}
-              <Link href="/login" className="text-primaryColor hover:underline">
-                Connectez-vous
-              </Link>
-            </p>
-          </form>
-        </div>
-      </section>
-    </div>
-  );
+            </form>
+        </CarteAuth>
+    );
 }

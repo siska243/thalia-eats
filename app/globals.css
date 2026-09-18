@@ -8,6 +8,29 @@
 
 :root {
   --whiteColor: #fff;
+
+  /*
+   * Hauteur de l'en-tete fixe.
+   *
+   * L'en-tete est en `fixed` : il ne prend aucune place dans le flux, et
+   * chaque page doit donc se decaler elle-meme. Cette valeur etait recopiee
+   * en dur dans dix fichiers, avec trois valeurs differentes (220/230,
+   * 220/200, 210/200) : selon la page, le contenu passait sous le menu ou
+   * flottait 60 pixels trop bas.
+   *
+   * Elle est desormais ecrite ici, une fois, et l'en-tete la corrige lui-meme
+   * a l'execution (voir Header.jsx) : il change de hauteur apres l'hydratation,
+   * puisque la barre du haut ne s'affiche qu'une fois montee.
+   *
+   * Les valeurs ci-dessous ne servent donc qu'au tout premier rendu.
+   */
+  --header-h: 128px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 176px;
+  }
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -51,7 +74,7 @@ h6 {
   }
 
   .scrollbar-thumb {
-    scrollbar-color: #f28a3c #f3f4f6; /* Pour Firefox */
+    scrollbar-color: #F99D1C #f3f4f6; /* Pour Firefox */
   }
 
   .scrollbar-custom::-webkit-scrollbar {
@@ -63,13 +86,13 @@ h6 {
   }
 
   .scrollbar-custom::-webkit-scrollbar-thumb {
-    background-color: #f28a3c; /* Couleur de la barre */
+    background-color: #F99D1C; /* Couleur de la barre */
     border-radius: 9999px; /* Arrondi */
     border: 3px solid #f3f4f6; /* Espacement avec la piste */
   }
 
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background-color: #e3732c; /* Couleur de la barre au survol */
+    background-color: #DB7E0B; /* Couleur de la barre au survol */
   }
   /* ************************ */
   .bg-custom-gradient {
@@ -91,7 +114,7 @@ h6 {
   margin-top: 20px;
 }
 .swiper-pagination-bullet-active {
-  background: #f28a3c !important;
+  background: #F99D1C !important;
 }
 
 /*****************$ restaurants section end ***************** */
@@ -106,3 +129,19 @@ h6 {
 
 /* --------------- */
 
+
+/*
+ * Defilement horizontal sans barre visible.
+ *
+ * Les rangees de categories defilent lateralement sur mobile. La barre de
+ * defilement native s'affiche par-dessus le contenu sous Linux et Windows et
+ * gache la rangee ; le geste, lui, reste disponible.
+ */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

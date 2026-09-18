@@ -3,7 +3,6 @@
 import useSWR from "swr";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
-import {getFlexPayOrder} from "@/server/manageToken";
 import {useEffect, useState} from "react";
 import Notify from "@/components/toastify/Notify";
 import {useRouter} from "next/navigation";
@@ -43,12 +42,18 @@ const UsswrPolling = () => {
     const router = useRouter()
 
 
+    /*
+     * Lecture du stockage local apres montage. Le serveur ne connait pas cette
+     * valeur : la lire au premier rendu ferait diverger le HTML du serveur et
+     * celui du client. React n'offre pas d'autre primitive pour attendre
+     * l'hydratation.
+     */
     useEffect(() => {
-        if (localStorage && typeof window !== "undefined") {
-            setPaymentId(localStorage.getItem("flex_pay_number_order_thalia_eats"))
-        }
+        if (typeof window === "undefined") return
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPaymentId(localStorage.getItem("flex_pay_number_order_thalia_eats"))
     }, []);
-    const {data, error, isLoading} = useSWR(
+    const {data} = useSWR(
         url,
         fetcher,
         {

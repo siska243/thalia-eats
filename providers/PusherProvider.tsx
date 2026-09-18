@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
-import Pusher from 'pusher-js';
+import { useEffect } from 'react';
 import pusherClient from "@/lib/pusher";
 
 export default function PusherProvider() {

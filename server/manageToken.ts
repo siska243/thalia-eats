@@ -38,7 +38,7 @@ export const getCurrenUser=async()=>{
         }
 
         return null
-    }catch (e) {
+    }catch {
         return null
     }
 
@@ -51,13 +51,14 @@ export const getToken=async ()=>{
         const hasToken = cookieStore.has('token_thalia_eats')
 
         if(hasToken){
-          return  await decode_data(cookieStore?.get('token_thalia_eats')?.value)
+          const valeur = cookieStore.get('token_thalia_eats')?.value
+          return valeur ? await decode_data(valeur) : null
 
         }
 
         return null
     }
-    catch (e){
+    catch {
 
         return null
     }
@@ -86,8 +87,8 @@ export const removeToken=async ()=>{
         try {
             cookieStore.delete('token_thalia_eats')
         }
-        catch (error){
-            console.log(error)
+        catch (error) {
+            console.error("Suppression du cookie impossible", error)
         }
 
     }
@@ -98,8 +99,8 @@ export const removeToken=async ()=>{
 
             return "ok"
         }
-        catch (error){
-            console.log(error)
+        catch (error) {
+            console.error("Suppression du cookie impossible", error)
         }
 
     }
@@ -112,7 +113,9 @@ export const userIsAuth=async ()=>{
 
     const token =await getToken()
     if(!token) return null
-    return await FetchData.getData(Route.user,token)
+    // `getData` ne prend qu'une URL : le jeton est deja injecte par
+    // l'intercepteur axios. Le second argument etait ignore.
+    return await FetchData.getData(Route.user)
 
 }
 
