@@ -164,6 +164,13 @@ const PaiementPrecommande = () => {
         };
     }, [uid, query]);
 
+    // Le telephone porte son message sous son propre champ ; les autres se
+    // regroupent sous le formulaire, sinon un 422 sur un champ sans emplacement
+    // dedie disparaitrait sans laisser de trace.
+    const messagesDeChamps = Object.entries(erreursChamps)
+        .filter(([champ]) => champ !== "recipient_phone")
+        .map(([, message]) => message);
+
     const devise = recapitulatif?.currency?.code ?? null;
     const coordonneesAsaisir = recapitulatif ? !recapitulatif.coordonnees_figees : false;
 
@@ -220,13 +227,38 @@ const PaiementPrecommande = () => {
             );
         }
 
-        if (reponse.response?.status === 410) {
+        const statut = reponse.response?.status;
+
+        if (statut === 410) {
             setErreurEcran({
                 titre: "Pré-commande indisponible",
                 message:
                     donnees?.message ??
                     "Cette pré-commande n'est plus payable. Demandez-en une nouvelle à votre assistant.",
             });
+            return true;
+        }
+
+        // Laravel rend « Invalid signature. » et « Too Many Attempts. », en
+        // anglais et sans rien dire au client de ce qu'il doit faire. Le cas
+        // n'a rien d'exotique : le lien vit douze heures, et celui qui l'ouvre
+        // près de la limite puis remplit le formulaire tombe sur le 403 au
+        // moment de payer — c'est-à-dire au pire moment.
+        if (statut === 403) {
+            setErreurEcran({
+                titre: "Lien expiré ou invalide",
+                message:
+                    "Ce lien n'est plus valable. Demandez-en un nouveau à votre assistant, votre commande n'est pas perdue.",
+            });
+            return true;
+        }
+
+        if (statut === 429) {
+            Notify(
+                "Trop de tentatives",
+                "error",
+                "Patientez une minute avant de réessayer. Votre commande est conservée."
+            );
             return true;
         }
 
@@ -440,13 +472,22 @@ const PaiementPrecommande = () => {
                                     />
                                 </div>
 
-                                {erreursChamps.adresse ? (
-                                    <p
+                                {/*
+                                  * Tous les messages, pas seulement celui de
+                                  * l'adresse : un 422 sur le nom du
+                                  * destinataire ne doit pas se resumer a un
+                                  * message generique. Le telephone garde le
+                                  * sien sous son champ, ou il est utile.
+                                  */}
+                                {messagesDeChamps.length > 0 ? (
+                                    <ul
                                         role="alert"
-                                        className="mt-4 rounded-control bg-danger-surface px-4 py-3 text-caption font-semibold text-danger"
+                                        className="mt-4 flex flex-col gap-1 rounded-control bg-danger-surface px-4 py-3 text-caption font-semibold text-danger"
                                     >
-                                        {erreursChamps.adresse}
-                                    </p>
+                                        {messagesDeChamps.map((message) => (
+                                            <li key={message}>{message}</li>
+                                        ))}
+                                    </ul>
                                 ) : null}
                             </section>
                         ) : (
