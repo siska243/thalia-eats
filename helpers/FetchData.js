@@ -34,11 +34,23 @@ class FetchData {
      * `avecJeton` a false ne pose pas l'en-tete Authorization.
      *
      * C'est ce qu'il faut pour le lien de paiement d'une pre-commande : son
-     * autorisation est la signature de l'URL, pas un jeton. Cote backend,
-     * RefuserAgentSansAbility refuse tout jeton porteur d'abilities sur une
-     * route qui n'en declare aucune — et cette route n'en declare aucune,
-     * volontairement. Un visiteur dont le navigateur traine un jeton d'assistant
-     * verrait donc son propre lien rejete en 403. On n'envoie rien.
+     * autorisation est la signature de l'URL, pas un jeton.
+     *
+     * CORRECTION : une version precedente de ce commentaire attribuait la
+     * protection au middleware RefuserAgentSansAbility. C'etait faux, et il ne
+     * faut pas raisonner dessus. Ce middleware lit `$request->user()`, qui
+     * resout le garde PAR DEFAUT — « web », pilote « session » — et le groupe
+     * api n'a pas de StartSession : sur une route sans `auth:sanctum`, aucun
+     * utilisateur n'est jamais resolu et le middleware laisse tout passer.
+     *
+     * Ce qui refuse reellement un jeton d'assistant sur le POST, c'est un
+     * controle ecrit a la main dans Api\LienPaiementPrecommandeController, qui
+     * resout `auth('sanctum')` explicitement.
+     *
+     * On n'envoie donc rien ici pour une autre raison, qui tient toujours : ce
+     * controle refuse tout jeton dont les capacites ne sont pas « * », et un
+     * visiteur dont le navigateur traine un jeton d'assistant verrait son
+     * propre lien rejete en 403.
      */
     instance = (contentType, avecJeton = true) => {
         const http = axios.create({
