@@ -1,11 +1,11 @@
 "use client";
 
 import {useSelector} from "react-redux";
+import LignesPrix from "./LignesPrix";
 import {calcul_price} from "@/helpers/calculePrice";
-import {formatPrix} from "@/helpers/openingHours";
 
 /**
- * Le detail du prix.
+ * Le detail du prix du panier.
  *
  * Repris de `components/cart/price-summary.tsx` du mobile, lignes et libelles
  * compris : le meme panier doit se lire pareil sur les deux clients.
@@ -17,18 +17,11 @@ import {formatPrix} from "@/helpers/openingHours";
  *
  * Tant qu'aucune commune n'est choisie, la livraison affiche « à confirmer »
  * plutot qu'un zero : zero est un prix, et il serait faux.
+ *
+ * Le rendu des lignes vit maintenant dans `LignesPrix` : la page de paiement
+ * d'une pre-commande affiche le meme bloc a partir de montants figes en base,
+ * sans panier ni Redux. Ce composant-ci garde la lecture du panier.
  */
-const Ligne = ({libelle, valeur, fort}) => (
-    <div className="flex items-baseline justify-between gap-3">
-        <dt className={fort ? "text-body font-bold text-ink" : "text-body text-ink-muted"}>
-            {libelle}
-        </dt>
-        <dd className={fort ? "text-title font-bold text-ink" : "text-body text-ink"}>
-            {valeur}
-        </dd>
-    </div>
-);
-
 export default function Total() {
     const {cart, order} = useSelector((state) => state.shop);
 
@@ -36,39 +29,17 @@ export default function Total() {
     const devise = chiffrage?.pricing?.currency?.code ?? cart?.[0]?.currency?.code;
 
     const sousTotal = calcul_price(cart ?? []);
-    const livraison = chiffrage?.pricing?.frais_livraison ?? null;
-    const service = chiffrage?.pricing?.service_price ?? null;
-
-    const livraisonInconnue = !chiffrage;
-    const total = chiffrage?.total_price ?? sousTotal;
 
     return (
         <div className="border-b border-surface-border px-4 py-4 sm:px-5">
-            <dl className="flex flex-col gap-2">
-                <Ligne libelle="Sous-total" valeur={formatPrix(sousTotal, devise)} />
-
-                <Ligne
-                    libelle="Livraison"
-                    valeur={
-                        livraisonInconnue ? "à confirmer" : formatPrix(livraison ?? 0, devise)
-                    }
-                />
-
-                {service ? (
-                    <Ligne libelle="Frais de service" valeur={formatPrix(service, devise)} />
-                ) : null}
-
-                <div className="my-1 h-px bg-surface-border" />
-
-                <Ligne libelle="Total" valeur={formatPrix(total, devise)} fort />
-            </dl>
-
-            {livraisonInconnue ? (
-                <p className="mt-2 text-caption text-warning">
-                    Les frais de livraison seront confirmés une fois votre adresse
-                    renseignée.
-                </p>
-            ) : null}
+            <LignesPrix
+                sousTotal={sousTotal}
+                livraison={chiffrage?.pricing?.frais_livraison ?? null}
+                service={chiffrage?.pricing?.service_price ?? null}
+                total={chiffrage?.total_price ?? sousTotal}
+                devise={devise}
+                livraisonInconnue={!chiffrage}
+            />
         </div>
     );
 }

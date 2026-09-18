@@ -1,7 +1,7 @@
 "use client";
 
 import {useCallback, useEffect, useState} from "react";
-import {FaRegTrashCan, FaRegCopy, FaPlus, FaWandMagicSparkles} from "react-icons/fa6";
+import {FaRegTrashCan, FaRegCopy, FaPlus, FaPlug, FaWandMagicSparkles} from "react-icons/fa6";
 import {IoCheckmarkCircle, IoCloseCircle} from "react-icons/io5";
 
 import ChampTexte from "@/components/auth/ChampTexte";
@@ -23,6 +23,28 @@ const AUTORISE = [
     "Calculer le prix d'une commande, livraison comprise",
     "Préparer une pré-commande",
     "Suivre l'état de vos commandes",
+];
+
+/**
+ * L'adresse du connecteur, celle que le client colle dans Claude ou ChatGPT.
+ *
+ * Configurable : la recette et la production ne pointent pas au meme endroit,
+ * et une adresse en dur ici devrait etre corrigee dans trois depots le jour ou
+ * le sous-domaine change.
+ */
+const ADRESSE_CONNECTEUR =
+    process.env.NEXT_PUBLIC_MCP_URL || "https://mcp.thaliaeats.com/mcp";
+
+/** Ou coller cette adresse, selon l'assistant. */
+const ETAPES = [
+    {
+        assistant: "Claude",
+        chemin: "Réglages › Connecteurs › Ajouter un connecteur personnalisé",
+    },
+    {
+        assistant: "ChatGPT",
+        chemin: "Réglages › Connecteurs › Ajouter",
+    },
 ];
 
 const JAMAIS = [
@@ -155,10 +177,10 @@ export default function AssistantsConnectes() {
         }
     };
 
-    const copier = async (jeton) => {
+    const copier = async (valeur, libelle = "Jeton copié") => {
         try {
-            await navigator.clipboard.writeText(jeton);
-            Notify("Jeton copié", "success");
+            await navigator.clipboard.writeText(valeur);
+            Notify(libelle, "success");
         } catch {
             // Le presse-papiers est refuse hors HTTPS et dans certains
             // navigateurs : le jeton reste selectionnable a la main, on ne
@@ -301,7 +323,45 @@ export default function AssistantsConnectes() {
                 </ul>
             )}
 
-            <div className="mt-6 rounded-card bg-surface-sunken p-4">
+            <div className="mt-6 rounded-card border border-primaryColor/25 bg-primaryColor/5 p-4">
+                <p className="mb-1 flex items-center gap-2 text-body font-bold text-secondaryColor">
+                    <FaPlug className="text-primaryColor" aria-hidden="true" />
+                    Connecter Thalia à votre assistant
+                </p>
+                <p className="mb-3 text-caption text-ink-muted">
+                    Copiez cette adresse et collez-la dans votre assistant. Il vous
+                    proposera ensuite un bouton « Connecter » : vous vous identifiez sur
+                    Thalia, et c&apos;est terminé.
+                </p>
+
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <code className="flex-1 select-all break-all rounded-card bg-surface px-3 py-2 text-caption text-ink">
+                        {ADRESSE_CONNECTEUR}
+                    </code>
+
+                    <button
+                        type="button"
+                        onClick={() => copier(ADRESSE_CONNECTEUR, "Adresse copiée")}
+                        className="flex items-center justify-center gap-2 rounded-card bg-primaryColor px-4 py-2 text-caption font-bold text-white"
+                    >
+                        <FaRegCopy aria-hidden="true" />
+                        Copier l&apos;adresse
+                    </button>
+                </div>
+
+                <dl className="mt-4 flex flex-col gap-2">
+                    {ETAPES.map((etape) => (
+                        <div key={etape.assistant} className="flex flex-wrap items-baseline gap-x-2">
+                            <dt className="text-caption font-bold text-ink">
+                                {etape.assistant}
+                            </dt>
+                            <dd className="text-caption text-ink-muted">{etape.chemin}</dd>
+                        </div>
+                    ))}
+                </dl>
+            </div>
+
+            <div className="mt-4 rounded-card bg-surface-sunken p-4">
                 <p className="mb-3 flex items-center gap-2 text-body font-bold text-ink">
                     <FaWandMagicSparkles className="text-primaryColor" aria-hidden="true" />
                     Ce qu&apos;un assistant peut faire

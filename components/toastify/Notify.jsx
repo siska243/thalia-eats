@@ -11,7 +11,13 @@ const ToastyNotification = ({ title,message }) => {
     );
 };
 
-// Fonction pour afficher une notification
+/**
+ * Affiche une notification.
+ *
+ * @param {string} title
+ * @param {"success" | "error" | "info" | "warning"} type
+ * @param {string | null} [message]
+ */
 const Notify = (title, type,message=null) => {
     toast(<ToastyNotification title={title} message={message} />, {
         type,

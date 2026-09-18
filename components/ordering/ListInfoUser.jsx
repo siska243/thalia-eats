@@ -1,4 +1,8 @@
-/** Une ligne d'information du client, avec son icone. */
+/**
+ * Une ligne d'information du client, avec son icone.
+ *
+ * @param {{Icon: any, title?: string | null, lastBorder?: boolean}} props
+ */
 export default function ListInfoUser({Icon, title, lastBorder}) {
     if (!title) return null;
 

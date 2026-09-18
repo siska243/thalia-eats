@@ -30,7 +30,38 @@ class FetchData {
 
     BASE_URL = () => API_BASE_URL;
 
-    instance = (contentType) => {
+    /**
+     * `avecJeton` a false ne pose pas l'en-tete Authorization.
+     *
+     * C'est ce qu'il faut pour le lien de paiement d'une pre-commande : son
+     * autorisation est la signature de l'URL, pas un jeton.
+     *
+     * CORRECTION : une version precedente de ce commentaire attribuait la
+     * protection au middleware RefuserAgentSansAbility. C'etait faux, et il ne
+     * faut pas raisonner dessus. Ce middleware lit `$request->user()`, qui
+     * resout le garde PAR DEFAUT — « web », pilote « session » — et le groupe
+     * api n'a pas de StartSession : sur une route sans `auth:sanctum`, aucun
+     * utilisateur n'est jamais resolu et le middleware laisse tout passer.
+     *
+     * Ce qui refuse reellement un jeton d'assistant sur le POST, c'est un
+     * controle ecrit a la main dans Api\LienPaiementPrecommandeController, qui
+     * resout `auth('sanctum')` explicitement.
+     *
+     * On n'envoie donc rien ici pour une autre raison, qui tient toujours : ce
+     * controle refuse tout jeton dont les capacites ne sont pas « * », et un
+     * visiteur dont le navigateur traine un jeton d'assistant verrait son
+     * propre lien rejete en 403.
+     */
+    instance = (contentType, avecJeton = true) => {
+        // `!== false` et non une evaluation de verite : les appelants
+        // historiques appellent `instance($token, "application/json")`, donc ce
+        // second argument recoit deja une chaine. Elle est vraie, le jeton
+        // reste, et ca marche — par chance. Avec un test de verite, un futur
+        // appelant qui passerait `""` ou `0` a cette place perdrait
+        // silencieusement son en-tete d'authentification sur une route
+        // authentifiee. Seul `false`, ecrit expres, retire le jeton.
+        const poserLeJeton = avecJeton !== false;
+
         const http = axios.create({
             baseURL: this.BASE_URL(),
             headers: {
@@ -43,7 +74,7 @@ class FetchData {
 
         http.interceptors.request.use(
             async (config) => {
-                const token = await getToken()
+                const token = poserLeJeton ? await getToken() : null
 
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
@@ -136,6 +167,37 @@ class FetchData {
             return response.data;
         } catch { }
     }
+    /**
+     * Les deux appels du lien de paiement d'une pre-commande : signes par
+     * l'URL, jamais par un jeton. Meme convention d'erreur que le reste de la
+     * classe — l'erreur axios est RETOURNEE, pas levee.
+     */
+    static async getSigned(url) {
+        try {
+            const $req = new FetchData().instance("application/json", false);
+            const response = await $req.get(url).then((e) => e).catch((e) => e);
+
+            if (response?.name === "AxiosError") return response;
+
+            return response.data;
+        } catch (e) {
+            return e;
+        }
+    }
+
+    static async postSigned(url, data) {
+        try {
+            const $req = new FetchData().instance("application/json", false);
+            const response = await $req.post(url, data).then((e) => e).catch((e) => e);
+
+            if (response?.name === "AxiosError") return response;
+
+            return response.data;
+        } catch (e) {
+            return e;
+        }
+    }
+
     static async putData(url, data, $token) {
         try {
             let $req = new FetchData().instance($token, "application/json");

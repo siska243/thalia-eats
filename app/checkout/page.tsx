@@ -1,16 +1,9 @@
 "use client";
 
 import React, {Suspense, useState} from "react";
-import Image from "next/image";
-import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
-import {ActionIcon, Button, Checkbox, Modal, Text, Title} from "rizzui";
-import {XMarkIcon} from "@heroicons/react/20/solid";
-import {FaCircleArrowRight} from "react-icons/fa6";
-import cart from "@/public/assets/images/cart.svg";
-import mpesa from "@/public/assets/images/mobile.jpeg";
-import PhoneNumber from "@/components/forms/phone-number";
-import Spinner from "@/components/Loader/Spinner";
+import ChoixPaiement from "@/components/ordering/ChoixPaiement";
+import ModalMobileMoney from "@/components/ordering/ModalMobileMoney";
 import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
@@ -37,6 +30,10 @@ const Page = () => (
  *   d'une colonne a deux apres l'hydratation. Une grille CSS n'a pas ce saut.
  * - quand le parametre `params` manquait, le bouton carte ne faisait
  *   strictement rien, sans un mot. Il le dit maintenant.
+ *
+ * Les deux cartes et la fenetre de saisie du numero vivent desormais dans
+ * `components/ordering/` : la page de paiement d'une pre-commande montre les
+ * memes, et non une imitation.
  */
 const CheckoutPage = () => {
     const [enCours, setEnCours] = useState<null | "carte" | "mobile">(null);
@@ -154,127 +151,23 @@ const CheckoutPage = () => {
                     </p>
                 </header>
 
-                <div className="mt-10 grid gap-5 sm:grid-cols-2">
-                    <article className="flex flex-col rounded-card bg-surface p-6 shadow-card">
-                        <h2 className="text-title font-bold text-secondaryColor">
-                            Mobile money
-                        </h2>
-
-                        <div className="my-5 flex flex-1 items-center justify-center">
-                            <Image
-                                className="h-[160px] w-auto object-contain"
-                                src={mpesa}
-                                alt=""
-                                width={250}
-                                height={160}
-                            />
-                        </div>
-
-                        <p className="text-body leading-6 text-ink-muted">
-                            Réglez depuis votre compte M-Pesa, Orange Money ou Airtel Money.
-                        </p>
-
-                        <button
-                            type="button"
-                            onClick={() => setModalState(true)}
-                            className="mt-5 inline-flex items-center justify-center rounded-pill bg-brand-500 px-6 py-3.5 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-                        >
-                            Payer par mobile money
-                        </button>
-                    </article>
-
-                    <article className="flex flex-col rounded-card bg-surface p-6 shadow-card">
-                        <h2 className="text-title font-bold text-secondaryColor">
-                            Carte bancaire
-                        </h2>
-
-                        <div className="my-5 flex flex-1 items-center justify-center">
-                            <Image
-                                className="h-[160px] w-auto object-contain"
-                                src={cart}
-                                alt=""
-                                width={180}
-                                height={160}
-                            />
-                        </div>
-
-                        <p className="text-body leading-6 text-ink-muted">
-                            Réglez par Visa ou Mastercard, sur la page sécurisée de notre
-                            prestataire.
-                        </p>
-
-                        <button
-                            type="button"
-                            onClick={handleCartPayement}
-                            disabled={enCours === "carte"}
-                            className="mt-5 inline-flex items-center justify-center rounded-pill border border-secondaryColor px-6 py-3.5 text-body font-semibold text-secondaryColor transition-colors duration-150 hover:bg-secondaryColor hover:text-white disabled:opacity-60"
-                        >
-                            {enCours === "carte" ? <Spinner /> : "Payer par carte"}
-                        </button>
-                    </article>
+                <div className="mt-10">
+                    <ChoixPaiement
+                        enCours={enCours}
+                        onMobile={() => setModalState(true)}
+                        onCarte={handleCartPayement}
+                    />
                 </div>
             </div>
 
-            <Modal
-                isOpen={modalState}
+            <ModalMobileMoney
+                ouvert={modalState}
                 onClose={() => setModalState(false)}
-                containerClassName="bg-white"
-            >
-                <form className="px-6 pb-8 pt-6 sm:px-7" onSubmit={handleSubmit}>
-                    <div className="mb-6 flex items-center justify-between gap-3">
-                        <Title as="h3" className="!text-title !font-bold">
-                            Paiement mobile money
-                        </Title>
-
-                        <ActionIcon size="sm" variant="text" onClick={() => setModalState(false)}>
-                            <XMarkIcon className="h-auto w-6" strokeWidth={1.8} />
-                        </ActionIcon>
-                    </div>
-
-                    <PhoneNumber
-                        className="mb-5 w-full"
-                        country="cd"
-                        value={phone}
-                        onChange={(valeur: string) => setPhone(valeur)}
-                        inputProps={{name: "phone", required: true, autoFocus: true}}
-                        preferredCountries={["cd"]}
-                        label="Votre numéro de téléphone"
-                    />
-
-                    <Checkbox
-                        size="lg"
-                        inputClassName="border-2"
-                        required
-                        label={
-                            <Text className="text-caption">
-                                J&apos;accepte les conditions d&apos;utilisation et la{" "}
-                                <Link href="/privacy" className="underline underline-offset-4">
-                                    politique de confidentialité
-                                </Link>{" "}
-                                de Thalia Eats.
-                            </Text>
-                        }
-                    />
-
-                    <Button
-                        className="mt-5 flex w-full items-center justify-center gap-2 rounded-pill bg-brand-500 py-3.5 text-white hover:bg-brand-600"
-                        type="submit"
-                        size="md"
-                        disabled={enCours === "mobile"}
-                    >
-                        {enCours === "mobile" ? (
-                            <Spinner />
-                        ) : (
-                            <>
-                                <FaCircleArrowRight />
-                                <span className="text-body font-semibold">
-                                    Je confirme le paiement
-                                </span>
-                            </>
-                        )}
-                    </Button>
-                </form>
-            </Modal>
+                phone={phone}
+                onPhone={setPhone}
+                onSubmit={handleSubmit}
+                enCours={enCours === "mobile"}
+            />
         </div>
     );
 };
