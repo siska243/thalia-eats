@@ -92,7 +92,7 @@ export const nettoyerFilDAriane = <T extends FilDAriane>(fil: T): T => {
 
 type EvenementSentry = {
     transaction?: string;
-    request?: {url?: string; query_string?: unknown};
+    request?: {url?: string; query_string?: unknown; headers?: Record<string, unknown>};
     breadcrumbs?: FilDAriane[];
     contexts?: {trace?: {data?: Record<string, unknown>}};
     spans?: Array<{description?: string; data?: Record<string, unknown>}>;
@@ -119,6 +119,15 @@ export const nettoyerEvenement = <T extends EvenementSentry>(evenement: T): T =>
     } else if (requete?.query_string && typeof requete.query_string === "object") {
         nettoyerChamps(requete.query_string as Record<string, unknown>);
     }
+
+    // Les en-tetes de requete. Le SDK les attache TOUS des que `sendDefaultPii`
+    // est faux, et il n'en retire que les cookies et les en-tetes d'adresse IP :
+    // `referer` n'est pas dans sa liste. Or un navigateur envoie l'URL COMPLETE
+    // en Referer sur une navigation de meme origine — et cette page propose
+    // justement « Retour a l'accueil », le clic attendu apres une initiation en
+    // mobile money. La signature vivante partait donc au saut suivant, la ou
+    // aucune de nos mesures ne regardait.
+    nettoyerChamps(evenement.request?.headers);
 
     if (evenement.transaction) {
         evenement.transaction = nettoyerUrl(evenement.transaction);

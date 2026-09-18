@@ -14,6 +14,16 @@ import type {Metadata} from "next";
  */
 export const metadata: Metadata = {
     title: "Régler votre commande",
+    // Ne jamais emettre le Referer depuis cette page. Un navigateur y met
+    // l'URL COMPLETE sur une navigation de meme origine : le clic « Retour a
+    // l'accueil » emporterait la signature vers la requete suivante, et de la
+    // dans la supervision.
+    //
+    // Cette defense et le nettoyage de `request.headers` ne se remplacent pas :
+    // l'une empeche l'emission, l'autre nettoie ce qui arrive malgre tout —
+    // depuis un autre onglet, un vieux cache, un navigateur qui ignore la
+    // directive.
+    referrer: "no-referrer",
     robots: {
         index: false,
         follow: false,

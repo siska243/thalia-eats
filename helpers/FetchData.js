@@ -53,6 +53,15 @@ class FetchData {
      * propre lien rejete en 403.
      */
     instance = (contentType, avecJeton = true) => {
+        // `!== false` et non une evaluation de verite : les appelants
+        // historiques appellent `instance($token, "application/json")`, donc ce
+        // second argument recoit deja une chaine. Elle est vraie, le jeton
+        // reste, et ca marche — par chance. Avec un test de verite, un futur
+        // appelant qui passerait `""` ou `0` a cette place perdrait
+        // silencieusement son en-tete d'authentification sur une route
+        // authentifiee. Seul `false`, ecrit expres, retire le jeton.
+        const poserLeJeton = avecJeton !== false;
+
         const http = axios.create({
             baseURL: this.BASE_URL(),
             headers: {
@@ -65,7 +74,7 @@ class FetchData {
 
         http.interceptors.request.use(
             async (config) => {
-                const token = avecJeton ? await getToken() : null
+                const token = poserLeJeton ? await getToken() : null
 
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
