@@ -1,14 +1,12 @@
 "use client";
 
 import useSWR from "swr";
-import {FetchData} from "@/helpers/FetchData";
+import {API_BASE_URL, FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {useEffect, useState} from "react";
 import Notify from "@/components/toastify/Notify";
 import {useRouter} from "next/navigation";
 
-
-const API_BASE_URL = process.env.NODE_ENV === 'production' ? "https://thalia.cooceckivu.org/api" : 'http://127.0.0.1:8000/api'
 
 const fetcher = async () => {
     try {
@@ -37,7 +35,13 @@ const UsswrPolling = () => {
 
     // Construire l'URL dynamiquement
 
-    const url = paymentId ? `${API_BASE_URL}${Route.swr_check_paiement(paymentId)}` : null;
+    /*
+     * Sert de cle de cache SWR : le fetcher passe par FetchData, qui porte sa
+     * propre base. Le fichier redefinissait pourtant cette base, et sur
+     * l'ancien domaine `thalia.cooceckivu.org` en production. Une seconde
+     * definition de la meme adresse, et celle-ci etait perimee.
+     */
+    const url = paymentId ? `${API_BASE_URL}/${Route.swr_check_paiement(paymentId)}` : null;
 
     const router = useRouter()
 
