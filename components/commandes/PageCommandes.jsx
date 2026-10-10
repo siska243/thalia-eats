@@ -10,8 +10,6 @@ import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {Route} from "@/helpers/Route";
 import {listeDe} from "@/helpers/reponseApi";
 import {smoothScroll} from "@/helpers/calculePrice";
-import {useNomsCommerciaux} from "@/hooks/useRental";
-import ListeCourses from "@/components/commandes/ListeCourses";
 
 /**
  * Les commandes du client : en cours et terminees, au meme endroit.
@@ -30,7 +28,6 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
     const [onglet, setOnglet] = useState(ongletInitial);
     const [commandeSuivie, setCommandeSuivie] = useState(null);
 
-    const noms = useNomsCommerciaux();
     const {user} = useGetCurrentUser();
 
     const enCours = useReferentialData({
@@ -125,31 +122,14 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                 </div>
 
                 {/*
-                  * Les deux univers sur le meme ecran, et separes.
+                  * Une page par univers.
                   *
-                  * Le proprietaire : « tu fusionnes pas mais tu ne mets sur le
-                  * meme ecran mais separer, on doit bien voir les commande
-                  * thalia eat et thalia trans ». Une bascule avait ete posee
-                  * d'abord : elle cachait l'un pour montrer l'autre, et il
-                  * fallait chercher. Deux sections titrees, les deux visibles,
-                  * l'une sous l'autre sur telephone.
-                  *
-                  * L'onglet choisit l'etat, pas l'univers : « En cours »
-                  * montre les commandes ET les courses en cours.
+                  * Les deux avaient ete reunis ici, l'un sous l'autre. Le
+                  * proprietaire : « c'est de page differente pas une seule
+                  * page pour le 2, ça fait desordre ». Les courses ont repris
+                  * leur page, `/location/courses`, et le menu mene a l'une ou
+                  * a l'autre.
                   */}
-                <section
-                    id="thalia-eats"
-                    aria-labelledby="titre-eats"
-                    className="mb-3 flex scroll-mt-[calc(var(--header-h)+16px)] items-baseline gap-2"
-                >
-                    <h2 id="titre-eats" className="text-title font-bold text-ink">
-                        {noms.food}
-                    </h2>
-                    <span className="text-caption text-ink-muted">
-                        {commandes.length} commande{commandes.length > 1 ? "s" : ""}
-                    </span>
-                </section>
-
                 <div className="grid gap-6 lg:grid-cols-2">
                     <div className="flex flex-col gap-4">
                         {courant.isLoading && commandes.length === 0 ? (
@@ -208,25 +188,6 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                     ) : null}
                 </div>
 
-                {/* La section location vient dessous, titree comme l'autre :
-                    sur telephone on fait defiler, sur grand ecran les deux
-                    restent dans la meme colonne de lecture. */}
-                <section
-                    id="thalia-trans"
-                    aria-labelledby="titre-trans"
-                    className="mt-10 scroll-mt-[calc(var(--header-h)+16px)]"
-                >
-                    <div className="mb-3 flex items-baseline gap-2">
-                        <h2 id="titre-trans" className="text-title font-bold text-ink">
-                            {noms.rental}
-                        </h2>
-                        <span className="text-caption text-ink-muted">
-                            voitures avec chauffeur
-                        </span>
-                    </div>
-
-                    <ListeCourses etat={onglet} />
-                </section>
             </div>
         </div>
     );

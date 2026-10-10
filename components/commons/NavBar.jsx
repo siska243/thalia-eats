@@ -36,26 +36,34 @@ export default function NavBar() {
     const noms = useNomsCommerciaux();
 
     /*
-     * Les deux univers sont sur la meme page, et le menu permet d'aller
-     * directement a l'un des deux.
+     * Un metier, une page.
      *
-     * Ce sont des ancres et non deux pages : les commandes et les courses se
-     * lisent ensemble, c'est ce qui a ete decide, et deux adresses separees
-     * auraient recree la coupure qu'on venait d'enlever. Les noms viennent des
-     * reglages d'administration, pas de chaines ecrites ici.
+     * Les deux avaient ete reunis sur un seul ecran : « ça fait desordre ».
+     * Le sous-menu mene donc a deux adresses distinctes, les repas d'un cote
+     * et les courses de l'autre. Les noms viennent des reglages
+     * d'administration, jamais de chaines ecrites ici.
      */
-    const universDe = (base) => [
-        {path: `${base}#thalia-eats`, name: noms.food},
-        {path: `${base}#thalia-trans`, name: noms.rental},
-    ];
-
     const links = [
         {path: "/", name: "Accueil"},
         {path: "/restaurant", name: "Restaurants"},
         {path: "/location", name: noms.rental},
         {path: "/ordering", name: "Panier"},
-        {path: "/tracking", name: "Ma commande", sous: universDe("/tracking")},
-        {path: "/historique", name: "Historique", sous: universDe("/historique")},
+        {
+            path: "/tracking",
+            name: "Ma commande",
+            sous: [
+                {path: "/tracking", name: noms.food},
+                {path: "/location/courses", name: noms.rental},
+            ],
+        },
+        {
+            path: "/historique",
+            name: "Historique",
+            sous: [
+                {path: "/historique", name: noms.food},
+                {path: "/location/courses", name: noms.rental},
+            ],
+        },
     ];
 
     useEffect(() => {
