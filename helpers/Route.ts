@@ -64,6 +64,17 @@ class Route
      * ouvert. La demande arrive dans le back-office et la societe rappelle.
      * Elle se fait donc sans compte, comme le catalogue.
      */
+    /**
+     * Le carnet d'adresses du client.
+     *
+     * Il existait cote serveur et cote mobile, et nulle part ici : le site
+     * faisait ressaisir l'adresse a chaque commande. Les trois routes sont
+     * celles du mobile, aucune n'a ete ajoutee.
+     */
+    static addresses = `${this.user}/addresses`
+
+    static address_delete = (slug: string): string => `${this.user}/addresses/${slug}`
+
     static prospect_partenaire = `prospects`
 
     static update_address_delivery=`${this.user}/commande/update-address-delivery`
