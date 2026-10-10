@@ -9,6 +9,8 @@ import {formatPrix} from "@/helpers/openingHours";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {notification} from "@/hooks/useCreateOrdering";
+import useExpiration from "@/hooks/useExpiration";
+import CompteARebours from "@/components/commons/CompteARebours";
 
 /** Statut « En attente paiement » : la commande existe mais n'est pas reglee. */
 export const STATUT_ATTENTE_PAIEMENT = 5;
@@ -38,6 +40,16 @@ export default function CarteCommande({commande, actionnable, onChange, onSuivre
     const [confirme, setConfirme] = useState(false);
 
     const attentePaiement = commande?.status?.id === STATUT_ATTENTE_PAIEMENT;
+
+    /*
+     * Le delai de reglement, battu a la seconde.
+     *
+     * Il existait sur le telephone et nulle part ici : le meme client, sur la
+     * meme commande, voyait son delai courir d'un cote et decouvrait
+     * l'annulation de l'autre sans avoir ete prevenu. L'echeance vient du
+     * serveur, le web n'en invente aucune.
+     */
+    const {minutes, ton, ecoule} = useExpiration(commande?.expires_at);
     // La devise vient de la commande. Elle etait deduite du premier produit,
     // ce qui laissait les commandes sans produit — il en existe en base —
     // afficher leur total sans unite : « 2,3 ». Le repli sur le produit reste
@@ -88,7 +100,16 @@ export default function CarteCommande({commande, actionnable, onChange, onSuivre
                     </p>
                 </div>
 
-                {commande?.status?.name ? (
+                {/* Le rebours a cote du statut, pas a la place : l'etat dit ou
+                    en est la commande, le delai dit ce qu'on peut encore
+                    perdre. Il ne s'affiche que si le serveur envoie une
+                    echeance, et seulement tant qu'un reglement est attendu. */}
+                <div className="flex shrink-0 items-center gap-2">
+                    {attentePaiement ? (
+                        <CompteARebours minutes={minutes} ton={ton} compact />
+                    ) : null}
+
+                    {commande?.status?.name ? (
                     <span
                         className="shrink-0 rounded-pill px-2.5 py-1 text-caption font-bold"
                         style={{
@@ -101,7 +122,8 @@ export default function CarteCommande({commande, actionnable, onChange, onSuivre
                     >
                         {commande.status.name}
                     </span>
-                ) : null}
+                    ) : null}
+                </div>
             </header>
 
             {visibles.length ? (
@@ -172,7 +194,15 @@ export default function CarteCommande({commande, actionnable, onChange, onSuivre
 
             {actionnable ? (
                 <div className="flex flex-col gap-2 sm:flex-row">
-                    {attentePaiement ? (
+                    {/* Le delai tombe pendant que la page est ouverte : le
+                        bouton part avec lui. Le serveur refuserait de toute
+                        facon, et proposer de payer une commande deja annulee
+                        n'avance personne. */}
+                    {attentePaiement && ecoule ? (
+                        <p className="flex-1 rounded-control bg-surface-sunken px-4 py-3 text-caption text-ink-muted">
+                            Faute de paiement dans le délai, cette commande a été annulée.
+                        </p>
+                    ) : attentePaiement ? (
                         <Link
                             href="/ordering"
                             className="flex flex-1 items-center justify-center rounded-control bg-brand-500 px-4 py-3 text-body font-bold text-ink-inverse transition-colors duration-150 hover:bg-brand-600"
