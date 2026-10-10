@@ -3,7 +3,7 @@
 import ImagePlat from "@/components/ui/ImagePlat";
 import {FaPlus} from "react-icons/fa6";
 import useCart from "@/hooks/useCart";
-import {formatPrix} from "@/helpers/openingHours";
+import {etatOuverture, formatPrix, libelleFermeture} from "@/helpers/openingHours";
 import {enTexte} from "@/helpers/reponseApi";
 
 /**
@@ -21,6 +21,11 @@ export default function CardPlat({product, className = ""}) {
     const {handleAddProductCart} = useCart();
 
     const enPromotion = product?.is_promotional && product?.promotionnalPrice;
+
+    // Meme fonction que les bandeaux et les cartes de restaurant : un seul
+    // endroit decide si un restaurant est ouvert.
+    const horaire = etatOuverture(product?.restaurant?.opens);
+    const ouvert = horaire.ouvert;
 
     return (
         <article
@@ -67,11 +72,25 @@ export default function CardPlat({product, className = ""}) {
                         </p>
                     </div>
 
+                    {/* Ferme, le bouton le montre plutot que de laisser
+                        decouvrir le refus apres l'appui. Le panier refuse de
+                        toute facon : ici c'est l'affordance, la regle est
+                        dans `useCart`. */}
                     <button
                         type="button"
                         onClick={() => handleAddProductCart(product)}
-                        aria-label={`Ajouter ${product?.title ?? "ce plat"} au panier`}
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill bg-brand-500 text-ink-inverse transition-colors duration-150 hover:bg-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                        disabled={!ouvert}
+                        aria-label={
+                            ouvert
+                                ? `Ajouter ${product?.title ?? "ce plat"} au panier`
+                                : `${product?.restaurant?.name ?? "Ce restaurant"} est fermé`
+                        }
+                        title={ouvert ? undefined : libelleFermeture(horaire)}
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-pill transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
+                            ouvert
+                                ? "bg-brand-500 text-ink-inverse hover:bg-brand-600"
+                                : "cursor-not-allowed bg-surface-sunken text-ink-subtle"
+                        }`}
                     >
                         <FaPlus />
                     </button>

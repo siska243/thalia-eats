@@ -11,6 +11,10 @@ import useReferentialData from "@/hooks/useQueryTanStack";
 import useCart from "@/hooks/useCart";
 import {notification} from "@/hooks/useCreateOrdering";
 import {Route} from "@/helpers/Route";
+import useAdresses from "@/hooks/useAdresses";
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
+import CarnetAdresses from "@/components/ordering/CarnetAdresses";
+import type {AdresseEnregistree} from "@/types/adresse";
 import {OrderType} from "@/types/main";
 
 type Commune = {uid: string; slug: string; title: string};
@@ -64,6 +68,18 @@ const ConfirmAdress = () => {
 
     const {handleCustomOrder} = useCart();
 
+    /*
+     * Le carnet d'adresses.
+     *
+     * Il n'est lu que pour un client connecte : la route exige un jeton, et
+     * la demander sans compte ferait une 401 a chaque ouverture du panier.
+     */
+    const {user} = useGetCurrentUser();
+    const carnet = useAdresses(!!user);
+
+    const [choisie, setChoisie] = useState<string | null>(null);
+    const [memoriser, setMemoriser] = useState(false);
+
     const remplirDepuis = useCallback((adresse?: AdresseLivraison) => {
         setTown(adresse?.town?.slug ?? "");
         setStreet(adresse?.street ?? "");
@@ -110,6 +126,51 @@ const ConfirmAdress = () => {
         if (order?.data?.adresse) remplirDepuis(order.data.adresse);
     }, [order?.data, remplirDepuis]);
 
+    /**
+     * Choisir une adresse du carnet.
+     *
+     * Elle remplit le formulaire ET s'applique tout de suite : demander au
+     * client de la choisir puis de valider lui ferait faire deux gestes pour
+     * une seule intention.
+     */
+    const choisirDuCarnet = (adresse: AdresseEnregistree) => {
+        const commune = data?.town?.find((item: Commune) => item.slug === adresse.town?.slug);
+
+        setChoisie(adresse.slug);
+        setTown(adresse.town?.slug ?? "");
+        setStreet(adresse.street ?? "");
+        setNumberStreet(adresse.number_street ?? "");
+        setReference(adresse.reference ?? "");
+        setAdresseComplete(adresse.adresse);
+        setErreur("");
+
+        const retenue = {
+            adresse: adresse.adresse,
+            town: commune ?? adresse.town,
+            reference: adresse.reference ?? "",
+            street: adresse.street ?? "",
+            number_street: adresse.number_street ?? "",
+        };
+
+        localStorage.setItem("thalia_eat_order_delivery_address", JSON.stringify(retenue));
+        handleCustomOrder(commune ?? adresse.town ?? undefined);
+        notification("Adresse de livraison choisie");
+        setModalState(false);
+    };
+
+    const supprimerDuCarnet = async (adresse: AdresseEnregistree) => {
+        try {
+            await carnet.supprimer.mutateAsync(adresse.slug);
+
+            if (choisie === adresse.slug) setChoisie(null);
+        } catch (e) {
+            // Un garde qui arrete doit toujours poser un message : une
+            // suppression silencieusement ratee laisse croire qu'elle a eu
+            // lieu, et l'adresse revient au rechargement.
+            setErreur((e as Error).message);
+        }
+    };
+
     const handlerSendData = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -139,6 +200,24 @@ const ConfirmAdress = () => {
             );
 
             handleCustomOrder(commune);
+
+            /*
+             * Le carnet n'est alimente que si le client le demande, et sans
+             * bloquer la commande : une adresse qui ne s'enregistre pas ne
+             * doit pas empecher de se faire livrer.
+             */
+            if (memoriser && user) {
+                carnet.enregistrer
+                    .mutateAsync({
+                        adresse: adresse.adresse,
+                        town: commune?.slug ?? town,
+                        street,
+                        number_street: numberStreet,
+                        reference,
+                    })
+                    .catch((erreur: Error) => notification(erreur.message));
+            }
+
             notification("Votre adresse de livraison est enregistrée");
             setModalState(false);
         } finally {
@@ -186,6 +265,28 @@ const ConfirmAdress = () => {
                             <XMarkIcon className="h-auto w-6" strokeWidth={1.8} />
                         </ActionIcon>
                     </div>
+
+                    {/* Le carnet en haut de la fenetre : on y revient pour
+                        reprendre une adresse connue bien plus souvent que
+                        pour en saisir une neuve. */}
+                    {user && carnet.adresses.length ? (
+                        <div className="mb-5 flex flex-col gap-4">
+                            <CarnetAdresses
+                                adresses={carnet.adresses}
+                                choisie={choisie}
+                                onChoisir={choisirDuCarnet}
+                                onSupprimer={supprimerDuCarnet}
+                            />
+
+                            <div className="flex items-center gap-3">
+                                <span className="h-px flex-1 bg-surface-border" />
+                                <span className="text-caption text-ink-subtle">
+                                    ou saisir une nouvelle adresse
+                                </span>
+                                <span className="h-px flex-1 bg-surface-border" />
+                            </div>
+                        </div>
+                    ) : null}
 
                     <form className="flex flex-col gap-5" onSubmit={handlerSendData}>
                         <div className="grid gap-5 sm:grid-cols-2">
@@ -237,6 +338,21 @@ const ConfirmAdress = () => {
                                 required
                             />
                         </div>
+
+                        {/* Proposee seulement a un client connecte : le
+                            carnet vit sur son compte, et une case qui ne fait
+                            rien se lit comme une panne. */}
+                        {user ? (
+                            <label className="flex min-h-11 items-center gap-3 text-body text-ink">
+                                <input
+                                    type="checkbox"
+                                    checked={memoriser}
+                                    onChange={(e) => setMemoriser(e.target.checked)}
+                                    className="h-5 w-5 accent-brand-500"
+                                />
+                                Enregistrer cette adresse pour mes prochaines commandes
+                            </label>
+                        ) : null}
 
                         {erreur ? (
                             <p

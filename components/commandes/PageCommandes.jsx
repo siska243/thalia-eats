@@ -82,7 +82,7 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
     return (
         <div className="min-h-svh bg-surface-sunken pt-[var(--header-h)]">
             <div className="mx-auto max-w-[1400px] px-4 pb-16 pt-6 sm:px-5">
-                <header className="mb-5">
+                <header className="mb-4">
                     <p className="text-caption text-ink-muted">Votre historique</p>
                     <h1 className="text-display font-extrabold text-secondaryColor">
                         Commandes
@@ -121,6 +121,15 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                     })}
                 </div>
 
+                {/*
+                  * Une page par univers.
+                  *
+                  * Les deux avaient ete reunis ici, l'un sous l'autre. Le
+                  * proprietaire : « c'est de page differente pas une seule
+                  * page pour le 2, ça fait desordre ». Les courses ont repris
+                  * leur page, `/location/courses`, et le menu mene a l'une ou
+                  * a l'autre.
+                  */}
                 <div className="grid gap-6 lg:grid-cols-2">
                     <div className="flex flex-col gap-4">
                         {courant.isLoading && commandes.length === 0 ? (
@@ -178,6 +187,7 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                         </div>
                     ) : null}
                 </div>
+
             </div>
         </div>
     );

@@ -14,16 +14,25 @@ import type {Metadata} from "next";
  */
 export const metadata: Metadata = {
     title: "Régler votre commande",
-    // Ne jamais emettre le Referer depuis cette page. Un navigateur y met
+    // Le Referer ne doit jamais emporter la signature. Un navigateur y met
     // l'URL COMPLETE sur une navigation de meme origine : le clic « Retour a
-    // l'accueil » emporterait la signature vers la requete suivante, et de la
-    // dans la supervision.
+    // l'accueil » l'expedierait vers la requete suivante, et de la dans la
+    // supervision.
+    //
+    // « strict-origin » et non « no-referrer », qui etait trop large : sur
+    // « Payer par carte » la page part vers la passerelle, et FlexPay recevait
+    // jusqu'ici l'origine seule (comportement par defaut en inter-domaines).
+    // Ne plus rien lui envoyer du tout, sur un chemin de paiement, est un
+    // risque qu'aucun test ne peut lever puisque la passerelle est simulee.
+    // « strict-origin » retire le chemin ET la chaine de requete, y compris en
+    // navigation de meme origine — la fuite par « Retour a l'accueil » reste
+    // donc fermee a l'identique — mais la passerelle garde l'origine.
     //
     // Cette defense et le nettoyage de `request.headers` ne se remplacent pas :
-    // l'une empeche l'emission, l'autre nettoie ce qui arrive malgre tout —
+    // l'une limite ce qui est emis, l'autre nettoie ce qui arrive malgre tout —
     // depuis un autre onglet, un vieux cache, un navigateur qui ignore la
-    // directive.
-    referrer: "no-referrer",
+    // consigne.
+    referrer: "strict-origin",
     robots: {
         index: false,
         follow: false,

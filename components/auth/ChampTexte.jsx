@@ -18,6 +18,16 @@ export default function ChampTexte({
     motDePasse = false,
     aide = "",
     className = "",
+    /*
+     * Dire ce qui est exige, et surtout ce qui ne l'est pas.
+     *
+     * Les formulaires ne marquaient rien : le visiteur decouvrait au refus
+     * quels champs manquaient. Un asterisque sur l'obligatoire ne suffit pas
+     * seul — on le lit comme une decoration quand tout en porte un — d'ou la
+     * mention « facultatif » sur les autres, qui est l'information vraiment
+     * utile : celle qui permet de passer son chemin.
+     */
+    requis = false,
     ...props
 }) {
     const id = useId();
@@ -27,12 +37,21 @@ export default function ChampTexte({
         <div className={`flex flex-col ${className}`}>
             <label htmlFor={id} className="mb-2 text-caption font-semibold text-ink">
                 {label}
+                {requis ? (
+                    <span className="text-danger" aria-hidden>
+                        {" *"}
+                    </span>
+                ) : (
+                    <span className="font-normal text-ink-subtle">{" (facultatif)"}</span>
+                )}
             </label>
 
             <div className="relative">
                 <input
                     id={id}
                     type={motDePasse ? (visible ? "text" : "password") : type}
+                    required={requis}
+                    aria-required={requis}
                     className={`w-full rounded-control border border-surface-border bg-surface px-4 py-3 text-body text-ink outline-none transition-colors duration-150 placeholder:text-ink-subtle focus:border-brand-500 ${
                         motDePasse ? "pr-12" : ""
                     }`}
