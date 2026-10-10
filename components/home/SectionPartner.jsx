@@ -11,14 +11,14 @@ export default function SectionPartner() {
       title: "Commencer comme restaurant",
       secondTitle: "Inscrivez-vous en tant que restaurant",
       topTitle: "Gagnez plus de client",
-      btnLink: "/",
+      btnLink: "/partenaires/restaurant",
     },
     {
       imageSrc: thalia2, // Les chemins réels de tes images
       title: "Roulez avec nous",
       secondTitle: "Inscrivez-vous en tant que livreur",
       topTitle: "Roulez à votre rythme",
-      btnLink: "/",
+      btnLink: "/partenaires/livreur",
     },
   ];
   return (

@@ -57,6 +57,15 @@ class Route
     static lien_paiement_precommande=(uid:string,query:string):string=>
         `precommandes/${encodeURIComponent(uid)}/lien-paiement${query ? `?${query}` : ""}`
 
+    /**
+     * Une demande de partenariat, restaurant ou livreur.
+     *
+     * Ce n'est pas une inscription : rien n'est cree, aucun compte n'est
+     * ouvert. La demande arrive dans le back-office et la societe rappelle.
+     * Elle se fait donc sans compte, comme le catalogue.
+     */
+    static prospect_partenaire = `prospects`
+
     static update_address_delivery=`${this.user}/commande/update-address-delivery`
     static swr_check_paiement =(params:string)=>`${this.user}/commande/swr-check-paiement/${params}`
     
