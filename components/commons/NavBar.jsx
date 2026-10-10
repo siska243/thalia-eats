@@ -35,6 +35,7 @@ export default function NavBar() {
     const links = [
         {path: "/", name: "Accueil"},
         {path: "/restaurant", name: "Restaurants"},
+        {path: "/location", name: "Thalia Trans"},
         {path: "/ordering", name: "Panier"},
         {path: "/tracking", name: "Ma commande"},
         {path: "/historique", name: "Historique"},

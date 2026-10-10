@@ -9,6 +9,7 @@ import SectionFeatured from "@/components/home/SectionFeatured";
 import SectionRestaurants from "@/components/home/SectionRestaurants";
 import SectionPartner from "@/components/home/SectionPartner";
 import SectionAbout from "@/components/home/SectionAbout";
+import EntreeLocation from "@/components/rental/EntreeLocation";
 
 /**
  * L'accueil.
@@ -49,6 +50,10 @@ export default function Home() {
     return (
         <div className="bg-surface pb-12">
             <Hero previews={plats} />
+
+            {/* La location est une ligne de produit voisine : une carte
+                juste sous le hero, et non une section de plus. */}
+            <EntreeLocation />
 
             <SectionCategories categories={categories?.data ?? []} />
             <SectionFeatured previews={plats} />

@@ -65,7 +65,22 @@ export default function PageConnexion() {
             // cote serveur doivent le relire. `refresh()` les regenere sans
             // recharger l'application — `window.location.href` reconstruisait
             // tout depuis zero, panier Redux et cache TanStack Query compris.
-            router.replace("/");
+            /*
+             * Le chemin d'ou l'on vient, quand la page nous l'a passe.
+             *
+             * Thalia Trans envoie ici un visiteur qui a deja choisi sa voiture
+             * et son creneau : le ramener sur l'accueil lui ferait tout
+             * refaire. Lu de `window.location` et non de `useSearchParams`,
+             * pour ne pas avoir a envelopper cette page dans un Suspense.
+             *
+             * Seuls les chemins internes sont suivis : une adresse absolue
+             * ferait de ce parametre une redirection ouverte, de quoi deposer
+             * un client fraichement connecte sur un site tiers.
+             */
+            const retour = new URLSearchParams(window.location.search).get("retour");
+            const destination = retour?.startsWith("/") && !retour.startsWith("//") ? retour : "/";
+
+            router.replace(destination);
             router.refresh();
         } finally {
             setLoading(false);
