@@ -1,7 +1,6 @@
 "use client";
 
 import {useState} from "react";
-import {useSearchParams} from "next/navigation";
 import Link from "next/link";
 import CarteCommande from "./CarteCommande";
 import EmptyState from "@/components/ui/EmptyState";
@@ -30,37 +29,6 @@ import ListeCourses from "@/components/commandes/ListeCourses";
 export default function PageCommandes({ongletInitial = "en-cours"}) {
     const [onglet, setOnglet] = useState(ongletInitial);
     const [commandeSuivie, setCommandeSuivie] = useState(null);
-
-    /*
-     * Les deux univers au meme endroit, repas et location.
-     *
-     * Ils vivaient dans deux pages : les commandes ici, les courses sur
-     * `/location/courses`. C'est le meme client qui regarde « mes commandes »,
-     * et le proprietaire l'a dit : « dans commande on doit avoir pour thalia
-     * eat et thalia trans, de meme dans historique ».
-     *
-     * L'univers est porte par l'adresse (`?univers=location`) et non par un
-     * simple etat : un lien se partage, le bouton retour du navigateur marche,
-     * et l'ancienne adresse des courses peut y rediriger. Par defaut, les
-     * repas, qui restent le gros du trafic.
-     */
-    const parametres = useSearchParams();
-    const [univers, setUnivers] = useState(
-        parametres.get("univers") === "location" ? "location" : "eats",
-    );
-
-    const choisirUnivers = (cle) => {
-        setUnivers(cle);
-
-        // `replaceState` plutot qu'une navigation : rien a recharger, et on
-        // n'empile pas une entree d'historique a chaque aller-retour.
-        const url = new URL(window.location.href);
-
-        if (cle === "eats") url.searchParams.delete("univers");
-        else url.searchParams.set("univers", cle);
-
-        window.history.replaceState(null, "", url);
-    };
 
     const noms = useNomsCommerciaux();
     const {user} = useGetCurrentUser();
@@ -124,49 +92,9 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                     </h1>
                 </header>
 
-                {/*
-                  * La bascule d'univers passe AVANT les onglets d'etat : elle
-                  * change ce qu'on regarde, pas la facon de le filtrer. Pleine
-                  * largeur sur telephone, ou le pouce doit atteindre les deux
-                  * sans viser, et bornee a partir du format tablette.
-                  */}
                 <div
                     role="tablist"
-                    aria-label="Univers"
-                    className="mb-4 flex gap-2 rounded-pill bg-surface p-1 shadow-card sm:max-w-md"
-                >
-                    {[
-                        {cle: "eats", libelle: noms.food},
-                        {cle: "location", libelle: noms.rental},
-                    ].map((item) => {
-                        const actif = univers === item.cle;
-
-                        return (
-                            <button
-                                key={item.cle}
-                                type="button"
-                                role="tab"
-                                aria-selected={actif}
-                                onClick={() => choisirUnivers(item.cle)}
-                                className={`flex min-h-11 flex-1 items-center justify-center rounded-pill px-3 text-body font-bold transition-colors duration-150 ${
-                                    actif
-                                        ? "bg-brand-500 text-ink-inverse"
-                                        : "text-ink-muted hover:text-ink"
-                                }`}
-                            >
-                                {item.libelle}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {univers === "location" ? <ListeCourses /> : null}
-
-                <div
-                    role="tablist"
-                    className={`mb-6 flex rounded-control bg-surface-sunken p-1 ring-1 ring-surface-border sm:max-w-md ${
-                        univers === "location" ? "hidden" : ""
-                    }`}
+                    className="mb-6 flex rounded-control bg-surface-sunken p-1 ring-1 ring-surface-border sm:max-w-md"
                 >
                     {onglets.map((item) => {
                         const actif = onglet === item.cle;
@@ -196,7 +124,29 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                     })}
                 </div>
 
-                <div className={`grid gap-6 lg:grid-cols-2 ${univers === "location" ? "hidden" : ""}`}>
+                {/*
+                  * Les deux univers sur le meme ecran, et separes.
+                  *
+                  * Le proprietaire : « tu fusionnes pas mais tu ne mets sur le
+                  * meme ecran mais separer, on doit bien voir les commande
+                  * thalia eat et thalia trans ». Une bascule avait ete posee
+                  * d'abord : elle cachait l'un pour montrer l'autre, et il
+                  * fallait chercher. Deux sections titrees, les deux visibles,
+                  * l'une sous l'autre sur telephone.
+                  *
+                  * L'onglet choisit l'etat, pas l'univers : « En cours »
+                  * montre les commandes ET les courses en cours.
+                  */}
+                <section aria-labelledby="titre-eats" className="mb-3 flex items-baseline gap-2">
+                    <h2 id="titre-eats" className="text-title font-bold text-ink">
+                        {noms.food}
+                    </h2>
+                    <span className="text-caption text-ink-muted">
+                        {commandes.length} commande{commandes.length > 1 ? "s" : ""}
+                    </span>
+                </section>
+
+                <div className="grid gap-6 lg:grid-cols-2">
                     <div className="flex flex-col gap-4">
                         {courant.isLoading && commandes.length === 0 ? (
                             Array.from({length: 3}).map((_, i) => (
@@ -253,6 +203,22 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                         </div>
                     ) : null}
                 </div>
+
+                {/* La section location vient dessous, titree comme l'autre :
+                    sur telephone on fait defiler, sur grand ecran les deux
+                    restent dans la meme colonne de lecture. */}
+                <section aria-labelledby="titre-trans" className="mt-10">
+                    <div className="mb-3 flex items-baseline gap-2">
+                        <h2 id="titre-trans" className="text-title font-bold text-ink">
+                            {noms.rental}
+                        </h2>
+                        <span className="text-caption text-ink-muted">
+                            voitures avec chauffeur
+                        </span>
+                    </div>
+
+                    <ListeCourses etat={onglet} />
+                </section>
             </div>
         </div>
     );

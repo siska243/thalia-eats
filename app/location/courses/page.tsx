@@ -8,5 +8,5 @@ import {redirect} from "next/navigation";
  * en favori : elle redirige plutot que de disparaitre.
  */
 export default function Page() {
-    redirect("/tracking?univers=location");
+    redirect("/tracking");
 }
