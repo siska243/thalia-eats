@@ -5,12 +5,56 @@ import {FiClock} from "react-icons/fi";
 
 import {compteARebours, TonExpiration} from "@/helpers/expiration";
 
+/**
+ * Ce que le client perd si le délai tombe.
+ *
+ * Le mécanisme est le même des deux côtés — le serveur pose une échéance et
+ * défait tout seul ce qui n'est pas payé — mais pas l'enjeu : une commande de
+ * repas est annulée, un créneau de location repart à la vente. Les phrases du
+ * mobile disent déjà cette différence, et elles sont reprises telles quelles :
+ * un seul compte à rebours, deux vocabulaires.
+ */
+export type SujetExpiration = "commande" | "reservation";
+
 interface Props {
     minutes: number | null;
     ton: TonExpiration | null;
     /** En pastille sur une carte de commande, en bloc sur la page de paiement. */
     compact?: boolean;
+    sujet?: SujetExpiration;
 }
+
+/** Ce qui change d'un sujet à l'autre : les mots, jamais le délai. */
+const phrases: Record<SujetExpiration, Record<TonExpiration, {longue: string; courte: string}> & {
+    titre: string;
+    expire: string;
+}> = {
+    commande: {
+        titre: "Il reste",
+        expire: "Commande expirée",
+        calme: {longue: "pour régler cette commande", courte: "pour payer"},
+        pressant: {longue: "avant que la commande ne soit annulée", courte: "pour payer"},
+        critique: {
+            longue: "dernière minute pour régler cette commande",
+            courte: "dernière minute",
+        },
+        ecoule: {
+            longue: "la commande a été annulée faute de paiement",
+            courte: "commande expirée",
+        },
+    },
+    reservation: {
+        titre: "Il reste",
+        expire: "Réservation expirée",
+        calme: {longue: "pour régler l’acompte et retenir ce véhicule", courte: "pour payer"},
+        pressant: {longue: "avant que le créneau ne reparte à la vente", courte: "pour payer"},
+        critique: {
+            longue: "dernière minute pour retenir ce véhicule",
+            courte: "dernière minute",
+        },
+        ecoule: {longue: "le créneau a été relâché", courte: "créneau relâché"},
+    },
+};
 
 /**
  * Fond, taille, texte et phrase vont ensemble : un seul endroit les accorde.
@@ -22,15 +66,13 @@ interface Props {
  */
 const tons: Record<
     TonExpiration,
-    {fond: string; fondCompact: string; chiffre: string; taille: string; phrase: string; phraseCourte: string; phraseTon: string}
+    {fond: string; fondCompact: string; chiffre: string; taille: string; phraseTon: string}
 > = {
     calme: {
         fond: "bg-surface",
         fondCompact: "bg-surface-sunken",
         chiffre: "text-danger",
         taille: "text-heading",
-        phrase: "pour régler cette commande",
-        phraseCourte: "pour payer",
         phraseTon: "text-ink-muted",
     },
     pressant: {
@@ -38,8 +80,6 @@ const tons: Record<
         fondCompact: "bg-danger-surface",
         chiffre: "text-danger",
         taille: "text-display",
-        phrase: "avant que la commande ne soit annulée",
-        phraseCourte: "pour payer",
         phraseTon: "text-danger",
     },
     critique: {
@@ -47,8 +87,6 @@ const tons: Record<
         fondCompact: "bg-danger-surface border border-danger",
         chiffre: "text-danger",
         taille: "text-display",
-        phrase: "dernière minute pour régler cette commande",
-        phraseCourte: "dernière minute",
         phraseTon: "text-danger",
     },
     ecoule: {
@@ -56,8 +94,6 @@ const tons: Record<
         fondCompact: "bg-surface-sunken",
         chiffre: "text-ink-muted",
         taille: "text-heading",
-        phrase: "la commande a été annulée faute de paiement",
-        phraseCourte: "commande expirée",
         phraseTon: "text-ink-muted",
     },
 };
@@ -71,10 +107,11 @@ const tons: Record<
  *
  * Sans échéance envoyée par le serveur, rien ne s'affiche.
  */
-export default function CompteARebours({minutes, ton, compact}: Props) {
+export default function CompteARebours({minutes, ton, compact, sujet = "commande"}: Props) {
     if (ton === null) return null;
 
     const apparence = tons[ton];
+    const mots = phrases[sujet];
     const valeur = compteARebours(minutes);
 
     if (compact) {
@@ -82,7 +119,7 @@ export default function CompteARebours({minutes, ton, compact}: Props) {
             <span
                 className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 ${apparence.fondCompact}`}
                 aria-label={
-                    ton === "ecoule" ? "Commande expirée" : `Il reste ${valeur} pour payer`
+                    ton === "ecoule" ? mots.expire : `Il reste ${valeur} pour payer`
                 }
             >
                 <FiClock className={apparence.phraseTon} aria-hidden />
@@ -94,7 +131,7 @@ export default function CompteARebours({minutes, ton, compact}: Props) {
                 )}
 
                 <span className={`text-caption ${apparence.phraseTon}`}>
-                    {apparence.phraseCourte}
+                    {mots[ton].courte}
                 </span>
             </span>
         );
@@ -104,7 +141,7 @@ export default function CompteARebours({minutes, ton, compact}: Props) {
         <div className={`flex flex-col items-center gap-1 rounded-card px-4 py-5 ${apparence.fond}`}>
             <span className="flex items-center gap-1.5 text-caption font-semibold text-ink-muted">
                 <FiClock aria-hidden />
-                {ton === "ecoule" ? "Commande expirée" : "Il reste"}
+                {ton === "ecoule" ? mots.expire : mots.titre}
             </span>
 
             {ton === "ecoule" ? null : (
@@ -117,7 +154,7 @@ export default function CompteARebours({minutes, ton, compact}: Props) {
             )}
 
             <span className={`text-center text-body ${apparence.phraseTon}`}>
-                {apparence.phrase}
+                {mots[ton].longue}
             </span>
         </div>
     );
