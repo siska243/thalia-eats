@@ -1,3 +1,21 @@
+# *
 User-agent: *
 Allow: /
+Disallow: /reglages
+Disallow: /reglages/*
+Disallow: /historique
+Disallow: /tracking
+Disallow: /checkout
+Disallow: /paiement/*
+Disallow: /payement/*
+Disallow: /location/courses
+Disallow: /location/courses/*
+Disallow: /location/reservation
+Disallow: /api/*
+Disallow: /monitoring
+
+# Host
+Host: https://thaliaeats.com
+
+# Sitemaps
 Sitemap: https://thaliaeats.com/sitemap.xml
