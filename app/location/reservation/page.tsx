@@ -24,6 +24,8 @@ import {
     useRentalVehicle,
 } from "@/hooks/useRental";
 import ChampTexte from "@/components/auth/ChampTexte";
+import useGetCurrentUser from "@/hooks/useGetCurrentUser";
+import {FetchData} from "@/helpers/FetchData";
 import ChoixPaiement from "@/components/ordering/ChoixPaiement";
 import ModalMobileMoney from "@/components/ordering/ModalMobileMoney";
 import HorsZone from "@/components/rental/HorsZone";
@@ -115,6 +117,29 @@ const TunnelReservation = () => {
     const [modalOuverte, setModalOuverte] = useState(false);
     const [phone, setPhone] = useState<string | null>(null);
 
+    /*
+     * Le numero que le chauffeur appellera.
+     *
+     * Il n'etait demande nulle part : le client reservait, et personne
+     * n'avait de quoi le joindre. Le serveur ne porte pas de telephone sur la
+     * reservation — `CourseChauffeurResource` rend celui du COMPTE — donc
+     * c'est bien le compte qu'il faut renseigner, et non un champ de plus
+     * dans la reservation qui n'irait nulle part.
+     *
+     * Pre-rempli depuis le compte : le client l'a donne en s'inscrivant, le
+     * lui redemander de zero serait une saisie pour rien. Il reste modifiable,
+     * parce qu'on ne prend pas toujours la course sur le telephone qui a
+     * servi a creer le compte.
+     */
+    // `useGetCurrentUser` n'est pas type : le compte arrive en `{}`. On ne
+    // lit que les quatre champs dont on a besoin, nommes ici.
+    const {user} = useGetCurrentUser() as {
+        user?: {email?: string; name?: string; last_name?: string; phone?: string} | null;
+    };
+    const telephoneDuCompte: string = user?.phone ?? "";
+    const [telephone, setTelephone] = useState("");
+    const telephoneRetenu = (telephone || telephoneDuCompte).trim();
+
     const [communeSlug, setCommuneSlug] = useState("");
     const [avenue, setAvenue] = useState("");
     const [numero, setNumero] = useState("");
@@ -158,8 +183,23 @@ const TunnelReservation = () => {
     const continuer = () => {
         setErreur(null);
 
-        if (!communeSlug || !avenue.trim() || !numero.trim() || !repere.trim()) {
-            setErreur("Indiquez l’adresse complète où le chauffeur doit vous prendre.");
+        /*
+         * Le numero d'avenue n'est PAS exige.
+         *
+         * Beaucoup d'adresses de Kinshasa n'en ont pas, et le reclamer faisait
+         * inventer un chiffre au client — une fausse precision est pire qu'une
+         * absence pour le chauffeur qui cherche. La commune, l'avenue et le
+         * repere suffisent a venir prendre quelqu'un ; c'est le repere qui
+         * fait le travail sur le terrain.
+         */
+        if (!telephoneRetenu) {
+            setErreur("Indiquez le numéro sur lequel le chauffeur vous appellera.");
+
+            return;
+        }
+
+        if (!communeSlug || !avenue.trim() || !repere.trim()) {
+            setErreur("Indiquez la commune, l’avenue et un repère où le chauffeur doit vous prendre.");
 
             return;
         }
@@ -217,6 +257,28 @@ const TunnelReservation = () => {
         setEnCours(method === "cart" ? "carte" : "mobile");
 
         try {
+            /*
+             * Le numero change est ecrit sur le COMPTE, pas sur la
+             * reservation : c'est celui-la que le chauffeur lira. L'echec
+             * n'arrete pas la reservation — perdre une course parce qu'un
+             * numero n'a pas pu etre enregistre serait absurde — mais il se
+             * dit, sinon le client croirait avoir corrige son numero.
+             */
+            if (user && telephoneRetenu && telephoneRetenu !== telephoneDuCompte) {
+                const reponse = await FetchData.sendData(Route.update_user, {
+                    email: user.email,
+                    name: user.name,
+                    last_name: user.last_name,
+                    phone: telephoneRetenu,
+                });
+
+                if (reponse?.name === "AxiosError") {
+                    setErreur(
+                        "Votre numéro n'a pas pu être enregistré sur votre compte. La réservation continue.",
+                    );
+                }
+            }
+
             let booking = reservation;
 
             if (!reglementSeul) {
@@ -330,13 +392,38 @@ const TunnelReservation = () => {
 
                 {etape === 0 ? (
                     <section className="flex flex-col gap-5 rounded-card bg-surface p-4 shadow-card sm:p-6">
+                        <p className="text-caption text-ink-muted">
+                            Les champs marqués d&apos;un
+                            <span className="text-danger" aria-hidden>
+                                {" * "}
+                            </span>
+                            sont obligatoires.
+                        </p>
+
                         <div className="grid gap-5 sm:grid-cols-2">
+                            <ChampTexte
+                                label="Votre téléphone"
+                                requis
+                                type="tel"
+                                inputMode="tel"
+                                autoComplete="tel"
+                                aide="Le chauffeur vous appellera sur ce numéro"
+                                placeholder="+243 ..."
+                                value={telephone || telephoneDuCompte}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setTelephone(e.target.value)
+                                }
+                            />
+
                             <div className="flex flex-col">
                                 <label
                                     htmlFor="commune-prise-en-charge"
                                     className="mb-2 text-caption font-semibold text-ink"
                                 >
                                     Commune
+                                    <span className="text-danger" aria-hidden>
+                                        {" *"}
+                                    </span>
                                 </label>
                                 <select
                                     id="commune-prise-en-charge"
@@ -355,6 +442,7 @@ const TunnelReservation = () => {
 
                             <ChampTexte
                                 label="Avenue"
+                                requis
                                 placeholder="Nom de votre avenue"
                                 value={avenue}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -373,6 +461,7 @@ const TunnelReservation = () => {
 
                             <ChampTexte
                                 label="Repère"
+                                requis
                                 placeholder="Un repère proche de vous"
                                 aide="Ce qui aide le chauffeur à vous trouver"
                                 value={repere}

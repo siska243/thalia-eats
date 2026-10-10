@@ -25,6 +25,15 @@ class Route
   
     static logout = "auth/logout"
     // mise à jour des informations de l'utilisateur
+    /**
+     * Les informations du compte : nom, prenom, telephone.
+     *
+     * C'est le telephone du COMPTE que le chauffeur et le livreur lisent —
+     * aucune commande ni reservation n'en porte un. Le corriger ici est donc
+     * le seul moyen d'etre joignable.
+     */
+    static update_user = `${this.me}/update`
+
     static update_adresse =`${this.me}/update/adresse`
     static update_password =`${this.me}/update/password`
     // traitement commande
