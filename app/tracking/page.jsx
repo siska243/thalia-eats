@@ -1,5 +1,7 @@
 "use client";
 
+import {Suspense} from "react";
+
 import PageCommandes from "@/components/commandes/PageCommandes";
 
 /**
@@ -10,5 +12,15 @@ import PageCommandes from "@/components/commandes/PageCommandes";
  * haut, dans le menu, et dans les liens deja partages.
  */
 export default function PageTracking() {
-    return <PageCommandes ongletInitial="en-cours" />;
+    /*
+     * Suspense : la page lit l'univers choisi dans l'adresse
+     * (`?univers=location`), et `useSearchParams` impose cette frontiere dans
+     * l'App Router. Sans elle, le build bascule toute la page en rendu
+     * dynamique sans rien dire.
+     */
+    return (
+        <Suspense fallback={<div className="min-h-svh bg-surface-sunken" />}>
+            <PageCommandes ongletInitial="en-cours" />
+        </Suspense>
+    );
 }

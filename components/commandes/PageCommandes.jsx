@@ -1,6 +1,7 @@
 "use client";
 
 import {useState} from "react";
+import {useSearchParams} from "next/navigation";
 import Link from "next/link";
 import CarteCommande from "./CarteCommande";
 import EmptyState from "@/components/ui/EmptyState";
@@ -10,6 +11,8 @@ import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {Route} from "@/helpers/Route";
 import {listeDe} from "@/helpers/reponseApi";
 import {smoothScroll} from "@/helpers/calculePrice";
+import {useNomsCommerciaux} from "@/hooks/useRental";
+import ListeCourses from "@/components/commandes/ListeCourses";
 
 /**
  * Les commandes du client : en cours et terminees, au meme endroit.
@@ -28,6 +31,38 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
     const [onglet, setOnglet] = useState(ongletInitial);
     const [commandeSuivie, setCommandeSuivie] = useState(null);
 
+    /*
+     * Les deux univers au meme endroit, repas et location.
+     *
+     * Ils vivaient dans deux pages : les commandes ici, les courses sur
+     * `/location/courses`. C'est le meme client qui regarde « mes commandes »,
+     * et le proprietaire l'a dit : « dans commande on doit avoir pour thalia
+     * eat et thalia trans, de meme dans historique ».
+     *
+     * L'univers est porte par l'adresse (`?univers=location`) et non par un
+     * simple etat : un lien se partage, le bouton retour du navigateur marche,
+     * et l'ancienne adresse des courses peut y rediriger. Par defaut, les
+     * repas, qui restent le gros du trafic.
+     */
+    const parametres = useSearchParams();
+    const [univers, setUnivers] = useState(
+        parametres.get("univers") === "location" ? "location" : "eats",
+    );
+
+    const choisirUnivers = (cle) => {
+        setUnivers(cle);
+
+        // `replaceState` plutot qu'une navigation : rien a recharger, et on
+        // n'empile pas une entree d'historique a chaque aller-retour.
+        const url = new URL(window.location.href);
+
+        if (cle === "eats") url.searchParams.delete("univers");
+        else url.searchParams.set("univers", cle);
+
+        window.history.replaceState(null, "", url);
+    };
+
+    const noms = useNomsCommerciaux();
     const {user} = useGetCurrentUser();
 
     const enCours = useReferentialData({
@@ -82,16 +117,56 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
     return (
         <div className="min-h-svh bg-surface-sunken pt-[var(--header-h)]">
             <div className="mx-auto max-w-[1400px] px-4 pb-16 pt-6 sm:px-5">
-                <header className="mb-5">
+                <header className="mb-4">
                     <p className="text-caption text-ink-muted">Votre historique</p>
                     <h1 className="text-display font-extrabold text-secondaryColor">
                         Commandes
                     </h1>
                 </header>
 
+                {/*
+                  * La bascule d'univers passe AVANT les onglets d'etat : elle
+                  * change ce qu'on regarde, pas la facon de le filtrer. Pleine
+                  * largeur sur telephone, ou le pouce doit atteindre les deux
+                  * sans viser, et bornee a partir du format tablette.
+                  */}
                 <div
                     role="tablist"
-                    className="mb-6 flex rounded-control bg-surface-sunken p-1 ring-1 ring-surface-border sm:max-w-md"
+                    aria-label="Univers"
+                    className="mb-4 flex gap-2 rounded-pill bg-surface p-1 shadow-card sm:max-w-md"
+                >
+                    {[
+                        {cle: "eats", libelle: noms.food},
+                        {cle: "location", libelle: noms.rental},
+                    ].map((item) => {
+                        const actif = univers === item.cle;
+
+                        return (
+                            <button
+                                key={item.cle}
+                                type="button"
+                                role="tab"
+                                aria-selected={actif}
+                                onClick={() => choisirUnivers(item.cle)}
+                                className={`flex min-h-11 flex-1 items-center justify-center rounded-pill px-3 text-body font-bold transition-colors duration-150 ${
+                                    actif
+                                        ? "bg-brand-500 text-ink-inverse"
+                                        : "text-ink-muted hover:text-ink"
+                                }`}
+                            >
+                                {item.libelle}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {univers === "location" ? <ListeCourses /> : null}
+
+                <div
+                    role="tablist"
+                    className={`mb-6 flex rounded-control bg-surface-sunken p-1 ring-1 ring-surface-border sm:max-w-md ${
+                        univers === "location" ? "hidden" : ""
+                    }`}
                 >
                     {onglets.map((item) => {
                         const actif = onglet === item.cle;
@@ -121,7 +196,7 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                     })}
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-2">
+                <div className={`grid gap-6 lg:grid-cols-2 ${univers === "location" ? "hidden" : ""}`}>
                     <div className="flex flex-col gap-4">
                         {courant.isLoading && commandes.length === 0 ? (
                             Array.from({length: 3}).map((_, i) => (
