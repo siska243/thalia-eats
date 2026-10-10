@@ -24,6 +24,8 @@ import {
     useRentalVehicle,
 } from "@/hooks/useRental";
 import ChampTexte from "@/components/auth/ChampTexte";
+import PhoneNumber from "@/components/forms/phone-number";
+import {pourLaSaisie, pourLeCompte} from "@/helpers/telephone";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {FetchData} from "@/helpers/FetchData";
 import ChoixPaiement from "@/components/ordering/ChoixPaiement";
@@ -136,9 +138,15 @@ const TunnelReservation = () => {
     const {user} = useGetCurrentUser() as {
         user?: {email?: string; name?: string; last_name?: string; phone?: string} | null;
     };
-    const telephoneDuCompte: string = user?.phone ?? "";
+    /*
+     * Le compte stocke le format local, « 0810000001 », et le composant de
+     * saisie travaille en international sans le plus, « 243810000001 ». Les
+     * deux conversions vivent dans `helpers/telephone`, une fois : la forme
+     * enregistree ne peut pas dependre de l'ecran ou le numero a ete tape.
+     */
+    const telephoneDuCompte = pourLaSaisie(user?.phone);
     const [telephone, setTelephone] = useState("");
-    const telephoneRetenu = (telephone || telephoneDuCompte).trim();
+    const telephoneRetenu = telephone || telephoneDuCompte;
 
     const [communeSlug, setCommuneSlug] = useState("");
     const [avenue, setAvenue] = useState("");
@@ -269,7 +277,10 @@ const TunnelReservation = () => {
                     email: user.email,
                     name: user.name,
                     last_name: user.last_name,
-                    phone: telephoneRetenu,
+                    // Reconverti au format local : le mobile analyse le numero
+                    // du compte en supposant ce format, et l'international le
+                    // lui rendrait illisible.
+                    phone: pourLeCompte(telephoneRetenu),
                 });
 
                 if (reponse?.name === "AxiosError") {
@@ -401,18 +412,30 @@ const TunnelReservation = () => {
                         </p>
 
                         <div className="grid gap-5 sm:grid-cols-2">
-                            <ChampTexte
-                                label="Votre téléphone"
-                                requis
-                                type="tel"
-                                inputMode="tel"
-                                autoComplete="tel"
-                                aide="Le chauffeur vous appellera sur ce numéro"
-                                placeholder="+243 ..."
-                                value={telephone || telephoneDuCompte}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                    setTelephone(e.target.value)
+                            {/*
+                              * Le composant telephone du depot, et non un
+                              * champ texte : il porte l'indicatif, le drapeau
+                              * et le format du pays. C'est celui qu'utilise
+                              * deja la fenetre mobile money — deux saisies
+                              * differentes pour un numero, sur le meme site,
+                              * se mettent a accepter des formes differentes.
+                              */}
+                            <PhoneNumber
+                                className="w-full"
+                                country="cd"
+                                preferredCountries={["cd"]}
+                                label={
+                                    <>
+                                        Votre téléphone
+                                        <span className="text-danger" aria-hidden>
+                                            {" *"}
+                                        </span>
+                                    </>
                                 }
+                                helperText="Le chauffeur vous appellera sur ce numéro"
+                                value={telephone || telephoneDuCompte}
+                                onChange={(valeur: string) => setTelephone(valeur)}
+                                inputProps={{name: "telephone", required: true}}
                             />
 
                             <div className="flex flex-col">
