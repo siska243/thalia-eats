@@ -2,6 +2,9 @@ import {withSentryConfig} from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: { unoptimized: true },
+    // `X-Powered-By: Next.js` sur chaque reponse annonce le cadre et sa
+    // famille de versions a qui scanne. Rien ne le lit.
+    poweredByHeader: false,
     /*
      * Le build voit de nouveau les erreurs.
      *
