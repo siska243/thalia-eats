@@ -71,4 +71,96 @@ class Route
     
 }
 
-export {Route}
+/**
+ * Thalia Trans : la location de vehicule avec chauffeur.
+ *
+ * Decalque de la classe `RouteRental` du mobile (`helpers/Route.ts`), parce
+ * que les deux clients parlent a la meme API sur la meme reservation : deux
+ * listes d'adresses finiraient par diverger, et c'est deja le defaut connu
+ * des deux `Route.ts` de ce produit.
+ *
+ * Les routes du chauffeur ne sont pas reprises : il n'a pas d'application web,
+ * sa fiche est tenue en administration. Les ajouter ici serait du contrat mort
+ * a maintenir.
+ */
+class RouteRental
+{
+    private static prefix = "rental"
+
+    /**
+     * Le catalogue, sans creneau, comme la liste des restaurants.
+     *
+     * On regarde les voitures d'abord et on choisit ses dates ensuite, sur la
+     * fiche. La recherche est deleguee au serveur, exactement comme
+     * `/list-restaurant?search=`.
+     */
+    static catalogue = (search?: string, page?: number): string => {
+        const parametres: string[] = []
+
+        if (search) parametres.push(`search=${encodeURIComponent(search)}`)
+        // La premiere page est implicite cote serveur : ne pas l'ecrire garde
+        // l'URL identique a celle des clients deja installes.
+        if (page && page > 1) parametres.push(`page=${page}`)
+
+        return parametres.length
+            ? `${this.prefix}/vehicles?${parametres.join("&")}`
+            : `${this.prefix}/vehicles`
+    }
+
+    /** Le meme catalogue restreint a un creneau : il porte alors le prix. */
+    static vehicles = (startsAt: string, endsAt: string): string =>
+        `${this.prefix}/vehicles?starts_at=${encodeURIComponent(startsAt)}&ends_at=${encodeURIComponent(endsAt)}`
+
+    /**
+     * La fiche d'un vehicule, comme `/list-restaurant/{slug}`.
+     *
+     * Le creneau est facultatif : sans lui la fiche se lit, avec lui elle
+     * porte le prix et la disponibilite sur ces heures precises.
+     */
+    static vehicle = (
+        slug: string,
+        startsAt?: string,
+        endsAt?: string,
+        mode?: string,
+    ): string => {
+        const base = `${this.prefix}/vehicles/${encodeURIComponent(slug)}`
+
+        if (!startsAt || !endsAt) return base
+
+        const parametres = [
+            `starts_at=${encodeURIComponent(startsAt)}`,
+            `ends_at=${encodeURIComponent(endsAt)}`,
+        ]
+
+        // Le mode n'est ecrit que s'il sort de l'ordinaire : sans lui le
+        // serveur chiffre a l'heure, et l'URL reste celle que les clients
+        // deja installes appellent.
+        if (mode && mode !== "hourly") parametres.push(`pricing_mode=${encodeURIComponent(mode)}`)
+
+        return `${base}?${parametres.join("&")}`
+    }
+
+    /**
+     * Les reglages publics de la location : noms commerciaux, contact hors
+     * zone, communes desservies, bornes de duree et delai de prevenance.
+     * Publique comme le catalogue, elle se lit sans compte.
+     */
+    static config = `${this.prefix}/config`
+
+    static bookings = `${this.prefix}/bookings`
+    static booking = (uid: string): string => `${this.prefix}/bookings/${uid}`
+    static booking_cancel = (uid: string): string => `${this.prefix}/bookings/${uid}/cancel`
+    static booking_deposit = (uid: string): string => `${this.prefix}/bookings/${uid}/deposit`
+
+    /**
+     * La position du chauffeur et le point de rendez-vous d'une course.
+     *
+     * Separee de la reservation : elle change toutes les dix secondes quand la
+     * course roule, alors que la reservation elle-meme ne bouge pas. Les
+     * fondre aurait fait retelecharger le vehicule, les montants et le code de
+     * depart a chaque releve de position.
+     */
+    static booking_suivi = (uid: string): string => `${this.prefix}/bookings/${uid}/suivi`
+}
+
+export {Route, RouteRental}
