@@ -65,7 +65,16 @@ class FetchData {
         const http = axios.create({
             baseURL: this.BASE_URL(),
             headers: {
-                "X-API-KEY": "2-34x5-s-w9yh5iv7---",
+                /*
+                 * L'en-tete `X-API-KEY` a ete RETIRE.
+                 *
+                 * Sa valeur etait ecrite ici en clair, donc servie dans le
+                 * bundle a tout visiteur et embarquee dans l'APK : une cle que
+                 * le client porte n'authentifie pas le client. Cote serveur,
+                 * rien ne la lisait — le middleware cense le faire n'a jamais
+                 * existe dans le depot — donc la retirer ne casse aucun appel.
+                 * C'est Sanctum qui authentifie, et lui seul.
+                 */
                 Accept: "application/json",
                 "Content-Type": contentType || 'application/json',
             },
