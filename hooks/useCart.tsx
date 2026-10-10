@@ -6,6 +6,7 @@ import {setOrderCart, setShopCart} from "@/store/reducers/shopSlice";
 import {clearLocalStorageOrdering, setLocalStorageOrdering} from "@/helpers/localstorage-data";
 import {notification} from "@/hooks/useCreateOrdering";
 import {calcul_price, customProduct, price_delivrery, total} from "@/helpers/calculePrice";
+import {etatOuverture} from "@/helpers/openingHours";
 import {useEffect} from "react";
 import useCurrentCommande from "@/hooks/useCurrentCommande";
 import useReferentialData from "@/hooks/useQueryTanStack";
@@ -33,6 +34,37 @@ const useCart = () => {
 
 
     const handleAddProductCart = async (product: ProductType) => {
+
+        /*
+         * Un restaurant ferme ne prend pas de commande.
+         *
+         * Le site affichait « Ferme » sur la fiche et laissait quand meme
+         * remplir le panier et payer : le client reglait un repas que personne
+         * n'allait preparer. Le controle est pose ICI, dans le panier, et non
+         * sur chaque bouton : tous les chemins d'ajout du site passent par
+         * cette fonction, et un garde par bouton se serait oublie au premier
+         * ecran ajoute.
+         *
+         * `etatOuverture` est la meme fonction que celle des bandeaux et des
+         * cartes, et elle repond « ouvert » quand aucun horaire n'est saisi :
+         * un restaurateur qui a oublie de remplir ses horaires ne doit pas se
+         * retrouver ferme sans le savoir.
+         *
+         * Ce garde ne remplace pas la verification du serveur, qui n'existe
+         * pas encore : un appel direct a l'API passe toujours. C'est le ticket
+         * cote backend qui fermera reellement la porte.
+         */
+        const ouverture = etatOuverture(product?.restaurant?.opens)
+
+        if (!ouverture.ouvert) {
+            notification(
+                ouverture.ouvreA
+                    ? `${product?.restaurant?.name ?? "Ce restaurant"} est fermé. Il ouvre à ${ouverture.ouvreA}.`
+                    : `${product?.restaurant?.name ?? "Ce restaurant"} est fermé aujourd'hui.`,
+            )
+
+            return
+        }
 
         await refetch()
         if(data){
