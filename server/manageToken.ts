@@ -5,6 +5,34 @@ import {decode_data, encode_data} from "@/server/referential";
 import {Route} from "@/helpers/Route";
 
 
+/**
+ * Les attributs communs aux cookies de session.
+ *
+ * `httpOnly` manquait : le jeton Sanctum et la fiche du compte etaient lisibles
+ * par n'importe quel script de la page, donc exfiltrables par la premiere
+ * injection venue. Rien ne les lit cote navigateur, seules les fonctions
+ * serveur de ce fichier y touchent, donc les fermer ne retire aucune
+ * fonctionnalite.
+ *
+ * `sameSite: "lax"` empeche un site tiers de declencher une requete
+ * authentifiee en notre nom, tout en laissant passer les retours de navigation
+ * depuis la passerelle de paiement, qui arrivent en GET de premier niveau.
+ *
+ * `path` est ecrit explicitement : sans lui le cookie prend le chemin de la
+ * page qui l'a pose, et un jeton pose depuis /checkout ne serait pas renvoye
+ * sur /historique.
+ *
+ * `flex_pay_number_order_thalia_eats` les reprend aussi : sa duree valait
+ * `60*3600`, lu par Next comme un instant en millisecondes depuis 1970, donc
+ * une date deja passee. Le cookie naissait expire.
+ */
+const ATTRIBUTS_SESSION = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+} as const
+
 export const parseJwt =async (token:string)=> {
     return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 }
@@ -15,7 +43,7 @@ export const currentUser=async ()=>{
     const cookieStore = await cookies()
     if (response ) {
 
-        cookieStore.set('current_user_rdv', JSON.stringify(response), { secure: true })
+        cookieStore.set('current_user_rdv', JSON.stringify(response), ATTRIBUTS_SESSION)
     }
     else{
         cookieStore.delete('current_user_rdv')
@@ -71,7 +99,7 @@ export const setToken=async(token:string)=>{
     const encode=await encode_data(token)
     const cookieStore = await cookies()
 
-    cookieStore.set('token_thalia_eats', encode, { secure: true })
+    cookieStore.set('token_thalia_eats', encode, ATTRIBUTS_SESSION)
 
     setTimeout(async ()=>{
         await currentUser()
@@ -126,7 +154,7 @@ export const deleteAll=async ()=>{
 //flex pay order
 export const setFlexPayOrder=async (orderNumber:string):Promise<void>=>{
     const cookieStore=await cookies()
-    cookieStore.set('flex_pay_number_order_thalia_eats',orderNumber,{secure:true,httpOnly:true,expires:60*3600})
+    cookieStore.set('flex_pay_number_order_thalia_eats',orderNumber,ATTRIBUTS_SESSION)
 }
 
 export const getFlexPayOrder=async ():Promise<string|undefined>=>{
