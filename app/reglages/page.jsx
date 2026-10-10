@@ -1,6 +1,7 @@
 import AssistantsConnectes from "@/components/account/AssistantsConnectes";
 import EditCompte from "@/components/account/EditCompte";
 import Information from "@/components/account/Informations";
+import CarnetDuCompte from "@/components/account/CarnetDuCompte";
 
 /** Le compte : les informations, l'adresse, le mot de passe, les assistants. */
 export default function PageReglages() {
@@ -12,7 +13,7 @@ export default function PageReglages() {
                         Mon compte
                     </h1>
                     <p className="mt-1 text-caption text-ink-muted">
-                        Vos informations, votre adresse de livraison, votre mot de passe et les
+                        Vos informations, vos adresses enregistrées, votre mot de passe et les
                         assistants connectés à votre compte.
                     </p>
                 </header>
@@ -22,6 +23,8 @@ export default function PageReglages() {
                 </div>
 
                 <EditCompte />
+
+                <CarnetDuCompte />
 
                 <AssistantsConnectes />
             </div>

@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import fondImage from "@/public/assets/images/homeEat.png";
 import {formatPrix} from "@/helpers/openingHours";
+import {useNomsCommerciaux} from "@/hooks/useRental";
 
 /**
  * Le hero, pleine page.
@@ -33,6 +36,9 @@ import {formatPrix} from "@/helpers/openingHours";
  * d'adresse du navigateur et le bas du hero passait sous l'ecran.
  */
 export default function Hero({previews = []}) {
+    // Le nom commercial vient des reglages, jamais d'une chaine ecrite ici.
+    const noms = useNomsCommerciaux();
+
     const plats = previews.slice(0, 3);
 
     return (
@@ -66,8 +72,12 @@ export default function Hero({previews = []}) {
 
                 <div className="relative mx-auto flex min-h-[620px] w-full max-w-7xl flex-col justify-center px-4 pb-14 pt-[var(--header-h)] sm:px-6 lg:px-8 md:min-h-svh">
                     <div className="max-w-2xl">
+                        {/* Les deux lignes de produit annoncees des la
+                            premiere ligne : l'accueil ne parlait que de repas,
+                            et rien n'y laissait deviner qu'on peut aussi
+                            reserver une voiture avec chauffeur. */}
                         <p className="text-body text-brand-300">
-                            Restaurants de Kinshasa, livrés chez vous
+                            Repas livrés et voitures avec chauffeur, à Kinshasa
                         </p>
 
                         <h1 className="mt-4 text-[38px] font-extrabold leading-[1.03] tracking-tight text-white sm:text-[54px] lg:text-[68px]">
@@ -76,7 +86,14 @@ export default function Hero({previews = []}) {
 
                         <p className="mt-6 max-w-lg text-body leading-7 text-white/80">
                             Choisissez un restaurant, composez votre commande, payez par mobile
-                            money. Un livreur s&apos;en charge.
+                            money. Un livreur s&apos;en charge. Besoin de vous déplacer&nbsp;?{" "}
+                            <Link
+                                href="/location"
+                                className="font-semibold text-brand-300 underline-offset-4 hover:underline"
+                            >
+                                {noms.rental}
+                            </Link>{" "}
+                            vous trouve une voiture avec chauffeur, à l&apos;heure ou à la journée.
                         </p>
 
                         <div className="mt-9 flex flex-wrap gap-3">
@@ -88,8 +105,15 @@ export default function Hero({previews = []}) {
                             </Link>
 
                             <Link
-                                href="/historique"
+                                href="/location"
                                 className="inline-flex items-center justify-center rounded-pill border border-white/30 px-7 py-4 text-body font-semibold text-white backdrop-blur-sm transition-colors duration-150 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
+                            >
+                                Réserver une voiture
+                            </Link>
+
+                            <Link
+                                href="/tracking"
+                                className="inline-flex items-center justify-center rounded-pill px-5 py-4 text-body font-semibold text-white/80 transition-colors duration-150 hover:text-white"
                             >
                                 Mes commandes
                             </Link>

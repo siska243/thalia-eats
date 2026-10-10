@@ -32,7 +32,19 @@ export default function ListeCourses({etat}: Props) {
 
     const {aPayer, enCours, terminees} = useMemo(() => separerCourses(data ?? []), [data]);
 
-    const courses = etat === "en-cours" ? [...aPayer, ...enCours] : terminees;
+    const courses = etat === "en-cours" ? enCours : terminees;
+
+    /*
+     * Les reservations en attente d'acompte sortent de la liste.
+     *
+     * Elles y etaient melees aux courses confirmees et ne se distinguaient
+     * pas. Le proprietaire : « la location en attente de paiement on le voit
+     * ou ». Or c'est la seule qui EXPIRE : personne ne retient le vehicule
+     * tant que l'acompte n'est pas regle, et le serveur relache le creneau a
+     * l'echeance. Elle passe donc devant, dans un cadre qui le dit, avec son
+     * compte a rebours.
+     */
+    const aRegler = etat === "en-cours" ? aPayer : [];
 
     if (isLoading) {
         return (
@@ -62,7 +74,9 @@ export default function ListeCourses({etat}: Props) {
         );
     }
 
-    if (! courses.length) {
+    const rienDuTout = !courses.length && !aRegler.length;
+
+    if (rienDuTout) {
         return etat === "en-cours" ? (
             <EmptyState
                 title="Aucune course en cours"
@@ -85,12 +99,38 @@ export default function ListeCourses({etat}: Props) {
     }
 
     return (
-        <ul className="flex flex-col gap-4">
-            {courses.map((booking) => (
-                <li key={booking.uid}>
-                    <CarteCourse booking={booking} />
-                </li>
-            ))}
-        </ul>
+        <div className="flex flex-col gap-5">
+            {aRegler.length ? (
+                <div className="rounded-card border border-warning bg-warning-surface p-3 sm:p-4">
+                    <p className="text-body font-bold text-ink">
+                        {aRegler.length > 1
+                            ? `${aRegler.length} réservations attendent leur acompte`
+                            : "Une réservation attend son acompte"}
+                    </p>
+                    <p className="mt-1 text-caption text-ink-muted">
+                        Tant qu&apos;il n&apos;est pas réglé, le véhicule n&apos;est retenu pour
+                        personne et le créneau repart à la vente à la fin du délai.
+                    </p>
+
+                    <ul className="mt-3 flex flex-col gap-3">
+                        {aRegler.map((booking) => (
+                            <li key={booking.uid}>
+                                <CarteCourse booking={booking} />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ) : null}
+
+            {courses.length ? (
+                <ul className="flex flex-col gap-4">
+                    {courses.map((booking) => (
+                        <li key={booking.uid}>
+                            <CarteCourse booking={booking} />
+                        </li>
+                    ))}
+                </ul>
+            ) : null}
+        </div>
     );
 }

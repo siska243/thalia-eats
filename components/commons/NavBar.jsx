@@ -8,6 +8,7 @@ import {HiMiniBars3CenterLeft} from "react-icons/hi2";
 import {IoMdClose} from "react-icons/io";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Account from "../account/Account";
+import {useNomsCommerciaux} from "@/hooks/useRental";
 
 /**
  * La navigation principale.
@@ -32,13 +33,29 @@ export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
 
+    const noms = useNomsCommerciaux();
+
+    /*
+     * Les deux univers sont sur la meme page, et le menu permet d'aller
+     * directement a l'un des deux.
+     *
+     * Ce sont des ancres et non deux pages : les commandes et les courses se
+     * lisent ensemble, c'est ce qui a ete decide, et deux adresses separees
+     * auraient recree la coupure qu'on venait d'enlever. Les noms viennent des
+     * reglages d'administration, pas de chaines ecrites ici.
+     */
+    const universDe = (base) => [
+        {path: `${base}#thalia-eats`, name: noms.food},
+        {path: `${base}#thalia-trans`, name: noms.rental},
+    ];
+
     const links = [
         {path: "/", name: "Accueil"},
         {path: "/restaurant", name: "Restaurants"},
-        {path: "/location", name: "Thalia Trans"},
+        {path: "/location", name: noms.rental},
         {path: "/ordering", name: "Panier"},
-        {path: "/tracking", name: "Ma commande"},
-        {path: "/historique", name: "Historique"},
+        {path: "/tracking", name: "Ma commande", sous: universDe("/tracking")},
+        {path: "/historique", name: "Historique", sous: universDe("/historique")},
     ];
 
     useEffect(() => {
@@ -71,8 +88,10 @@ export default function NavBar() {
         <>
             <nav className="hidden items-center md:flex md:gap-4 lg:gap-6">
                 <ul className="flex gap-5 lg:gap-6">
-                    {links.map(({path, name}) => (
-                        <li key={path}>
+                    {links.map(({path, name, sous}) => (
+                        /* Le sous-menu s'ouvre au survol ET au focus clavier :
+                           au survol seul, il serait inatteignable sans souris. */
+                        <li key={path} className="group relative">
                             <Link
                                 href={path}
                                 aria-current={path === pathname ? "page" : undefined}
@@ -84,6 +103,21 @@ export default function NavBar() {
                             >
                                 {name}
                             </Link>
+
+                            {sous ? (
+                                <ul className="pointer-events-none absolute left-0 top-full z-50 w-48 rounded-card bg-surface p-1 opacity-0 shadow-raised transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+                                    {sous.map((item) => (
+                                        <li key={item.path}>
+                                            <Link
+                                                href={item.path}
+                                                className="flex min-h-11 items-center rounded-control px-3 text-body text-ink transition-colors duration-150 hover:bg-surface-sunken"
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
                         </li>
                     ))}
                 </ul>
@@ -127,8 +161,8 @@ export default function NavBar() {
                 </button>
 
                 <ul className="mt-24 flex flex-col items-center gap-5">
-                    {links.map(({path, name}) => (
-                        <li key={path}>
+                    {links.map(({path, name, sous}) => (
+                        <li key={path} className="flex flex-col items-center gap-1">
                             <Link
                                 href={path}
                                 aria-current={path === pathname ? "page" : undefined}
@@ -138,6 +172,24 @@ export default function NavBar() {
                             >
                                 {name}
                             </Link>
+
+                            {/* Au telephone, pas de survol : les deux univers
+                                sont ecrits sous leur parent plutot que caches
+                                derriere un geste qui n'existe pas. */}
+                            {sous ? (
+                                <ul className="flex gap-4">
+                                    {sous.map((item) => (
+                                        <li key={item.path}>
+                                            <Link
+                                                href={item.path}
+                                                className="flex min-h-11 items-center px-2 text-body text-primaryColor"
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
                         </li>
                     ))}
                 </ul>

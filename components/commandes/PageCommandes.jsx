@@ -137,7 +137,11 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                   * L'onglet choisit l'etat, pas l'univers : « En cours »
                   * montre les commandes ET les courses en cours.
                   */}
-                <section aria-labelledby="titre-eats" className="mb-3 flex items-baseline gap-2">
+                <section
+                    id="thalia-eats"
+                    aria-labelledby="titre-eats"
+                    className="mb-3 flex scroll-mt-[calc(var(--header-h)+16px)] items-baseline gap-2"
+                >
                     <h2 id="titre-eats" className="text-title font-bold text-ink">
                         {noms.food}
                     </h2>
@@ -207,7 +211,11 @@ export default function PageCommandes({ongletInitial = "en-cours"}) {
                 {/* La section location vient dessous, titree comme l'autre :
                     sur telephone on fait defiler, sur grand ecran les deux
                     restent dans la meme colonne de lecture. */}
-                <section aria-labelledby="titre-trans" className="mt-10">
+                <section
+                    id="thalia-trans"
+                    aria-labelledby="titre-trans"
+                    className="mt-10 scroll-mt-[calc(var(--header-h)+16px)]"
+                >
                     <div className="mb-3 flex items-baseline gap-2">
                         <h2 id="titre-trans" className="text-title font-bold text-ink">
                             {noms.rental}
