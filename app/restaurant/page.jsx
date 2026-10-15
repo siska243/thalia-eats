@@ -1,10 +1,11 @@
 "use client";
 
-import {Suspense} from "react";
+import {Suspense, useSyncExternalStore} from "react";
 import Restaurants from "@/components/restaurants/Restaurants";
 import BanniereRestaurants from "@/components/restaurants/BanniereRestaurants";
 import SectionAbout from "@/components/home/SectionAbout";
 import {Route} from "@/helpers/Route";
+import {communeDeLivraison} from "@/helpers/commune-livraison";
 import useReferentialData from "@/hooks/useQueryTanStack";
 
 /**
@@ -16,9 +17,27 @@ import useReferentialData from "@/hooks/useQueryTanStack";
  * suite, et seule la grille montre son chargement.
  */
 export default function PageRestaurants() {
+    /*
+     * Lue cote client seulement : `localStorage` n'existe pas sur le serveur,
+     * et un rendu client different du rendu serveur declenche une erreur
+     * d'hydratation. `useSyncExternalStore` rend `null` au rendu serveur puis
+     * la vraie commune une fois dans le navigateur.
+     *
+     * Rien a surveiller : la commune de livraison ne change pas pendant qu'on
+     * parcourt le catalogue, elle se choisit au paiement.
+     */
+    const commune = useSyncExternalStore(
+        () => () => {},
+        communeDeLivraison,
+        () => null,
+    );
+
     const {data, isLoading} = useReferentialData({
-        url: Route.list_restaurant,
-        queryKey: "query-list-restaurant",
+        // La commune deja choisie part avec la requete : c'est elle qui permet
+        // au serveur de dire quels restaurants sont hors zone. Absente, le
+        // catalogue s'affiche comme avant.
+        url: commune ? `${Route.list_restaurant}?town=${encodeURIComponent(commune)}` : Route.list_restaurant,
+        queryKey: `query-list-restaurant-${commune ?? "sans-commune"}`,
     });
 
     return (
