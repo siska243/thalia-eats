@@ -17,10 +17,20 @@ import {etatOuverture, libelleFermeture} from "@/helpers/openingHours";
 export default function CardRestaurant({restaurant}) {
     const horaire = etatOuverture(restaurant?.opens);
 
+    /*
+     * Vrai par defaut : le catalogue web n'envoie pas encore de position, le
+     * serveur ne renvoie donc pas `livrable`, et la carte s'affiche comme
+     * avant. Elle sait rendre l'etat le jour ou la position sera transmise.
+     */
+    const livrable = restaurant?.livrable !== false;
+    const distance = restaurant?.distance_km;
+
     return (
         <Link
             href={`/restaurant/${restaurant.slug}`}
-            className="group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition-shadow duration-200 hover:shadow-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+            className={`group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition-shadow duration-200 hover:shadow-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
+                livrable ? "" : "opacity-40"
+            }`}
         >
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-sunken">
                 <ImagePlat
@@ -33,14 +43,21 @@ export default function CardRestaurant({restaurant}) {
                     }`}
                 />
 
+                {/*
+                  * Hors zone, l'horaire n'a plus d'interet : savoir que le
+                  * restaurant ouvre a 9h ne sert a rien quand on ne peut pas y
+                  * commander. La pastille dit donc la chose la plus utile.
+                  */}
                 <span
                     className={`absolute left-3 top-3 rounded-pill px-2.5 py-1 text-caption font-bold ${
-                        horaire.ouvert
-                            ? "bg-success-surface text-success"
-                            : "bg-white/90 text-ink-muted"
+                        !livrable
+                            ? "bg-warning-surface text-warning"
+                            : horaire.ouvert
+                              ? "bg-success-surface text-success"
+                              : "bg-white/90 text-ink-muted"
                     }`}
                 >
-                    {horaire.ouvert ? "Ouvert" : "Fermé"}
+                    {!livrable ? "Hors zone" : horaire.ouvert ? "Ouvert" : "Fermé"}
                 </span>
             </div>
 
@@ -63,10 +80,20 @@ export default function CardRestaurant({restaurant}) {
                   */}
                 <p
                     className={`mt-auto pt-3 text-caption ${
-                        horaire.ouvert ? "text-ink-subtle" : "font-semibold text-brand-700"
+                        !livrable
+                            ? "font-semibold text-warning"
+                            : horaire.ouvert
+                              ? "text-ink-subtle"
+                              : "font-semibold text-brand-700"
                     }`}
                 >
-                    {horaire.ouvert ? horaire.creneau : libelleFermeture(horaire)}
+                    {!livrable
+                        ? distance != null
+                            ? `À ${distance.toFixed(1)} km · hors zone de livraison`
+                            : "Hors zone de livraison"
+                        : horaire.ouvert
+                          ? horaire.creneau
+                          : libelleFermeture(horaire)}
                 </p>
             </div>
         </Link>
