@@ -177,7 +177,7 @@ const Corps = ({uid}: {uid: string}) => {
                         <section className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card">
                             <div className="flex items-center gap-3.5">
                                 <span className="relative h-[76px] w-[104px] shrink-0 overflow-hidden rounded-control bg-surface-sunken">
-                                    <PhotoVehicule src={booking.vehicle?.image} alt="" tailleIcone={28} />
+                                    <PhotoVehicule src={booking.vehicle?.image} alt="" />
                                 </span>
 
                                 <div className="min-w-0">

@@ -156,7 +156,7 @@ export default function FicheVehicule({slug}: {slug: string}) {
                 <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr] lg:items-start">
                     <section className="overflow-hidden rounded-card bg-surface shadow-card">
                         <div className="relative h-56 w-full sm:h-80">
-                            <PhotoVehicule src={vehicle.image} alt="" tailleIcone={48} />
+                            <PhotoVehicule src={vehicle.image} alt="" />
                         </div>
 
                         <div className="flex flex-col gap-2 p-4 sm:p-5">

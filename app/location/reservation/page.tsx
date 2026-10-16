@@ -376,7 +376,7 @@ const TunnelReservation = () => {
                 {vehiculeAffiche ? (
                     <div className="mb-5 flex items-center gap-3 rounded-card border border-surface-border bg-surface p-3">
                         <span className="relative h-16 w-24 shrink-0 overflow-hidden rounded-control bg-surface-sunken">
-                            <PhotoVehicule src={vehiculeAffiche.image} alt="" tailleIcone={22} />
+                            <PhotoVehicule src={vehiculeAffiche.image} alt="" />
                         </span>
 
                         <div className="min-w-0">

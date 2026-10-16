@@ -37,7 +37,7 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
             className="flex items-center gap-3.5 rounded-card bg-surface p-3 shadow-card transition-shadow duration-150 hover:shadow-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:p-4"
         >
             <span className="relative h-[84px] w-[104px] shrink-0 overflow-hidden rounded-control bg-surface-sunken sm:h-[104px] sm:w-[140px]">
-                <PhotoVehicule src={vehicle.image} alt="" tailleIcone={28} />
+                <PhotoVehicule src={vehicle.image} alt="" />
 
                 {!libre ? (
                     <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-ink-inverse">
