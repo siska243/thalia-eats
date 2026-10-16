@@ -23,6 +23,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Bascule from "@/components/rental/Bascule";
 import PhotoVehicule from "@/components/rental/PhotoVehicule";
 import TypeCoursePicker from "@/components/rental/TypeCoursePicker";
+import {tarifApplique} from "@/helpers/tarifApplique";
 import SelecteurCreneau from "@/components/rental/SelecteurCreneau";
 
 /**
@@ -99,6 +100,16 @@ export default function FicheVehicule({slug}: {slug: string}) {
      * journée : un segment unique n'est pas un choix, c'est du bruit, et il
      * laisserait croire qu'une option est indisponible.
      */
+    /*
+     * Le tarif QUI S'APPLIQUE, et non celui du vehicule.
+     *
+     * La bascule annonçait le prix habituel pendant que le total appliquait
+     * celui du type : deux nombres pour la meme course, et le client ne
+     * savait pas lequel croire. Le serveur tranche, l'ecran lit.
+     */
+    const tarifHoraire = tarifApplique(vehicle, "hourly");
+    const tarifJournalier = tarifApplique(vehicle, "daily");
+
     const choixDuMode = proposeLaJournee(vehicle);
 
     /*
@@ -223,7 +234,7 @@ export default function FicheVehicule({slug}: {slug: string}) {
                             ) : null}
 
                             <p className="text-body font-bold text-brand-700">
-                                {formatPrix(vehicle.hourly_rate, devise)}
+                                {formatPrix(tarifHoraire, devise)}
                                 <span className="text-caption font-normal text-ink-muted">
                                     {" "}
                                     / heure
@@ -243,12 +254,12 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                         {
                                             cle: "hourly",
                                             libelle: libelleDuMode("hourly"),
-                                            detail: `${formatPrix(vehicle.hourly_rate, devise)} / heure`,
+                                            detail: `${formatPrix(tarifHoraire, devise)} / heure`,
                                         },
                                         {
                                             cle: "daily",
                                             libelle: libelleDuMode("daily"),
-                                            detail: `${formatPrix(vehicle.daily_rate, devise)} / jour`,
+                                            detail: `${formatPrix(tarifJournalier, devise)} / jour`,
                                         },
                                     ]}
                                     choisi={mode}
@@ -277,7 +288,7 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                 mode={mode}
                                 peutBasculer={choixDuMode}
                                 seuilJournee={seuilJournee}
-                                prixJournee={formatPrix(vehicle.daily_rate, devise)}
+                                prixJournee={formatPrix(tarifJournalier, devise)}
                                 bornes={bornes}
                                 nomService={noms.rental}
                                 onChange={(date, duree) => {

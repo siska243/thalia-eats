@@ -50,6 +50,14 @@ export type RentalVehicleType = {
      * qu'un prix invente.
      */
     daily_rate?: number | null;
+    /**
+     * Le tarif qui S'APPLIQUE a la course demandee.
+     *
+     * Les deux champs au-dessus restent le prix habituel du vehicule ; ceux-ci
+     * tiennent compte du type choisi, et retombent dessus quand le type n'a
+     * pas de tarif propre.
+     */
+    applied_rates?: {hourly?: number | null; daily?: number | null};
     currency?: RentalCurrencyType | null;
     /** Present au catalogue seulement : le prix du creneau demande. */
     quote?: RentalQuoteType | null;
