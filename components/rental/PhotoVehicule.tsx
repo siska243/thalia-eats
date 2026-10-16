@@ -3,7 +3,7 @@
 import React, {useState} from "react";
 import Image from "next/image";
 
-import voitureParDefaut from "@/public/assets/thalia-trans.png";
+import voitureParDefaut from "@/public/assets/thalia-trans.jpg";
 
 interface Props {
     src?: string | null;
@@ -23,23 +23,23 @@ interface Props {
  *
  * Depuis le 16 octobre c'est la photo fournie par le proprietaire, et non plus
  * un pictogramme gris : un vehicule sans photo reste une offre, et c'est ce
- * que le substitut doit montrer. `object-contain` parce qu'elle est detouree
- * sur fond transparent et doit tenir entiere.
+ * que le substitut doit montrer. Elle est livree en tuile CARREE, exactement
+ * au meme format que celle de Thalia Eats, et se rend donc comme une vraie
+ * photo de vehicule.
  */
 export default function PhotoVehicule({src, alt = ""}: Props) {
     const [cassee, setCassee] = useState(false);
 
     if (!src || cassee) {
         return (
-            <span className="flex h-full w-full items-center justify-center bg-surface-sunken p-2">
-                <Image
-                    src={voitureParDefaut}
-                    alt=""
-                    aria-hidden
-                    className="h-auto w-full object-contain"
-                    sizes="(max-width: 640px) 40vw, 240px"
-                />
-            </span>
+            <Image
+                src={voitureParDefaut}
+                alt=""
+                aria-hidden
+                fill
+                sizes="(max-width: 640px) 40vw, 240px"
+                className="object-cover"
+            />
         );
     }
 
