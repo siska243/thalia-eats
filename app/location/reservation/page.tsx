@@ -434,7 +434,7 @@ const TunnelReservation = () => {
                             <p className="flex flex-wrap items-center gap-x-3 text-caption text-ink-muted">
                                 {vehiculeAffiche.seats ? (
                                     <span className="flex items-center gap-1">
-                                        <FaUsers aria-hidden /> {vehiculeAffiche.seats} places
+                                        <FaUsers aria-hidden /> {vehiculeAffiche.seats} personnes
                                     </span>
                                 ) : null}
                                 <span>

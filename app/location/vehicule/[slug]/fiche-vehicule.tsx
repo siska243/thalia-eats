@@ -6,6 +6,7 @@ import {useRouter} from "next/navigation";
 import {FaChevronLeft, FaUsers} from "react-icons/fa6";
 
 import {
+    creneauLisible,
     creneauRental,
     departLePlusTot,
     dureeFacturee,
@@ -139,6 +140,45 @@ export default function FicheVehicule({slug}: {slug: string}) {
      * composer une demande vouee au refus.
      */
     const minimumHeures = minimumAnnonce(vehicle, typeChoisi);
+
+    /*
+     * La fiche en etapes — « tu le mets en 2 ou 3 etapes pour ne pas
+     * apparaitre long ».
+     *
+     * L'ETAPE DU TYPE DISPARAIT quand le vehicule n'en propose aucun : une
+     * etape vide se compterait quand meme dans « 1 sur 3 » et allongerait
+     * justement ce qu'on cherche a raccourcir. La plupart des vehicules n'en
+     * proposent pas — ils verront deux etapes.
+     *
+     * Le vehicule, lui, reste visible a TOUTES les etapes dans la colonne de
+     * gauche : on ne demande pas de choisir un creneau pour une voiture qu'on
+     * ne voit plus. C'est deja le principe du tunnel de paiement.
+     */
+    const etapes = [
+        ...(typesCourse.length ? (["course"] as const) : []),
+        "creneau" as const,
+        "prix" as const,
+    ];
+
+    const [etape, setEtape] = useState(0);
+
+    const courante = etapes[Math.min(etape, etapes.length - 1)];
+    const derniere = etape >= etapes.length - 1;
+
+    const titres: Record<(typeof etapes)[number], {titre: string; detail: string}> = {
+        course: {
+            titre: "Quelle course ?",
+            detail: "Le type choisi peut imposer la durée et le mode de tarification.",
+        },
+        creneau: {
+            titre: "Votre créneau",
+            detail: "Le prix se calcule à partir de ces dates.",
+        },
+        prix: {
+            titre: "Ce que vous payez",
+            detail: "L’acompte retient le véhicule, le solde se règle au chauffeur.",
+        },
+    };
 
     /*
      * À partir de cette heure-là, la journée coûte moins cher que le cumul des
@@ -296,91 +336,147 @@ export default function FicheVehicule({slug}: {slug: string}) {
 
                     <div className="flex flex-col gap-5 lg:sticky lg:top-[calc(var(--header-h)+16px)]">
                         <section className="flex flex-col gap-4 rounded-card bg-surface p-4 shadow-card sm:p-5">
-                            <h2 className="text-title font-bold text-ink">Votre créneau</h2>
+                            {/*
+                              * L'indicateur est celui du tunnel de paiement :
+                              * un formulaire decoupe sans repere est vecu
+                              * comme plus long qu'un formulaire d'un seul
+                              * tenant.
+                              */}
+                            <header className="flex flex-col gap-1">
+                                <p className="text-caption text-ink-muted">
+                                    Étape {etape + 1} sur {etapes.length}
+                                </p>
+                                <h2 className="text-title font-bold text-ink">
+                                    {titres[courante].titre}
+                                </h2>
+                                <p className="text-caption text-ink-muted">
+                                    {titres[courante].detail}
+                                </p>
 
-                            {choixDuMode ? (
-                                <Bascule
-                                    etiquette="Mode de tarification"
-                                    onglets={[
-                                        {
-                                            cle: "hourly",
-                                            libelle: libelleDuMode("hourly"),
-                                            detail: `${formatPrix(tarifHoraire, devise)} / heure`,
-                                        },
-                                        {
-                                            cle: "daily",
-                                            libelle: libelleDuMode("daily"),
-                                            detail: `${formatPrix(tarifJournalier, devise)} / jour`,
-                                        },
-                                    ]}
-                                    choisi={mode}
-                                    onChoisir={changerDeMode}
+                                <div className="mt-1 flex gap-1.5" aria-hidden>
+                                    {etapes.map((cle, rang) => (
+                                        <span
+                                            key={cle}
+                                            className={`h-1 flex-1 rounded-pill transition-colors duration-200 ${
+                                                rang <= etape ? "bg-brand-500" : "bg-surface-border"
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            </header>
+
+                            {courante === "course" ? (
+                                <TypeCoursePicker
+                                    types={typesCourse}
+                                    choisi={typeChoisi}
+                                    onChoisir={choisirLeType}
+                                    parking={parking}
+                                    onParking={setParking}
+                                    devise={devise}
                                 />
                             ) : null}
 
-                            {/*
-                              * Le type de course, SOUS la bascule
-                              * heure/journée parce qu'il peut l'imposer : on
-                              * lit d'abord ce qu'on choisit, puis la
-                              * contrainte.
-                              */}
-                            <TypeCoursePicker
-                                types={typesCourse}
-                                choisi={typeChoisi}
-                                onChoisir={choisirLeType}
-                                parking={parking}
-                                onParking={setParking}
-                                devise={devise}
-                            />
+                            {courante === "creneau" ? (
+                                <>
+                                    {/*
+                                      * La bascule reste AVEC le creneau : elle
+                                      * change la duree, et les separer ferait
+                                      * revenir en arriere pour corriger ce
+                                      * qu'on vient de poser.
+                                      */}
+                                    {choixDuMode ? (
+                                        <Bascule
+                                            etiquette="Mode de tarification"
+                                            onglets={[
+                                                {
+                                                    cle: "hourly",
+                                                    libelle: libelleDuMode("hourly"),
+                                                    detail: `${formatPrix(tarifHoraire, devise)} / heure`,
+                                                },
+                                                {
+                                                    cle: "daily",
+                                                    libelle: libelleDuMode("daily"),
+                                                    detail: `${formatPrix(tarifJournalier, devise)} / jour`,
+                                                },
+                                            ]}
+                                            choisi={mode}
+                                            onChoisir={changerDeMode}
+                                        />
+                                    ) : null}
 
-                            <SelecteurCreneau
-                                startsAt={startsAt}
-                                hours={hours}
-                                mode={mode}
-                                peutBasculer={choixDuMode}
-                                seuilJournee={seuilJournee}
-                                prixJournee={formatPrix(tarifJournalier, devise)}
-                                bornes={bornes}
-                                nomService={noms.rental}
-                                onChange={(date, duree) => {
-                                    setStartsAt(date);
-                                    setHours(duree);
-                                }}
-                            />
+                                    <SelecteurCreneau
+                                        startsAt={startsAt}
+                                        hours={hours}
+                                        mode={mode}
+                                        peutBasculer={choixDuMode}
+                                        seuilJournee={seuilJournee}
+                                        prixJournee={formatPrix(tarifJournalier, devise)}
+                                        bornes={bornes}
+                                        nomService={noms.rental}
+                                        onChange={(date, duree) => {
+                                            setStartsAt(date);
+                                            setHours(duree);
+                                        }}
+                                    />
+                                </>
+                            ) : null}
+
+                            {courante === "prix" ? (
+                                <>
+                                    <div className="flex items-baseline justify-between gap-3">
+                                        <span className="text-caption text-ink-muted">
+                                            {creneauLisible(creneau.debut, creneau.fin)}
+                                        </span>
+                                        <span className="text-caption text-ink-muted">
+                                            {dureeFacturee(
+                                                vehicle.quote?.mode ?? mode,
+                                                vehicle.quote?.billed_units,
+                                                hours,
+                                            )}
+                                        </span>
+                                    </div>
+
+                                    <dl className="flex flex-col gap-1.5">
+                                        {lignes.secondaires.map((ligne) => (
+                                            <div
+                                                key={ligne.cle}
+                                                className="flex justify-between gap-3"
+                                            >
+                                                <dt className="text-body text-ink-muted">
+                                                    {ligne.libelle}
+                                                </dt>
+                                                <dd className="text-body font-semibold text-ink">
+                                                    {formatPrix(ligne.montant, devise) || "—"}
+                                                </dd>
+                                            </div>
+                                        ))}
+                                    </dl>
+
+                                    <p className="text-caption text-ink-subtle">
+                                        Le véhicule n’est retenu qu’une fois l’acompte payé. Si
+                                        quelqu’un paie avant vous sur ce créneau, votre acompte
+                                        vous est remboursé.
+                                    </p>
+
+                                    {!libre ? (
+                                        <p
+                                            role="status"
+                                            className="rounded-control bg-warning-surface px-3 py-2.5 text-caption text-warning"
+                                        >
+                                            Ce véhicule est déjà pris sur ce créneau. Revenez à
+                                            l’étape précédente pour choisir un autre horaire.
+                                        </p>
+                                    ) : null}
+                                </>
+                            ) : null}
                         </section>
 
                         {/*
-                         * Le détail du prix, puis l'acompte détaché sur un fond
-                         * creux. Les trois montants à plat se lisaient comme
-                         * une liste de courses : celui qu'il faut sortir
-                         * maintenant ne se distinguait pas de celui qu'on
-                         * paiera au chauffeur.
+                         * L'acompte reste visible a TOUTES les etapes : c'est
+                         * la somme qu'on va demander, et la perdre de vue en
+                         * cours de route serait un recul.
                          */}
                         <section className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card sm:p-5">
-                            <div className="flex items-center justify-between gap-3">
-                                <h2 className="text-title font-bold text-ink">Ce que vous payez</h2>
-                                <span className="text-caption text-ink-muted">
-                                    {dureeFacturee(
-                                        vehicle.quote?.mode ?? mode,
-                                        vehicle.quote?.billed_units,
-                                        hours,
-                                    )}
-                                </span>
-                            </div>
-
-                            <dl className="flex flex-col gap-1.5">
-                                {lignes.secondaires.map((ligne) => (
-                                    <div key={ligne.cle} className="flex justify-between gap-3">
-                                        <dt className="text-body text-ink-muted">
-                                            {ligne.libelle}
-                                        </dt>
-                                        <dd className="text-body font-semibold text-ink">
-                                            {formatPrix(ligne.montant, devise) || "—"}
-                                        </dd>
-                                    </div>
-                                ))}
-                            </dl>
-
                             <div className="flex items-center justify-between gap-3 rounded-control bg-surface-sunken px-3 py-2.5">
                                 <span className="text-body font-semibold text-ink">
                                     {lignes.accent.libelle}
@@ -390,33 +486,40 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                 </strong>
                             </div>
 
-                            <p className="text-caption text-ink-subtle">
-                                Le véhicule n’est retenu qu’une fois l’acompte payé. Si quelqu’un
-                                paie avant vous sur ce créneau, votre acompte vous est remboursé.
-                            </p>
+                            <div className="flex items-center gap-3">
+                                {etape > 0 ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setEtape((rang) => rang - 1)}
+                                        className="inline-flex min-h-12 items-center justify-center rounded-pill border border-surface-border bg-surface px-6 text-body font-semibold text-ink transition-colors duration-150 hover:bg-surface-sunken"
+                                    >
+                                        Retour
+                                    </button>
+                                ) : null}
 
-                            {!libre ? (
-                                <p
-                                    role="status"
-                                    className="rounded-control bg-warning-surface px-3 py-2.5 text-caption text-warning"
+                                {/*
+                                 * L'indisponibilite ne bloque que la DERNIERE
+                                 * etape : un creneau pris se change a l'etape
+                                 * d'avant, et figer le bouton des le debut
+                                 * empecherait justement d'y aller.
+                                 */}
+                                <button
+                                    type="button"
+                                    onClick={
+                                        derniere ? reserver : () => setEtape((rang) => rang + 1)
+                                    }
+                                    disabled={derniere && !libre}
+                                    className="inline-flex min-h-12 flex-1 items-center justify-center rounded-pill bg-brand-500 px-6 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    Ce véhicule est déjà pris sur ce créneau. Choisissez un autre
-                                    horaire ou une autre durée.
-                                </p>
-                            ) : null}
-
-                            <button
-                                type="button"
-                                onClick={reserver}
-                                disabled={!libre}
-                                className="mt-1 inline-flex min-h-12 w-full items-center justify-center rounded-pill bg-brand-500 px-6 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {!libre
-                                    ? "Indisponible"
-                                    : user
-                                      ? "Réserver"
-                                      : "Se connecter pour réserver"}
-                            </button>
+                                    {!derniere
+                                        ? "Continuer"
+                                        : !libre
+                                          ? "Indisponible"
+                                          : user
+                                            ? "Réserver"
+                                            : "Se connecter pour réserver"}
+                                </button>
+                            </div>
                         </section>
                     </div>
                 </div>
