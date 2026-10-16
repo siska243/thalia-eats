@@ -22,6 +22,7 @@ import {
     useRentalBooking,
     useRentalConfig,
     useRentalVehicle,
+    useTypesCourse,
 } from "@/hooks/useRental";
 import ChampTexte from "@/components/auth/ChampTexte";
 import PhoneNumber from "@/components/forms/phone-number";
@@ -98,7 +99,27 @@ const TunnelReservation = () => {
      */
     const mode = modeDepuisParam(params.get("mode"));
 
-    const {data: vehicle} = useRentalVehicle(slug, debut, fin, mode);
+    /*
+     * Le type de course choisi sur la fiche, retrouvé dans le référentiel.
+     *
+     * Seul son IDENTIFIANT voyage : ses règles viennent de la configuration,
+     * une seule source. Les recopier dans l'URL aurait figé un commentaire
+     * exigé ou un tarif de parking au moment du clic.
+     */
+    const typesCourse = useTypesCourse();
+    const typeCourse =
+        typesCourse.find((type) => String(type.id) === params.get("course_type_id")) ?? null;
+    const parking = params.get("parking") === "1";
+    const [commentaire, setCommentaire] = useState("");
+
+    const {data: vehicle} = useRentalVehicle(
+        slug,
+        debut,
+        fin,
+        mode,
+        typeCourse?.id,
+        parking,
+    );
     const {reserver, payerAcompte} = useRentalActions();
 
     const {data: configRental} = useRentalConfig();
@@ -258,6 +279,20 @@ const TunnelReservation = () => {
             return;
         }
 
+        /*
+         * Le commentaire exigé par LE TYPE, demandé ici.
+         *
+         * C'est la ligne du référentiel qui l'exige, pas un code écrit ici :
+         * un quatrième type qui le demande sera traité sans relivraison. Le
+         * serveur refuse de toute façon — on évite seulement au client d'aller
+         * jusqu'au paiement pour l'apprendre.
+         */
+        if (!reglementSeul && typeCourse?.note_required && !commentaire.trim()) {
+            setErreur(`Précisez votre course « ${typeCourse.title} » avant de continuer.`);
+
+            return;
+        }
+
         setErreur(null);
         // `ChoixPaiement` nomme ses deux boutons « carte » et « mobile », la
         // passerelle attend « cart » : le libelle de l'ecran et le litteral du
@@ -302,6 +337,11 @@ const TunnelReservation = () => {
                     // La commune, quand on la connaît : c'est elle que le
                     // serveur confronte à la zone desservie.
                     pickup_town_id: zone.etat === "desservie" ? zone.townId : undefined,
+                    // Le type, son commentaire et l'option parking. Absents,
+                    // le serveur chiffre et accepte exactement comme avant.
+                    course_type_id: typeCourse?.id,
+                    course_note: commentaire.trim() || undefined,
+                    parking: parking || undefined,
                 });
             }
 
@@ -493,6 +533,24 @@ const TunnelReservation = () => {
                                 }
                             />
                         </div>
+
+                        {/*
+                          * Le commentaire, quand le type le demande. Il vit
+                          * avec l'adresse : c'est là que le client décrit sa
+                          * course, pas au moment de payer.
+                          */}
+                        {typeCourse?.note_required ? (
+                            <ChampTexte
+                                label={`Précisions sur votre course « ${typeCourse.title} »`}
+                                requis
+                                placeholder="Destination, numéro de vol, heure d'arrivée…"
+                                aide={typeCourse.description ?? undefined}
+                                value={commentaire}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setCommentaire(e.target.value)
+                                }
+                            />
+                        ) : null}
 
                         {zone.etat === "hors-zone" ? (
                             <HorsZone

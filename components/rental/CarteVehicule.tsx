@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import {FaCalendarDays, FaLock, FaUsers} from "react-icons/fa6";
 
+import {etatVehicule} from "@/helpers/etatVehicule";
 import {formatPrix} from "@/helpers/openingHours";
 import {RentalVehicleType} from "@/types/rental";
 import PhotoVehicule from "@/components/rental/PhotoVehicule";
@@ -24,7 +25,9 @@ import PhotoVehicule from "@/components/rental/PhotoVehicule";
  * choisies, et c'est le serveur qui le calcule.
  */
 export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
-    const libre = vehicle.available !== false;
+    // La regle vit dans `etatVehicule`, une seule fois, et le mobile lit la
+    // meme : les deux clients doivent dire la meme chose du meme vehicule.
+    const {libre, libelle} = etatVehicule(vehicle);
     const devise = vehicle.currency?.code;
 
     const journalier = vehicle.daily_rate
@@ -69,7 +72,7 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
                                 : "bg-surface-sunken text-ink-muted"
                         }`}
                     >
-                        {libre ? "Libre" : "En course"}
+                        {libelle}
                     </span>
                 </span>
 

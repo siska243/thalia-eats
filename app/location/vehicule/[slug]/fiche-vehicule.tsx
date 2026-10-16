@@ -17,11 +17,12 @@ import {
     seuilJourneeAvantageuse,
 } from "@/helpers/rental";
 import {formatPrix} from "@/helpers/openingHours";
-import {useBornesDuree, useNomsCommerciaux, useRentalVehicle} from "@/hooks/useRental";
+import {TypeCourse, useBornesDuree, useNomsCommerciaux, useRentalVehicle, useTypesCourse} from "@/hooks/useRental";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import EmptyState from "@/components/ui/EmptyState";
 import Bascule from "@/components/rental/Bascule";
 import PhotoVehicule from "@/components/rental/PhotoVehicule";
+import TypeCoursePicker from "@/components/rental/TypeCoursePicker";
 import SelecteurCreneau from "@/components/rental/SelecteurCreneau";
 
 /**
@@ -66,9 +67,27 @@ export default function FicheVehicule({slug}: {slug: string}) {
     const [hours, setHours] = useState(3);
     const [mode, setMode] = useState<ModeTarifaire>("hourly");
 
+    /*
+     * Le type de course, et l'option parking qu'il propose parfois.
+     *
+     * Les deux changent le PRIX : ils entrent donc dans la requête de la
+     * fiche, sinon l'écran annoncerait un montant que la réservation ne
+     * tiendrait pas.
+     */
+    const typesCourse = useTypesCourse();
+    const [typeChoisi, setTypeChoisi] = useState<TypeCourse | null>(null);
+    const [parking, setParking] = useState(false);
+
     const creneau = useMemo(() => creneauRental(startsAt, hours), [startsAt, hours]);
 
-    const {data: vehicle, isLoading} = useRentalVehicle(slug, creneau.debut, creneau.fin, mode);
+    const {data: vehicle, isLoading} = useRentalVehicle(
+        slug,
+        creneau.debut,
+        creneau.fin,
+        mode,
+        typeChoisi?.id,
+        parking,
+    );
 
     const devise = vehicle?.quote?.currency?.code ?? vehicle?.currency?.code;
     const libre = vehicle?.available !== false;
@@ -96,10 +115,34 @@ export default function FicheVehicule({slug}: {slug: string}) {
         setHours((heures) => heuresPourMode(choisi, heures, bornes));
     };
 
+    /**
+     * Choisir un type peut imposer le mode et allonger la durée.
+     *
+     * Le serveur refuse l'autre mode plutôt que de basculer en silence ; on
+     * évite donc au client de composer une demande vouée au refus. Les règles
+     * viennent de la ligne du référentiel, jamais d'un code écrit ici.
+     */
+    const choisirLeType = (type: TypeCourse) => {
+        setTypeChoisi(type);
+        // L'option parking appartient au type : changer de type la referme.
+        setParking(false);
+
+        if (type.forced_mode && type.forced_mode !== mode) changerDeMode(type.forced_mode);
+
+        if (type.minimum_hours) {
+            setHours((heures) => Math.max(heures, type.minimum_hours!));
+        }
+    };
+
     const reserver = () => {
+        const options = [
+            typeChoisi ? `&course_type_id=${typeChoisi.id}` : "",
+            parking ? "&parking=1" : "",
+        ].join("");
+
         const destination = `/location/reservation?slug=${encodeURIComponent(slug)}&starts_at=${encodeURIComponent(
             creneau.debut,
-        )}&ends_at=${encodeURIComponent(creneau.fin)}&mode=${mode}`;
+        )}&ends_at=${encodeURIComponent(creneau.fin)}&mode=${mode}${options}`;
 
         if (!user) {
             // Le catalogue se regarde sans compte, réserver en demande un. On
@@ -212,6 +255,21 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                     onChoisir={changerDeMode}
                                 />
                             ) : null}
+
+                            {/*
+                              * Le type de course, SOUS la bascule
+                              * heure/journée parce qu'il peut l'imposer : on
+                              * lit d'abord ce qu'on choisit, puis la
+                              * contrainte.
+                              */}
+                            <TypeCoursePicker
+                                types={typesCourse}
+                                choisi={typeChoisi}
+                                onChoisir={choisirLeType}
+                                parking={parking}
+                                onParking={setParking}
+                                devise={devise}
+                            />
 
                             <SelecteurCreneau
                                 startsAt={startsAt}

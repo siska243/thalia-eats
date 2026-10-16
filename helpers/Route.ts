@@ -142,6 +142,8 @@ class RouteRental
         startsAt?: string,
         endsAt?: string,
         mode?: string,
+        courseTypeId?: number,
+        parking?: boolean,
     ): string => {
         const base = `${this.prefix}/vehicles/${encodeURIComponent(slug)}`
 
@@ -156,6 +158,16 @@ class RouteRental
         // serveur chiffre a l'heure, et l'URL reste celle que les clients
         // deja installes appellent.
         if (mode && mode !== "hourly") parametres.push(`pricing_mode=${encodeURIComponent(mode)}`)
+
+        /*
+         * Le type de course et l'option parking changent le PRIX : sans eux,
+         * la fiche annoncerait un montant que la reservation ne tiendrait pas.
+         *
+         * Ecrits seulement quand ils existent, pour la meme raison que le
+         * mode : l'URL d'un appelant qui ne les connait pas reste la meme.
+         */
+        if (courseTypeId) parametres.push(`course_type_id=${courseTypeId}`)
+        if (parking) parametres.push("parking=1")
 
         return `${base}?${parametres.join("&")}`
     }

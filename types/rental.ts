@@ -61,6 +61,18 @@ export type RentalVehicleType = {
      * qu'il sera peut-etre libre demain.
      */
     available?: boolean;
+    /** La ville ou ce vehicule travaille. Nulle : il accepte toutes les villes. */
+    city?: {title: string; slug: string} | null;
+    /**
+     * Ce vehicule peut-il prendre la course demandee ?
+     *
+     * Calcule par le SERVEUR a partir de la commune de prise en charge : sa
+     * ville, et les communes d'ou il sort. Vrai quand on ne sait pas.
+     *
+     * Le catalogue reste MONDIAL : le vehicule d'ailleurs est rendu et grise,
+     * exactement comme celui qui est en course.
+     */
+    reservable?: boolean;
 };
 
 export type RentalChauffeurType = {

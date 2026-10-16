@@ -45,6 +45,26 @@ const BOOKINGS_KEY = "rental:bookings";
  * Elle se lit sans compte, comme le catalogue, et change rarement : une heure
  * de fraicheur evite de la redemander a chaque fiche ouverte.
  */
+/**
+ * Un type de course, tel que le serveur le decrit.
+ *
+ * **L'ecran ne connait AUCUN code.** Il lit les regles portees par la ligne —
+ * duree minimale, mode impose, commentaire exige, option parking — et s'y
+ * conforme. C'est la condition pour qu'un quatrieme type cree en
+ * administration apparaisse ici sans qu'on relivre le site.
+ */
+export interface TypeCourse {
+    id: number;
+    code: string;
+    title: string;
+    description?: string | null;
+    minimum_hours?: number | null;
+    forced_mode?: ModeTarifaire | null;
+    note_required: boolean;
+    parking_option: boolean;
+    parking_hourly_fee: number;
+}
+
 export interface RentalConfig {
     brand_food?: string;
     brand_rental?: string;
@@ -52,6 +72,7 @@ export interface RentalConfig {
     out_of_zone_message?: string;
     towns?: {id: number; slug: string; title: string}[];
     duree?: Partial<BornesDuree>;
+    course_types?: TypeCourse[];
 }
 
 export const useRentalConfig = () =>
@@ -64,6 +85,15 @@ export const useRentalConfig = () =>
         },
         staleTime: 60 * 60 * 1000,
     });
+
+/**
+ * Les types de course proposes.
+ *
+ * Vide tant que la configuration n'est pas arrivee, ou si le referentiel n'en
+ * contient aucun : l'ecran n'affiche alors rien de nouveau et la reservation
+ * part sans type, comme avant.
+ */
+export const useTypesCourse = (): TypeCourse[] => useRentalConfig().data?.course_types ?? [];
 
 /** Les bornes en vigueur, repli compris : un seul endroit les derive. */
 export const useBornesDuree = (): BornesDuree => {
@@ -108,11 +138,18 @@ export const useRentalVehicle = (
     debut?: string,
     fin?: string,
     mode: ModeTarifaire = "hourly",
+    courseTypeId?: number,
+    parking?: boolean,
 ) =>
     useQuery({
-        queryKey: ["rental:vehicle", slug, debut, fin, mode],
+        // Le type et le parking entrent dans la cle pour la meme raison que le
+        // mode : ils changent le prix, et sans eux la fiche servirait le devis
+        // du type precedent.
+        queryKey: ["rental:vehicle", slug, debut, fin, mode, courseTypeId, parking],
         queryFn: async () => {
-            const reponse = await FetchData.getData(RouteRental.vehicle(slug!, debut, fin, mode));
+            const reponse = await FetchData.getData(
+                RouteRental.vehicle(slug!, debut, fin, mode, courseTypeId, parking),
+            );
 
             return contenuRental<RentalVehicleType>(reponse);
         },
@@ -169,6 +206,17 @@ export interface NouvelleReservation {
      */
     pickup_town_id?: number;
     dropoff_location?: string | null;
+    /**
+     * Le type de course, son commentaire et l'option parking.
+     *
+     * Les trois sont facultatifs : sans type, le serveur chiffre et accepte
+     * exactement comme avant. Le commentaire devient obligatoire quand LE TYPE
+     * le demande — et c'est le serveur qui le refuse, l'ecran ne fait que
+     * l'eviter au client.
+     */
+    course_type_id?: number;
+    course_note?: string;
+    parking?: boolean;
 }
 
 export const useRentalActions = () => {
