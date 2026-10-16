@@ -63,7 +63,13 @@ export type RestaurantType = {
     "whatsapp": string,
     "location": null,
     "commune": CommuneType,
-    "image": string
+    "image": string,
+    /** Distance entre le restaurant et l'adresse de livraison. Null si inconnue. */
+    "distance_km"?: number | null,
+    /** Faux quand le restaurant est hors du rayon autorisé. Vrai par défaut. */
+    "livrable"?: boolean,
+    /** La phrase du serveur. Jamais recopiée ici. */
+    "portee_message"?: string | null
 }
 export type OpenType = {
     "day": string,

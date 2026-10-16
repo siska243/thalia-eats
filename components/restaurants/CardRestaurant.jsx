@@ -2,6 +2,7 @@
 
 import ImagePlat from "@/components/ui/ImagePlat";
 import Link from "next/link";
+import {MdLocationOff} from "react-icons/md";
 import {etatOuverture, libelleFermeture} from "@/helpers/openingHours";
 
 /**
@@ -25,9 +26,18 @@ export default function CardRestaurant({restaurant}) {
     const livrable = restaurant?.livrable !== false;
     const distance = restaurant?.distance_km;
 
+    /*
+     * Hors zone, la carte n'est plus un lien.
+     *
+     * Une `div` plutot qu'un lien desactive : un lien grise reste un lien, il
+     * garde son curseur, sa cible clavier et son entree dans l'historique.
+     * L'icone de localisation barree dit pourquoi, sans attendre un clic.
+     */
+    const Conteneur = livrable ? Link : "div";
+
     return (
-        <Link
-            href={`/restaurant/${restaurant.slug}`}
+        <Conteneur
+            {...(livrable ? {href: `/restaurant/${restaurant.slug}`} : {"aria-disabled": true})}
             className={`group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition-shadow duration-200 hover:shadow-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
                 livrable ? "" : "opacity-40"
             }`}
@@ -57,7 +67,16 @@ export default function CardRestaurant({restaurant}) {
                               : "bg-white/90 text-ink-muted"
                     }`}
                 >
-                    {!livrable ? "Hors zone" : horaire.ouvert ? "Ouvert" : "Fermé"}
+                    {!livrable ? (
+                        <span className="inline-flex items-center gap-1">
+                            <MdLocationOff aria-hidden="true" />
+                            Hors zone
+                        </span>
+                    ) : horaire.ouvert ? (
+                        "Ouvert"
+                    ) : (
+                        "Fermé"
+                    )}
                 </span>
             </div>
 
@@ -89,13 +108,13 @@ export default function CardRestaurant({restaurant}) {
                 >
                     {!livrable
                         ? distance != null
-                            ? `À ${distance.toFixed(1)} km · hors zone de livraison`
-                            : "Hors zone de livraison"
+    ? `À ${distance.toFixed(1)} km de votre adresse`
+                            : "Trop loin de votre adresse"
                         : horaire.ouvert
                           ? horaire.creneau
                           : libelleFermeture(horaire)}
                 </p>
             </div>
-        </Link>
+        </Conteneur>
     );
 }
