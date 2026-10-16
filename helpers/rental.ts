@@ -561,13 +561,17 @@ export const pageSuivante = (meta?: Partial<MetaPagination> | null): number | un
  * Aucun calcul ici : les montants viennent du serveur et ne font que passer.
  */
 export interface MontantsRental {
+    /** La course seule, avant toute option. */
+    base_price?: number | null;
+    /** Le parking, quand le type le propose et que le client l'a coche. */
+    parking_fee?: number | null;
     total?: number | null;
     deposit?: number | null;
     balance?: number | null;
 }
 
 export interface LignePrix {
-    cle: "total" | "deposit" | "balance";
+    cle: "base" | "parking" | "total" | "deposit" | "balance";
     libelle: string;
     montant?: number | null;
 }
@@ -587,7 +591,30 @@ export const lignesDuPrix = (
 ) => {
     const close = accent === "total";
 
+    /*
+     * Le parking entre dans le TOTAL, et donc dans l'acompte : le client en
+     * paie sa part en ligne. Le laisser invisible, c'est lui facturer sans le
+     * dire — « si le prix du parking est paye dans le total general on doit le
+     * voir, et c'est super important ».
+     *
+     * Les deux lignes de detail n'apparaissent QUE s'il y a un parking a
+     * facturer. Sans option, la course seule vaut le total, et une ligne qui
+     * repete le total en-dessous se lit comme une double facturation.
+     */
+    const parking = montants?.parking_fee ?? 0;
+    const detaille = parking > 0;
+
     const toutes: LignePrix[] = [
+        ...(detaille
+            ? [
+                  {
+                      cle: "base" as const,
+                      libelle: "Course",
+                      montant: montants?.base_price,
+                  },
+                  {cle: "parking" as const, libelle: "Parking", montant: parking},
+              ]
+            : []),
         {cle: "total", libelle: "Total de la course", montant: montants?.total},
         {
             cle: "deposit",

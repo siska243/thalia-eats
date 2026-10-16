@@ -29,6 +29,17 @@ export type RentalQuoteType = {
     /** Les unites facturees, entamees comprises. */
     billed_units?: number;
     duration_hours: number;
+    /**
+     * Le detail du total, pour que la page puisse dire d'ou vient le montant.
+     *
+     * Le parking entre dans le TOTAL, donc dans l'acompte : le client en paie
+     * sa part en ligne. Sans ces deux champs, il la paierait sans la voir.
+     *
+     * Nuls sur les reservations d'avant les types de course : la page
+     * n'affiche alors aucun detail, comme avant.
+     */
+    base_price?: number | null;
+    parking_fee?: number | null;
     total: number;
     deposit: number;
     balance: number;
@@ -166,6 +177,9 @@ export type RentalBookingType = {
     dropoff_lng?: number | null;
 
     hourly_rate: number;
+    /** Le detail du total, comme sur le devis : la course, puis le parking. */
+    base_price?: number | null;
+    parking_fee?: number | null;
     total: number;
     deposit: number;
     balance: number;

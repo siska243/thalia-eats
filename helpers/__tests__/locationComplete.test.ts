@@ -1,6 +1,12 @@
 import {describe, expect, it} from "vitest";
 
-import {minimumAnnonce, minimumLisible, proposeLaJournee, proposeLHeure} from "@/helpers/rental";
+import {
+    lignesDuPrix,
+    minimumAnnonce,
+    minimumLisible,
+    proposeLaJournee,
+    proposeLHeure,
+} from "@/helpers/rental";
 
 /**
  * T117 — « La location par jour c'est combien et le minimum c'est combien de
@@ -44,5 +50,42 @@ describe("le minimum annoncé", () => {
 
     it("ne dit rien quand rien n'est imposé", () => {
         expect(minimumLisible(0)).toBeNull();
+    });
+});
+
+/**
+ * T124 — « Si le prix du parking est payé dans le total général on doit le
+ * voir, et c'est super important. »
+ *
+ * Mêmes cas que le mobile : le parking entre dans le TOTAL, donc dans
+ * l'acompte. Le laisser invisible, c'est le facturer sans le dire.
+ */
+describe("le détail du total", () => {
+    const montants = {base_price: 60, parking_fee: 30, total: 90, deposit: 18, balance: 72};
+
+    it("montre la course et le parking quand il y a un parking", () => {
+        const {secondaires} = lignesDuPrix(montants);
+
+        expect(secondaires.map((ligne) => ligne.cle)).toEqual([
+            "base",
+            "parking",
+            "total",
+            "balance",
+        ]);
+        expect(secondaires.find((ligne) => ligne.cle === "parking")?.montant).toBe(30);
+        expect(secondaires.find((ligne) => ligne.cle === "base")?.montant).toBe(60);
+    });
+
+    it("n'ajoute rien sans parking : la course seule vaut le total", () => {
+        const {secondaires} = lignesDuPrix({...montants, parking_fee: 0, total: 60});
+
+        expect(secondaires.map((ligne) => ligne.cle)).toEqual(["total", "balance"]);
+    });
+
+    it("ne change rien aux réservations d'avant, qui n'ont aucun détail", () => {
+        const {secondaires, accent} = lignesDuPrix({total: 60, deposit: 12, balance: 48});
+
+        expect(secondaires.map((ligne) => ligne.cle)).toEqual(["total", "balance"]);
+        expect(accent.cle).toBe("deposit");
     });
 });
