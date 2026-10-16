@@ -9,6 +9,8 @@
  * Les types du chauffeur ne sont pas repris : il n'a pas d'ecran web.
  */
 
+import {ModeTarifaire} from "@/helpers/rental";
+
 export type RentalCurrencyType = {
     id?: number;
     title?: string;
@@ -32,6 +34,26 @@ export type RentalQuoteType = {
     balance: number;
     currency?: RentalCurrencyType | null;
 };
+
+/**
+ * Un type de course, tel que le serveur le decrit.
+ *
+ * **L'ecran ne connait AUCUN code.** Il lit les regles portees par la ligne —
+ * duree minimale, mode impose, commentaire exige, option parking — et s'y
+ * conforme. C'est la condition pour qu'un quatrieme type cree en
+ * administration apparaisse ici sans qu'on relivre le site.
+ */
+export interface TypeCourse {
+    id: number;
+    code: string;
+    title: string;
+    description?: string | null;
+    minimum_hours?: number | null;
+    forced_mode?: ModeTarifaire | null;
+    note_required: boolean;
+    parking_option: boolean;
+    parking_hourly_fee: number;
+}
 
 export type RentalVehicleType = {
     uid: string;
@@ -58,6 +80,13 @@ export type RentalVehicleType = {
      * pas de tarif propre.
      */
     applied_rates?: {hourly?: number | null; daily?: number | null};
+    /**
+     * Les types de course que CE vehicule propose.
+     *
+     * Ceux dont le tarif a ete saisi sur sa fiche, et eux seuls. Vide — le cas
+     * de tout le parc existant — l'ecran ne propose aucun type.
+     */
+    course_types?: TypeCourse[];
     currency?: RentalCurrencyType | null;
     /** Present au catalogue seulement : le prix du creneau demande. */
     quote?: RentalQuoteType | null;

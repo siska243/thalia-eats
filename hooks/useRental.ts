@@ -21,7 +21,7 @@ import {
     ModeTarifaire,
     pageSuivante,
 } from "@/helpers/rental";
-import {RentalBookingType, RentalSuiviType, RentalVehicleType} from "@/types/rental";
+import {RentalBookingType, RentalSuiviType, RentalVehicleType, TypeCourse} from "@/types/rental";
 
 const CATALOGUE_KEY = "rental:vehicles";
 const BOOKINGS_KEY = "rental:bookings";
@@ -45,25 +45,7 @@ const BOOKINGS_KEY = "rental:bookings";
  * Elle se lit sans compte, comme le catalogue, et change rarement : une heure
  * de fraicheur evite de la redemander a chaque fiche ouverte.
  */
-/**
- * Un type de course, tel que le serveur le decrit.
- *
- * **L'ecran ne connait AUCUN code.** Il lit les regles portees par la ligne —
- * duree minimale, mode impose, commentaire exige, option parking — et s'y
- * conforme. C'est la condition pour qu'un quatrieme type cree en
- * administration apparaisse ici sans qu'on relivre le site.
- */
-export interface TypeCourse {
-    id: number;
-    code: string;
-    title: string;
-    description?: string | null;
-    minimum_hours?: number | null;
-    forced_mode?: ModeTarifaire | null;
-    note_required: boolean;
-    parking_option: boolean;
-    parking_hourly_fee: number;
-}
+export type {TypeCourse} from "@/types/rental";
 
 export interface RentalConfig {
     brand_food?: string;

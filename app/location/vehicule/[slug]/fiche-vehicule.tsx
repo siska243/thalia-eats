@@ -17,7 +17,7 @@ import {
     seuilJourneeAvantageuse,
 } from "@/helpers/rental";
 import {formatPrix} from "@/helpers/openingHours";
-import {TypeCourse, useBornesDuree, useNomsCommerciaux, useRentalVehicle, useTypesCourse} from "@/hooks/useRental";
+import {TypeCourse, useBornesDuree, useNomsCommerciaux, useRentalVehicle} from "@/hooks/useRental";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import EmptyState from "@/components/ui/EmptyState";
 import Bascule from "@/components/rental/Bascule";
@@ -75,7 +75,6 @@ export default function FicheVehicule({slug}: {slug: string}) {
      * fiche, sinon l'écran annoncerait un montant que la réservation ne
      * tiendrait pas.
      */
-    const typesCourse = useTypesCourse();
     const [typeChoisi, setTypeChoisi] = useState<TypeCourse | null>(null);
     const [parking, setParking] = useState(false);
 
@@ -107,6 +106,15 @@ export default function FicheVehicule({slug}: {slug: string}) {
      * celui du type : deux nombres pour la meme course, et le client ne
      * savait pas lequel croire. Le serveur tranche, l'ecran lit.
      */
+    /*
+     * Les types proposes par CE vehicule, et non tout le referentiel.
+     *
+     * Configurer un tarif pour un type, c'est rendre ce type disponible sur ce
+     * vehicule. Un vehicule sans aucun tarif n'en propose aucun, et l'ecran se
+     * comporte alors exactement comme avant.
+     */
+    const typesCourse = vehicle?.course_types ?? [];
+
     const tarifHoraire = tarifApplique(vehicle, "hourly");
     const tarifJournalier = tarifApplique(vehicle, "daily");
 

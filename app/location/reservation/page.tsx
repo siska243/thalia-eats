@@ -22,7 +22,6 @@ import {
     useRentalBooking,
     useRentalConfig,
     useRentalVehicle,
-    useTypesCourse,
 } from "@/hooks/useRental";
 import ChampTexte from "@/components/auth/ChampTexte";
 import PhoneNumber from "@/components/forms/phone-number";
@@ -106,9 +105,15 @@ const TunnelReservation = () => {
      * une seule source. Les recopier dans l'URL aurait figé un commentaire
      * exigé ou un tarif de parking au moment du clic.
      */
-    const typesCourse = useTypesCourse();
-    const typeCourse =
-        typesCourse.find((type) => String(type.id) === params.get("course_type_id")) ?? null;
+    /*
+     * L'IDENTIFIANT vient de l'URL, les REGLES du vehicule charge.
+     *
+     * L'identifiant doit etre connu avant la requete — c'est lui qui fait
+     * chiffrer la course — tandis que la duree minimale, le mode impose et
+     * l'option parking vivent sur la ligne du referentiel que le vehicule
+     * rapporte. Une seule source pour les regles.
+     */
+    const typeCourseId = Number(params.get("course_type_id")) || undefined;
     const parking = params.get("parking") === "1";
     const [commentaire, setCommentaire] = useState("");
 
@@ -117,9 +122,12 @@ const TunnelReservation = () => {
         debut,
         fin,
         mode,
-        typeCourse?.id,
+        typeCourseId,
         parking,
     );
+
+    const typeCourse =
+        (vehicle?.course_types ?? []).find((type) => type.id === typeCourseId) ?? null;
     const {reserver, payerAcompte} = useRentalActions();
 
     const {data: configRental} = useRentalConfig();
