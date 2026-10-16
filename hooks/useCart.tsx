@@ -75,6 +75,25 @@ const useCart = () => {
             return
         }
 
+        /*
+         * Plat epuise : rien n'entre dans le panier non plus.
+         *
+         * Au meme endroit que les deux autres refus, et pour la meme raison :
+         * tous les chemins d'ajout passent par cette fonction. `epuise` est
+         * calcule par le SERVEUR, jamais recopie ici - deux clients qui
+         * recalculent la meme regle finissent par dire le contraire l'un de
+         * l'autre, et c'est deja arrive sur les horaires d'ouverture.
+         *
+         * Absent, on laisse passer : un plat dont le stock n'est pas suivi,
+         * c'est-a-dire tout le catalogue d'aujourd'hui, ne doit rien voir
+         * changer.
+         */
+        if (product?.epuise === true) {
+            notification(`${product?.title ?? "Ce plat"} n'est plus disponible pour le moment.`)
+
+            return
+        }
+
         const ouverture = etatOuverture(product?.restaurant?.opens)
 
         if (!ouverture.ouvert) {
