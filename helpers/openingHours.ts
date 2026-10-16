@@ -96,10 +96,14 @@ export const etatOuverture = (
     // La fermeture est exclue, comme sur le serveur : a l'heure pile de
     // fermeture, le client ne doit pas annoncer « ouvert » alors que la
     // commande sera refusee.
-    const ouvert =
-        fin > debut
-            ? courant >= debut && courant < fin
-            : courant >= debut || courant < fin;
+    /*
+     * Un creneau qui passe minuit tient jusqu'a la fin de la journee ; sa queue
+     * appartient au LENDEMAIN, traitee plus haut comme creneau de la veille. La
+     * compter ici aussi ouvrait le restaurant le matin de son propre jour :
+     * « mercredi 23h – 2h » couvre la nuit du mercredi au jeudi, pas celle du
+     * mardi au mercredi.
+     */
+    const ouvert = fin > debut ? courant >= debut && courant < fin : courant >= debut;
 
     return {
         ouvert,
