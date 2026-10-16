@@ -51,8 +51,40 @@ export const etatOuverture = (
 ): EtatOuverture => {
     if (!opens?.length) return {ouvert: true, creneau: null, ouvreA: null};
 
-    const jour = JOURS[maintenant.getDay()];
-    const creneau = opens.find((c) => (c.day ?? c.Jour)?.toLowerCase() === jour);
+    const courant = maintenant.getHours() * 60 + maintenant.getMinutes();
+    const creneauDu = (jour: string) =>
+        opens.find((c) => (c.day ?? c.Jour)?.toLowerCase() === jour);
+
+    /*
+     * Le creneau de la VEILLE d'abord, quand il passe minuit.
+     *
+     * « 23h – 2h, c'est-a-dire le lendemain. » A une heure du matin un jeudi,
+     * le creneau qui tient le restaurant ouvert est celui du mercredi : ne
+     * regarder que le jour courant le fermait alors que le serveur acceptait
+     * la commande.
+     */
+    const veille = creneauDu(JOURS[(maintenant.getDay() + 6) % 7]);
+    const debutVeille = enMinutes(veille?.startAt);
+    const finVeille = enMinutes(veille?.endAt);
+
+    if (
+        debutVeille !== null &&
+        finVeille !== null &&
+        finVeille < debutVeille &&
+        courant < finVeille
+    ) {
+        const duJour = creneauDu(JOURS[maintenant.getDay()]);
+
+        return {
+            ouvert: true,
+            creneau: duJour
+                ? `${heureCourte(duJour.startAt)} – ${heureCourte(duJour.endAt)}`
+                : null,
+            ouvreA: null,
+        };
+    }
+
+    const creneau = creneauDu(JOURS[maintenant.getDay()]);
 
     if (!creneau) return {ouvert: false, creneau: null, ouvreA: null};
 
@@ -61,12 +93,13 @@ export const etatOuverture = (
 
     if (debut === null || fin === null) return {ouvert: true, creneau: null, ouvreA: null};
 
-    const courant = maintenant.getHours() * 60 + maintenant.getMinutes();
-
+    // La fermeture est exclue, comme sur le serveur : a l'heure pile de
+    // fermeture, le client ne doit pas annoncer « ouvert » alors que la
+    // commande sera refusee.
     const ouvert =
-        fin >= debut
-            ? courant >= debut && courant <= fin
-            : courant >= debut || courant <= fin;
+        fin > debut
+            ? courant >= debut && courant < fin
+            : courant >= debut || courant < fin;
 
     return {
         ouvert,
