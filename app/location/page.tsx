@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import {FaMagnifyingGlass} from "react-icons/fa6";
 
-import {useNomsCommerciaux, useVehicleList} from "@/hooks/useRental";
+import {useNomsCommerciaux, useRentalConfig, useTypesCourse, useVehicleList} from "@/hooks/useRental";
 import EmptyState from "@/components/ui/EmptyState";
 import CarteVehicule from "@/components/rental/CarteVehicule";
 import FiltresVehicules from "@/components/rental/FiltresVehicules";
@@ -56,9 +56,20 @@ export default function PageCatalogue() {
         places,
         setPlaces,
         placesCounts,
+        filtres,
+        setFiltres,
         hasActiveFilter,
         resetFilters,
     } = useVehicleList(term);
+
+    /*
+     * Les choix offerts par les filtres viennent du serveur : communes
+     * desservies et types de course s'ouvrent et se ferment en
+     * administration, et les ecrire ici demanderait une livraison a chaque
+     * changement.
+     */
+    const {data: configRental} = useRentalConfig();
+    const typesCourse = useTypesCourse();
 
     const enRecherche = term.length > 0;
 
@@ -103,6 +114,10 @@ export default function PageCatalogue() {
                         onSelectPlaces={setPlaces}
                         actif={hasActiveFilter}
                         onReset={resetFilters}
+                        filtres={filtres}
+                        onFiltres={setFiltres}
+                        communes={configRental?.towns ?? []}
+                        typesCourse={typesCourse}
                     />
                 </div>
 

@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-query";
 
 import {FetchData} from "@/helpers/FetchData";
-import {RouteRental} from "@/helpers/Route";
+import {FiltresCatalogue, RouteRental} from "@/helpers/Route";
 import {
     BORNES_PAR_DEFAUT,
     BornesDuree,
@@ -335,11 +335,19 @@ export const useVehicleList = (term: string) => {
     /** Nombre de places minimum, ou null pour tous. */
     const [places, setPlaces] = useState<number | null>(null);
 
+    /*
+     * Ces filtres-la partent au SERVEUR : ils entrent donc dans la cle de
+     * requete, sans quoi changer de commune rendrait la page deja en cache.
+     * Les trois au-dessus restent locaux — ils trient et masquent ce qui est
+     * deja descendu, sans rien redemander.
+     */
+    const [filtres, setFiltres] = useState<FiltresCatalogue>({});
+
     const query = useInfiniteQuery({
-        queryKey: [CATALOGUE_KEY, term],
+        queryKey: [CATALOGUE_KEY, term, filtres],
         queryFn: async ({pageParam}) => {
             const reponse = await FetchData.getData(
-                RouteRental.catalogue(term || undefined, pageParam),
+                RouteRental.catalogue(term || undefined, pageParam, filtres),
             );
 
             // Les erreurs axios sont retournees : `contenuRental` les leve,
@@ -380,12 +388,17 @@ export const useVehicleList = (term: string) => {
     const pages = query.data?.pages ?? [];
     const total = pages[pages.length - 1]?.meta?.total ?? source.length;
 
-    const hasActiveFilter = dispoOnly || places !== null || sortPrice;
+    const filtreServeurPose = Boolean(
+        filtres.cityId || filtres.townIds?.length || filtres.courseTypeId || filtres.proposes,
+    );
+
+    const hasActiveFilter = dispoOnly || places !== null || sortPrice || filtreServeurPose;
 
     const resetFilters = useCallback(() => {
         setDispoOnly(false);
         setPlaces(null);
         setSortPrice(false);
+        setFiltres({});
     }, []);
 
     return {
@@ -407,6 +420,8 @@ export const useVehicleList = (term: string) => {
         places,
         setPlaces,
         placesCounts,
+        filtres,
+        setFiltres,
         hasActiveFilter,
         resetFilters,
     };

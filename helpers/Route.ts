@@ -103,6 +103,14 @@ class Route
  * sa fiche est tenue en administration. Les ajouter ici serait du contrat mort
  * a maintenir.
  */
+/** Ce que le catalogue de location sait filtrer, cote serveur. */
+export interface FiltresCatalogue {
+    cityId?: number | null
+    townIds?: number[]
+    courseTypeId?: number | null
+    proposes?: "hourly" | "daily" | null
+}
+
 class RouteRental
 {
     private static prefix = "rental"
@@ -114,13 +122,36 @@ class RouteRental
      * fiche. La recherche est deleguee au serveur, exactement comme
      * `/list-restaurant?search=`.
      */
-    static catalogue = (search?: string, page?: number): string => {
+    static catalogue = (
+        search?: string,
+        page?: number,
+        filtres?: FiltresCatalogue,
+    ): string => {
         const parametres: string[] = []
 
         if (search) parametres.push(`search=${encodeURIComponent(search)}`)
         // La premiere page est implicite cote serveur : ne pas l'ecrire garde
         // l'URL identique a celle des clients deja installes.
         if (page && page > 1) parametres.push(`page=${page}`)
+
+        /*
+         * Les filtres partent au SERVEUR, qui pagine. Filtrer la page deja
+         * descendue donnerait des pages a trous : on demanderait quinze
+         * vehicules pour en afficher trois.
+         *
+         * Chacun n'est ecrit que s'il est pose : sans filtre, l'URL reste
+         * celle que le site appelait avant.
+         */
+        if (filtres?.cityId) parametres.push(`city_id=${filtres.cityId}`)
+
+        filtres?.townIds?.forEach((id) => parametres.push(`town_ids[]=${id}`))
+
+        if (filtres?.courseTypeId) parametres.push(`course_type_id=${filtres.courseTypeId}`)
+
+        // `proposes` et non `pricing_mode` : l'un dit ce qu'on CHERCHE,
+        // l'autre comment CHIFFRER. Les confondre cacherait du catalogue un
+        // vehicule qu'on sait encore chiffrer.
+        if (filtres?.proposes) parametres.push(`proposes=${filtres.proposes}`)
 
         return parametres.length
             ? `${this.prefix}/vehicles?${parametres.join("&")}`

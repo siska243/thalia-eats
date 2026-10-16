@@ -2,7 +2,9 @@
 
 import React from "react";
 
+import {FiltresCatalogue} from "@/helpers/Route";
 import {PALIERS_PLACES} from "@/helpers/rental";
+import {TypeCourse} from "@/types/rental";
 
 interface Props {
     dispoOnly: boolean;
@@ -16,6 +18,15 @@ interface Props {
     onSelectPlaces: (places: number | null) => void;
     actif: boolean;
     onReset: () => void;
+    /*
+     * Les filtres que le SERVEUR applique : ville, communes, type de course
+     * et mode propose. Les trois du dessus trient ce qui est deja descendu ;
+     * ceux-ci changent la requete.
+     */
+    filtres: FiltresCatalogue;
+    onFiltres: (filtres: FiltresCatalogue) => void;
+    communes: {id: number; title: string}[];
+    typesCourse: TypeCourse[];
 }
 
 interface PropsPuce {
@@ -78,7 +89,21 @@ export default function FiltresVehicules({
     onSelectPlaces,
     actif,
     onReset,
+    filtres,
+    onFiltres,
+    communes,
+    typesCourse,
 }: Props) {
+    const communesChoisies = filtres.townIds ?? [];
+
+    const basculerCommune = (id: number) =>
+        onFiltres({
+            ...filtres,
+            townIds: communesChoisies.includes(id)
+                ? communesChoisies.filter((autre) => autre !== id)
+                : [...communesChoisies, id],
+        });
+
     return (
         <div className="flex flex-wrap items-center gap-2">
             <Puce libelle="Libres maintenant" actif={dispoOnly} onClick={onToggleDispo} />
@@ -87,7 +112,7 @@ export default function FiltresVehicules({
             <span className="mx-1 hidden h-6 w-px bg-surface-border sm:block" />
 
             <Puce
-                libelle="Toutes les places"
+                libelle="Tout le parc"
                 nombre={total}
                 actif={places === null}
                 onClick={() => onSelectPlaces(null)}
@@ -96,12 +121,85 @@ export default function FiltresVehicules({
             {PALIERS_PLACES.map((palier) => (
                 <Puce
                     key={palier}
-                    libelle={`${palier}+ places`}
+                    libelle={`${palier} personnes`}
                     nombre={placesCounts[palier] ?? 0}
                     actif={places === palier}
                     onClick={() => onSelectPlaces(places === palier ? null : palier)}
                 />
             ))}
+
+            <span className="hidden h-6 w-px bg-surface-border sm:block" aria-hidden />
+
+            {/*
+              * « Se loue » interroge ce que le vehicule PROPOSE, pas comment
+              * il est chiffre : un vehicule sans tarif journalier reste
+              * affiche a l'heure, il ne doit pas pour autant disparaitre du
+              * filtre « a l'heure ».
+              *
+              * Un second clic eteint la puce : c'est la seule facon de
+              * revenir en arriere sans ajouter un bouton « tous » sur chaque
+              * bande.
+              */}
+            <Puce
+                libelle="À l’heure"
+                actif={filtres.proposes === "hourly"}
+                onClick={() =>
+                    onFiltres({
+                        ...filtres,
+                        proposes: filtres.proposes === "hourly" ? null : "hourly",
+                    })
+                }
+            />
+            <Puce
+                libelle="À la journée"
+                actif={filtres.proposes === "daily"}
+                onClick={() =>
+                    onFiltres({
+                        ...filtres,
+                        proposes: filtres.proposes === "daily" ? null : "daily",
+                    })
+                }
+            />
+
+            {/* Une bande sans valeur ne s'affiche pas : proposer un filtre
+              * vide laisse croire a une panne. */}
+            {typesCourse.length ? (
+                <>
+                    <span className="hidden h-6 w-px bg-surface-border sm:block" aria-hidden />
+
+                    {typesCourse.map((type) => (
+                        <Puce
+                            key={type.id}
+                            libelle={type.title}
+                            actif={filtres.courseTypeId === type.id}
+                            onClick={() =>
+                                onFiltres({
+                                    ...filtres,
+                                    courseTypeId:
+                                        filtres.courseTypeId === type.id ? null : type.id,
+                                })
+                            }
+                        />
+                    ))}
+                </>
+            ) : null}
+
+            {/* Les communes se cochent a PLUSIEURS, a la demande du
+              * proprietaire : on cherche rarement dans une seule. */}
+            {communes.length ? (
+                <>
+                    <span className="hidden h-6 w-px bg-surface-border sm:block" aria-hidden />
+
+                    {communes.map((commune) => (
+                        <Puce
+                            key={commune.id}
+                            libelle={commune.title.trim()}
+                            actif={communesChoisies.includes(commune.id)}
+                            onClick={() => basculerCommune(commune.id)}
+                        />
+                    ))}
+                </>
+            ) : null}
 
             {actif ? (
                 <button
