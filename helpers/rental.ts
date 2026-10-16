@@ -167,6 +167,7 @@ export const heuresPourMode = (
     mode: ModeTarifaire,
     heures: number,
     bornes: BornesDuree = BORNES_PAR_DEFAUT,
+    modePrecedent?: ModeTarifaire,
 ): number => {
     const {min, max} = bornesDuMode(mode, bornes);
 
@@ -176,7 +177,24 @@ export const heuresPourMode = (
         return borner(jours, min, max) * HEURES_PAR_JOUR;
     }
 
-    return borner(heures, min, max);
+    /*
+     * On vient de la journee : le nombre affiche etait un nombre de JOURS, et
+     * c'est lui qu'on garde — deux journees deviennent deux heures.
+     *
+     * Le total en heures etait replafonne au maximum horaire, si bien que
+     * 1 jour, 2 jours et 3 jours donnaient TOUS « 23 heures » : un nombre que
+     * le client n'avait jamais tape, et le meme quelle que soit sa demande.
+     * Une duree en jours ne tient pas en heures, et toute conversion de la
+     * duree reelle rend le meme resultat pour des demandes differentes.
+     *
+     * Sans mode precedent, un multiple de 24 trahit le mode journee : l'heure
+     * ne depasse jamais 23.
+     */
+    const venaitDeLaJournee = modePrecedent
+        ? modePrecedent === "daily"
+        : heures >= HEURES_PAR_JOUR && heures % HEURES_PAR_JOUR === 0;
+
+    return borner(venaitDeLaJournee ? heures / HEURES_PAR_JOUR : heures, min, max);
 };
 
 /**

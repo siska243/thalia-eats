@@ -131,7 +131,9 @@ export default function FicheVehicule({slug}: {slug: string}) {
         setMode(choisi);
         // La durée suit le mode : trois heures facturées à la journée, c'est
         // une journée pleine, et le client ne l'apprendrait qu'au total.
-        setHours((heures) => heuresPourMode(choisi, heures, bornes));
+        // Le mode PRECEDENT est passe : la conversion garde le nombre
+        // affiche, et n'a pas a deviner l'unite d'ou il vient.
+        setHours((heures) => heuresPourMode(choisi, heures, bornes, mode));
     };
 
     /**
