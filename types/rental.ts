@@ -87,6 +87,19 @@ export type RentalVehicleType = {
      * de tout le parc existant — l'ecran ne propose aucun type.
      */
     course_types?: TypeCourse[];
+    /**
+     * Ce que ce vehicule propose, et ce qu'il impose.
+     *
+     * Les modes sont COCHES en administration : ils ne se deduisent plus de la
+     * presence d'un tarif. `minimum_hours` reste nul quand le vehicule
+     * n'impose rien — la page ne doit pas annoncer une contrainte qui
+     * n'existe pas. `deposit_percentage`, lui, est toujours rempli : c'est
+     * celui qui sera preleve, et le client doit savoir ce qu'il paie en ligne.
+     */
+    allows_hourly?: boolean;
+    allows_daily?: boolean;
+    minimum_hours?: number | null;
+    deposit_percentage?: number;
     currency?: RentalCurrencyType | null;
     /** Present au catalogue seulement : le prix du creneau demande. */
     quote?: RentalQuoteType | null;

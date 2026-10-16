@@ -4,6 +4,7 @@ import {FaCalendarDays, FaLock, FaUsers} from "react-icons/fa6";
 
 import {etatVehicule} from "@/helpers/etatVehicule";
 import {formatPrix} from "@/helpers/openingHours";
+import {proposeLaJournee} from "@/helpers/rental";
 import {RentalVehicleType} from "@/types/rental";
 import PhotoVehicule from "@/components/rental/PhotoVehicule";
 
@@ -30,7 +31,13 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
     const {libre, libelle} = etatVehicule(vehicle);
     const devise = vehicle.currency?.code;
 
-    const journalier = vehicle.daily_rate
+    /*
+     * Le tarif journalier n'est annonce que si la journee est PROPOSEE.
+     * La presence du tarif ne suffit plus : un vehicule qu'on ne veut plus
+     * louer a la journee garde son prix, et afficher un prix qu'on ne peut
+     * pas reserver est pire que de ne rien dire.
+     */
+    const journalier = proposeLaJournee(vehicle)
         ? `${formatPrix(vehicle.daily_rate, devise)} / jour`
         : "À l'heure";
 
@@ -85,7 +92,8 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
                 <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-ink-muted">
                     {vehicle.seats ? (
                         <span className="flex items-center gap-1">
-                            <FaUsers aria-hidden /> {vehicle.seats} places
+                            <FaUsers aria-hidden /> {vehicle.seats} personne
+                        {(vehicle.seats ?? 0) > 1 ? "s" : ""}
                         </span>
                     ) : null}
 

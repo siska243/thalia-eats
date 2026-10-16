@@ -98,15 +98,69 @@ export const creneauRental = (startsAt: Date, hours: number) => ({
  */
 export type ModeTarifaire = "hourly" | "daily";
 
-/** Un vehicule sans tarif journalier ne se loue qu'a l'heure. */
-export const proposeLaJournee = (vehicule?: {daily_rate?: number | null} | null): boolean =>
-    typeof vehicule?.daily_rate === "number" && vehicule.daily_rate > 0;
+export const HEURES_PAR_JOUR = 24;
+
+/**
+ * La journee est-elle proposee ?
+ *
+ * Le serveur le DIT : le mode se coche en administration, et ne se deduit
+ * plus de la presence d'un tarif. Un vehicule qu'on ne veut plus louer a la
+ * journee garde son tarif — il sert encore a l'affichage — sans pour autant
+ * le proposer.
+ *
+ * Le repli sur le tarif ne vaut que pour une reponse d'un serveur qui ne
+ * connait pas encore le champ : la page se comporte alors comme avant.
+ */
+export const proposeLaJournee = (
+    vehicule?: {daily_rate?: number | null; allows_daily?: boolean} | null,
+): boolean =>
+    vehicule?.allows_daily !== undefined
+        ? vehicule.allows_daily
+        : typeof vehicule?.daily_rate === "number" && vehicule.daily_rate > 0;
+
+/** Jumelle de la precedente, pour l'heure. */
+export const proposeLHeure = (
+    vehicule?: {hourly_rate?: number | null; allows_hourly?: boolean} | null,
+): boolean =>
+    vehicule?.allows_hourly !== undefined
+        ? vehicule.allows_hourly
+        : typeof vehicule?.hourly_rate === "number" && vehicule.hourly_rate > 0;
+
+/**
+ * La duree minimale annoncee au client, en heures.
+ *
+ * La plus CONTRAIGNANTE du vehicule et du type de course : le serveur
+ * refusera la plus stricte, et annoncer la plus douce ferait composer une
+ * demande vouee au refus.
+ *
+ * Zero quand rien n'impose de minimum : la page n'affiche alors aucune
+ * contrainte, plutot qu'une contrainte qui n'existe pas.
+ */
+export const minimumAnnonce = (
+    vehicule?: {minimum_hours?: number | null} | null,
+    type?: {minimum_hours?: number | null} | null,
+): number => Math.max(vehicule?.minimum_hours ?? 0, type?.minimum_hours ?? 0);
+
+/**
+ * Le minimum, dit au client.
+ *
+ * En JOURNEES des qu'il en couvre une : « 2 jours minimum » se comprend,
+ * « 48 heures minimum » se calcule. `null` quand rien n'est impose — une
+ * ligne « aucun minimum » occuperait la place pour ne rien dire.
+ */
+export const minimumLisible = (heures: number): string | null => {
+    if (heures >= HEURES_PAR_JOUR) {
+        const jours = Math.round(heures / HEURES_PAR_JOUR);
+
+        return `${jours} jour${jours > 1 ? "s" : ""} minimum`;
+    }
+
+    return heures > 0 ? `${heures} heure${heures > 1 ? "s" : ""} minimum` : null;
+};
 
 /** Le mode lu d'un parametre d'URL. Inconnu ou absent, c'est l'heure. */
 export const modeDepuisParam = (valeur?: string | null): ModeTarifaire =>
     valeur === "daily" ? "daily" : "hourly";
-
-export const HEURES_PAR_JOUR = 24;
 
 /**
  * Les bornes d'une duree, et le delai de prevenance.

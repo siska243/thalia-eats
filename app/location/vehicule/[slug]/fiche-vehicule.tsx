@@ -12,8 +12,10 @@ import {
     heuresPourMode,
     libelleDuMode,
     lignesDuPrix,
+    minimumAnnonce,
     ModeTarifaire,
     proposeLaJournee,
+    proposeLHeure,
     seuilJourneeAvantageuse,
 } from "@/helpers/rental";
 import {formatPrix} from "@/helpers/openingHours";
@@ -21,6 +23,7 @@ import {TypeCourse, useBornesDuree, useNomsCommerciaux, useRentalVehicle} from "
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import EmptyState from "@/components/ui/EmptyState";
 import Bascule from "@/components/rental/Bascule";
+import ModalitesLocation from "@/components/rental/ModalitesLocation";
 import PhotoVehicule from "@/components/rental/PhotoVehicule";
 import TypeCoursePicker from "@/components/rental/TypeCoursePicker";
 import {tarifApplique} from "@/helpers/tarifApplique";
@@ -118,7 +121,24 @@ export default function FicheVehicule({slug}: {slug: string}) {
     const tarifHoraire = tarifApplique(vehicle, "hourly");
     const tarifJournalier = tarifApplique(vehicle, "daily");
 
-    const choixDuMode = proposeLaJournee(vehicle);
+    /*
+     * Ce que le vehicule PROPOSE, et non ce qu'il a comme tarif.
+     *
+     * La bascule ne s'affiche que si les DEUX modes sont proposes : un
+     * segment qu'on ne peut pas prendre n'est pas un choix. Et l'en-tete ne
+     * porte que les tarifs proposes — afficher un prix qu'on ne peut pas
+     * reserver est pire que de ne rien dire.
+     */
+    const journeeProposee = proposeLaJournee(vehicle);
+    const heureProposee = proposeLHeure(vehicle);
+    const choixDuMode = journeeProposee && heureProposee;
+
+    /*
+     * Le minimum le plus CONTRAIGNANT du vehicule et du type choisi : le
+     * serveur refusera le plus strict, et annoncer le plus doux ferait
+     * composer une demande vouee au refus.
+     */
+    const minimumHeures = minimumAnnonce(vehicle, typeChoisi);
 
     /*
      * À partir de cette heure-là, la journée coûte moins cher que le cumul des
@@ -231,7 +251,7 @@ export default function FicheVehicule({slug}: {slug: string}) {
                             <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-ink-muted">
                                 {vehicle.seats ? (
                                     <span className="flex items-center gap-1">
-                                        <FaUsers aria-hidden /> {vehicle.seats} places
+                                        <FaUsers aria-hidden /> {vehicle.seats} personnes
                                     </span>
                                 ) : null}
                                 <span>{vehicle.reference}</span>
@@ -243,13 +263,34 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                 </p>
                             ) : null}
 
-                            <p className="text-body font-bold text-brand-700">
-                                {formatPrix(tarifHoraire, devise)}
-                                <span className="text-caption font-normal text-ink-muted">
-                                    {" "}
-                                    / heure
-                                </span>
+                            <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-body font-bold text-brand-700">
+                                {heureProposee ? (
+                                    <span>
+                                        {formatPrix(tarifHoraire, devise)}
+                                        <span className="text-caption font-normal text-ink-muted">
+                                            {" "}
+                                            / heure
+                                        </span>
+                                    </span>
+                                ) : null}
+
+                                {journeeProposee ? (
+                                    <span>
+                                        {formatPrix(tarifJournalier, devise)}
+                                        <span className="text-caption font-normal text-ink-muted">
+                                            {" "}
+                                            / jour
+                                        </span>
+                                    </span>
+                                ) : null}
                             </p>
+
+                            <ModalitesLocation
+                                minimumHeures={minimumHeures}
+                                acompte={vehicle.deposit_percentage}
+                                montantAcompte={vehicle.quote?.deposit}
+                                devise={devise}
+                            />
                         </div>
                     </section>
 
