@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 
 import {
     BORNES_PAR_DEFAUT,
+    departLePlusTot,
     departTropProche,
     lignesDuPrix,
     minimumAnnonce,
@@ -118,5 +119,56 @@ describe("un départ trop proche", () => {
     it("accepte pile le délai, et au-delà", () => {
         expect(departTropProche(new Date("2026-10-17T13:00:00"), bornes, MIDI)).toBe(false);
         expect(departTropProche(new Date("2026-10-18T09:00:00"), bornes, MIDI)).toBe(false);
+    });
+});
+
+/**
+ * T133 — « On est le 17 et je veux commander une voiture pour le 17, mais
+ * c'est impossible car c'est le 18 qui apparaît. On ne force rien, on laisse
+ * l'utilisateur choisir ; mais on bloque les actions pas autorisées. »
+ *
+ * Le départ proposé doit tomber AUJOURD'HUI dès qu'il reste assez d'heures
+ * dans la journée, et être déjà réservable : sinon le bouton s'ouvre après
+ * une correction que personne n'a demandée.
+ */
+describe("le départ proposé à l'ouverture", () => {
+    const bornes = {...BORNES_PAR_DEFAUT, lead_time_minutes: 60};
+
+    /** La règle de la fiche : premier instant réservable, heure ronde d'après. */
+    const departParDefaut = (plusTot: Date) => {
+        const date = new Date(plusTot);
+
+        if (date.getMinutes() > 0 || date.getSeconds() > 0) {
+            date.setHours(date.getHours() + 1);
+        }
+
+        date.setMinutes(0, 0, 0);
+
+        return date;
+    };
+
+    it("reste aujourd'hui à 00h07, le cas signalé", () => {
+        const maintenant = new Date("2026-10-17T00:07:00").getTime();
+        const propose = departParDefaut(departLePlusTot(bornes, maintenant));
+
+        // Le 17 à 02:00, et non le 18.
+        expect(propose.getDate()).toBe(17);
+        expect(propose.getHours()).toBe(2);
+    });
+
+    it("est déjà réservable : rien à corriger pour ouvrir le bouton", () => {
+        const maintenant = new Date("2026-10-17T14:20:00").getTime();
+        const propose = departParDefaut(departLePlusTot(bornes, maintenant));
+
+        expect(departTropProche(propose, bornes, maintenant)).toBe(false);
+        expect(propose.getDate()).toBe(17);
+    });
+
+    it("bascule au lendemain seulement quand la journée n'a plus d'heure ronde", () => {
+        const maintenant = new Date("2026-10-17T23:30:00").getTime();
+        const propose = departParDefaut(departLePlusTot(bornes, maintenant));
+
+        expect(propose.getDate()).toBe(18);
+        expect(departTropProche(propose, bornes, maintenant)).toBe(false);
     });
 });

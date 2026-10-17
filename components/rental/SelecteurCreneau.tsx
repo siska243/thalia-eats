@@ -134,30 +134,25 @@ export default function SelecteurCreneau({
     const memeJourQuePlusTot = valeurDate(startsAt) === valeurDate(plusTot);
 
     /**
-     * Un départ trop proche est REFUSÉ, il n'est plus déplacé.
+     * ON N'IMPOSE RIEN, ON PRÉVIENT.
      *
-     * Le champ ramenait silencieusement la saisie au premier créneau
-     * possible. Le propriétaire a tranché : « 00h07 ça ne peut pas passer » —
-     * on le dit, on ne le déplace pas. Voir son heure changer toute seule
-     * est plus déroutant qu'un refus expliqué.
+     * Deux versions de ce code se sont trompées : d'abord ramener la saisie
+     * au premier créneau possible, puis la REFUSER. Les deux décident à la
+     * place du client. La seconde était la pire — choisir le 17 posait le 17
+     * à l'heure courante du champ, souvent déjà passée, donc un refus, et on
+     * ne pouvait plus atteindre aujourd'hui du tout.
      *
-     * Le navigateur refuse déjà une partie de ces saisies par `min`, mais pas
-     * toutes : un champ `time` ne connaît pas la date qui l'accompagne, et
-     * laisse donc composer une heure déjà passée du jour même.
+     * Le propriétaire a tranché : « on ne force rien, on laisse
+     * l'utilisateur choisir ; mais on bloque les actions pas autorisées. »
+     *
+     * Le champ pose donc exactement ce qu'on lui donne. Un créneau trop
+     * proche s'affiche, s'explique, et c'est le BOUTON DE RÉSERVATION qui
+     * reste fermé tant qu'il l'est.
      */
-    const [refuse, setRefuse] = useState(false);
+    const poserLeDepart = (depart: Date) => onChange(depart, hours);
 
-    /** N'accepte un départ que s'il respecte le délai de prévenance. */
-    const poserLeDepart = (depart: Date) => {
-        if (departTropProche(depart, bornes)) {
-            setRefuse(true);
-
-            return;
-        }
-
-        setRefuse(false);
-        onChange(depart, hours);
-    };
+    /** Le créneau composé est-il réservable à cet instant ? */
+    const tropProche = departTropProche(startsAt, bornes);
 
     const changerDate = (texte: string) => {
         const [annee, mois, jour] = texte.split("-").map(Number);
@@ -248,7 +243,9 @@ export default function SelecteurCreneau({
                 </label>
             </div>
 
-            {refuse ? (
+            {/* Un avertissement, pas un refus : le créneau est bien posé, il
+                n'est simplement pas réservable en l'état. */}
+            {tropProche ? (
                 <p role="alert" className="text-caption text-warning">
                     Ce départ est trop proche : la course se commande au moins{" "}
                     {bornes.lead_time_minutes} minutes à l’avance. Le plus tôt possible est le{" "}

@@ -32,18 +32,29 @@ import {tarifApplique} from "@/helpers/tarifApplique";
 import SelecteurCreneau from "@/components/rental/SelecteurCreneau";
 
 /**
- * Le départ par défaut : demain, même heure, minutes remises à zéro.
+ * Le départ proposé à l'ouverture : la prochaine heure ronde réservable.
  *
- * Personne ne loue une voiture pour tout de suite, et un départ de demain
- * respecte largement le délai de prévenance. Le garde reste : il se règle en
- * administration et pourrait un jour dépasser vingt-quatre heures.
+ * C'était DEMAIN, même heure. Le propriétaire, le 17 octobre : « on est le 17
+ * et je veux commander une voiture pour le 17, mais c'est impossible car
+ * c'est le 18 qui apparaît ». Proposer demain à quelqu'un qui veut partir
+ * dans deux heures lui fait corriger la date à chaque visite.
+ *
+ * On part donc du premier instant réservable et on arrondit à l'heure ronde
+ * supérieure : la valeur proposée est déjà valable, et il n'y a rien à
+ * corriger pour que le bouton s'ouvre.
  */
 const departParDefaut = (plusTot: Date) => {
-    const date = new Date();
-    date.setDate(date.getDate() + 1);
+    const date = new Date(plusTot);
+
+    // L'heure ronde d'APRÈS : arrondir vers le bas replacerait le départ
+    // avant le délai, et refermerait le bouton qu'on vient d'ouvrir.
+    if (date.getMinutes() > 0 || date.getSeconds() > 0) {
+        date.setHours(date.getHours() + 1);
+    }
+
     date.setMinutes(0, 0, 0);
 
-    return date.getTime() < plusTot.getTime() ? plusTot : date;
+    return date;
 };
 
 /**
