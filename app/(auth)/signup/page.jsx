@@ -4,6 +4,7 @@ import {useState} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import CarteAuth from "@/components/auth/CarteAuth";
+import Turnstile from "@/components/auth/Turnstile";
 import ChampTexte from "@/components/auth/ChampTexte";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
@@ -31,12 +32,19 @@ const CHAMPS_VIDES = {
  *   a l'identique.
  * - apres une inscription reussie, la page vidait le formulaire et s'arretait
  *   la : aucune redirection, aucun pas suivant. On restait devant un
- *   formulaire vierge sans savoir si le compte existait. Elle mene maintenant
- *   a la connexion.
+ *   formulaire vierge sans savoir si le compte existait.
+ *
+ * Elle mene desormais a la CONFIRMATION, et non a la connexion : depuis
+ * T146 l'adresse doit etre confirmee pour utiliser le compte, et renvoyer
+ * vers un ecran de connexion qui refusera est un cul-de-sac.
+ *
+ * Le defi anti-robot n'apparait que si la cle est configuree. Sans elle, le
+ * formulaire se comporte exactement comme avant.
  */
 export default function PageInscription() {
     const [champs, setChamps] = useState(CHAMPS_VIDES);
     const [loading, setLoading] = useState(false);
+    const [jetonAntiRobot, setJetonAntiRobot] = useState(null);
     const router = useRouter();
 
     const modifier = (cle) => (e) =>
@@ -58,6 +66,10 @@ export default function PageInscription() {
             const donnees = {...champs};
             delete donnees.confirmPassword;
 
+            // Absent quand le defi n'est pas configure : le serveur ne le
+            // reclame que si sa propre cle est posee.
+            if (jetonAntiRobot) donnees.turnstile_token = jetonAntiRobot;
+
             const response = await FetchData.sendData(Route.register, donnees);
 
             if (response?.name === "AxiosError") {
@@ -68,9 +80,11 @@ export default function PageInscription() {
                 return;
             }
 
+            const adresse = champs.email;
+
             setChamps(CHAMPS_VIDES);
-            Notify("Inscription réussie, connectez-vous", "success");
-            router.push("/login");
+            Notify("Compte créé. Saisissez le code reçu par e-mail.", "success");
+            router.push(`/confirmation?email=${encodeURIComponent(adresse)}`);
         } finally {
             setLoading(false);
         }
@@ -156,6 +170,8 @@ export default function PageInscription() {
                         required
                     />
                 </div>
+
+                <Turnstile onJeton={setJetonAntiRobot} />
 
                 <button
                     type="submit"
