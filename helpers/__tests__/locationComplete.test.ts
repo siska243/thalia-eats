@@ -1,6 +1,8 @@
 import {describe, expect, it} from "vitest";
 
 import {
+    BORNES_PAR_DEFAUT,
+    departTropProche,
     lignesDuPrix,
     minimumAnnonce,
     minimumLisible,
@@ -87,5 +89,34 @@ describe("le détail du total", () => {
 
         expect(secondaires.map((ligne) => ligne.cle)).toEqual(["total", "balance"]);
         expect(accent.cle).toBe("deposit");
+    });
+});
+
+/**
+ * T127 — « On ne peut pas commander à la même heure. Il est 00h07, je ne peux
+ * pas commander à 00h07 : le minimum c'est 01h07. Tenir compte heure ET jour.
+ * On ne peut commander qu'au futur. »
+ *
+ * Mêmes cas que le mobile.
+ */
+describe("un départ trop proche", () => {
+    const MIDI = new Date("2026-10-17T12:00:00").getTime();
+    const bornes = {...BORNES_PAR_DEFAUT, lead_time_minutes: 60};
+
+    it("refuse la minute présente", () => {
+        expect(departTropProche(new Date(MIDI), bornes, MIDI)).toBe(true);
+    });
+
+    it("refuse le passé, même du jour même", () => {
+        expect(departTropProche(new Date("2026-10-17T00:07:00"), bornes, MIDI)).toBe(true);
+    });
+
+    it("refuse une heure dans moins du délai", () => {
+        expect(departTropProche(new Date("2026-10-17T12:59:00"), bornes, MIDI)).toBe(true);
+    });
+
+    it("accepte pile le délai, et au-delà", () => {
+        expect(departTropProche(new Date("2026-10-17T13:00:00"), bornes, MIDI)).toBe(false);
+        expect(departTropProche(new Date("2026-10-18T09:00:00"), bornes, MIDI)).toBe(false);
     });
 });

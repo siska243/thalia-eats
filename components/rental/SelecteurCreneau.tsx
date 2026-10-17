@@ -8,6 +8,7 @@ import {
     BornesDuree,
     bornesDuMode,
     departLePlusTot,
+    departTropProche,
     dureeChoisie,
     formatDMY,
     formatTime,
@@ -133,21 +134,29 @@ export default function SelecteurCreneau({
     const memeJourQuePlusTot = valeurDate(startsAt) === valeurDate(plusTot);
 
     /**
-     * Un départ trop proche a été ramené au premier créneau possible.
+     * Un départ trop proche est REFUSÉ, il n'est plus déplacé.
      *
-     * On le dit : ramener la saisie sans un mot fait croire à un champ qui ne
-     * prend pas ce qu'on y tape. Le navigateur refuse déjà la plupart de ces
-     * saisies par `min`, mais pas toutes — un champ `time` ne connaît pas la
-     * date qui l'accompagne.
+     * Le champ ramenait silencieusement la saisie au premier créneau
+     * possible. Le propriétaire a tranché : « 00h07 ça ne peut pas passer » —
+     * on le dit, on ne le déplace pas. Voir son heure changer toute seule
+     * est plus déroutant qu'un refus expliqué.
+     *
+     * Le navigateur refuse déjà une partie de ces saisies par `min`, mais pas
+     * toutes : un champ `time` ne connaît pas la date qui l'accompagne, et
+     * laisse donc composer une heure déjà passée du jour même.
      */
-    const [ramene, setRamene] = useState(false);
+    const [refuse, setRefuse] = useState(false);
 
-    /** Garde le départ au-delà du délai de prévenance, et dit quand il l'a fallu. */
+    /** N'accepte un départ que s'il respecte le délai de prévenance. */
     const poserLeDepart = (depart: Date) => {
-        const tropTot = depart.getTime() < plusTot.getTime();
+        if (departTropProche(depart, bornes)) {
+            setRefuse(true);
 
-        setRamene(tropTot);
-        onChange(tropTot ? plusTot : depart, hours);
+            return;
+        }
+
+        setRefuse(false);
+        onChange(depart, hours);
     };
 
     const changerDate = (texte: string) => {
@@ -239,10 +248,11 @@ export default function SelecteurCreneau({
                 </label>
             </div>
 
-            {ramene ? (
-                <p role="status" className="text-caption text-warning">
-                    Le départ doit être prévu au moins {bornes.lead_time_minutes} minutes à
-                    l’avance. Nous l’avons placé au {formatDMY(plusTot)} à {formatTime(plusTot)}.
+            {refuse ? (
+                <p role="alert" className="text-caption text-warning">
+                    Ce départ est trop proche : la course se commande au moins{" "}
+                    {bornes.lead_time_minutes} minutes à l’avance. Le plus tôt possible est le{" "}
+                    {formatDMY(plusTot)} à {formatTime(plusTot)}.
                 </p>
             ) : null}
 

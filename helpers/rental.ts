@@ -432,6 +432,28 @@ export const departLePlusTot = (
     maintenant: number = Date.now(),
 ): Date => new Date(maintenant + Math.max(0, bornes.lead_time_minutes) * 60000);
 
+/**
+ * Ce depart est-il trop proche pour etre reserve ?
+ *
+ * Le proprietaire, le 17 octobre : « on ne peut pas commander a la meme
+ * heure, le minimum c'est 1 h avant. Il est 00h07, je ne peux pas commander
+ * a 00h07 : le minimum c'est 01h07. Donc tenir compte heure ET jour. On ne
+ * peut commander qu'au futur. »
+ *
+ * Compare des INSTANTS, pas des dates : un garde qui ne regarderait que le
+ * jour laisserait passer 00h07, puisque le jour est bien aujourd'hui. C'est
+ * exactement ce que l'attribut `min` d'un champ `time` ne sait pas faire —
+ * il ignore la date qui l'accompagne.
+ *
+ * La question se repose a chaque instant : un creneau compose a 23h50 pour
+ * 00h30 devient trop proche en restant a l'ecran.
+ */
+export const departTropProche = (
+    depart: Date,
+    bornes: BornesDuree = BORNES_PAR_DEFAUT,
+    maintenant: number = Date.now(),
+): boolean => depart.getTime() < departLePlusTot(bornes, maintenant).getTime();
+
 /** Paliers de places proposes au filtre. « 7+ » couvre les minibus. */
 export const PALIERS_PLACES = [2, 4, 5, 7];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {FaChevronLeft, FaUsers} from "react-icons/fa6";
@@ -9,6 +9,7 @@ import {
     creneauLisible,
     creneauRental,
     departLePlusTot,
+    departTropProche,
     dureeFacturee,
     heuresPourMode,
     libelleDuMode,
@@ -67,6 +68,26 @@ export default function FicheVehicule({slug}: {slug: string}) {
     // ce sont des règles commerciales que le propriétaire change en
     // administration.
     const bornes = useBornesDuree();
+
+    /*
+     * Le temps passe pendant qu'on compose sa demande.
+     *
+     * Un creneau choisi a 23h50 pour 00h30 devient trop proche en restant a
+     * l'ecran : le client cliquait « Reserver » et se faisait refuser par le
+     * serveur sans avoir rien change. Ce battement rouvre la question toutes
+     * les trente secondes, et le bouton se ferme tout seul.
+     *
+     * Trente secondes et non une : la minute affichee ne change pas plus
+     * vite, et reveiller React a chaque seconde pour une bordure de delai
+     * n'apporte rien.
+     */
+    const [horloge, setHorloge] = useState(() => Date.now());
+
+    useEffect(() => {
+        const battement = setInterval(() => setHorloge(Date.now()), 30_000);
+
+        return () => clearInterval(battement);
+    }, []);
 
     const [startsAt, setStartsAt] = useState(() => departParDefaut(departLePlusTot()));
     const [hours, setHours] = useState(3);
@@ -140,6 +161,13 @@ export default function FicheVehicule({slug}: {slug: string}) {
      * composer une demande vouee au refus.
      */
     const minimumHeures = minimumAnnonce(vehicle, typeChoisi);
+
+    /*
+     * « On ne peut pas commander a la meme heure, le minimum c'est 1 h
+     * avant » : la meme regle que le serveur oppose, posee ici pour que le
+     * client la voie avant de payer plutot qu'apres.
+     */
+    const tropProche = departTropProche(startsAt, bornes, horloge);
 
     /*
      * La fiche en etapes — « tu le mets en 2 ou 3 etapes pour ne pas
@@ -508,13 +536,15 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                     onClick={
                                         derniere ? reserver : () => setEtape((rang) => rang + 1)
                                     }
-                                    disabled={derniere && !libre}
+                                    disabled={derniere && (!libre || tropProche)}
                                     className="inline-flex min-h-12 flex-1 items-center justify-center rounded-pill bg-brand-500 px-6 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {!derniere
                                         ? "Continuer"
-                                        : !libre
-                                          ? "Indisponible"
+                                        : tropProche
+                                          ? "Départ trop proche"
+                                          : !libre
+                                            ? "Indisponible"
                                           : user
                                             ? "Réserver"
                                             : "Se connecter pour réserver"}
