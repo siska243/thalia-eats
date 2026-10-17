@@ -196,7 +196,7 @@ export default function Hero({previews = []}) {
                                 client paie un acompte, pas la course entiere.
                                 Le taire ferait reculer au moment du paiement. */}
                             <span className="flex flex-wrap gap-2">
-                                {["Acompte à la réservation", "Le solde au chauffeur"].map(
+                                {["Acompte à la réservation", "Le reste à la fin de la course"].map(
                                     (mention) => (
                                         <span
                                             key={mention}

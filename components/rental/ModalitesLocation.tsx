@@ -48,8 +48,8 @@ export default function ModalitesLocation({
                 <p className="flex items-center gap-2 text-caption text-ink-muted">
                     <FaWallet aria-hidden />
                     {montantAcompte
-                        ? `${acompte} % à la réservation, soit ${formatPrix(montantAcompte, devise)}. Le solde au chauffeur.`
-                        : `${acompte} % à la réservation, le solde au chauffeur.`}
+                        ? `${acompte} % à la réservation, soit ${formatPrix(montantAcompte, devise)}. Les ${100 - acompte} % restants à la fin de la course, au chauffeur.`
+                        : `${acompte} % à la réservation, les ${100 - acompte} % restants à la fin de la course, au chauffeur.`}
                 </p>
             ) : null}
         </div>

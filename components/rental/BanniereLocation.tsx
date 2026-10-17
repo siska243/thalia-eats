@@ -44,7 +44,7 @@ export default function BanniereLocation({nom, nombre}: Props) {
                     <p className="max-w-md text-body leading-7 text-white/80">
                         {nombre
                             ? `${nombre} véhicules avec chauffeur, à l’heure ou à la journée.`
-                            : "À l’heure ou à la journée. Un acompte retient le véhicule, le solde se règle au chauffeur."}
+                            : "À l’heure ou à la journée. Un acompte retient le véhicule, le reste se règle au chauffeur à la fin de la course."}
                     </p>
                 </div>
 

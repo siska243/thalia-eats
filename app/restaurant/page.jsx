@@ -1,12 +1,13 @@
 "use client";
 
-import {Suspense, useSyncExternalStore} from "react";
+import {Suspense, useMemo, useState, useSyncExternalStore} from "react";
 import Restaurants from "@/components/restaurants/Restaurants";
 import BanniereRestaurants from "@/components/restaurants/BanniereRestaurants";
 import SectionAbout from "@/components/home/SectionAbout";
 import {Route} from "@/helpers/Route";
 import {communeDeLivraison} from "@/helpers/commune-livraison";
 import useReferentialData from "@/hooks/useQueryTanStack";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 
 /**
  * La liste des restaurants.
@@ -32,12 +33,37 @@ export default function PageRestaurants() {
         () => null,
     );
 
-    const {data, isLoading} = useReferentialData({
+    /*
+     * La recherche est deleguee au serveur, comme sur le mobile.
+     *
+     * Elle se faisait ici, sur le nom et l'adresse des restaurants deja
+     * charges : chercher « poulet » ne trouvait donc rien, puisque les plats
+     * ne sont pas dans cette liste. Le serveur, lui, regarde aussi le titre
+     * des plats. Deux lectures de la meme regle avaient deja diverge.
+     */
+    const [recherche, setRecherche] = useState("");
+    const terme = useDebouncedValue(recherche).trim();
+
+    const url = useMemo(() => {
+        const parametres = [];
+
         // La commune deja choisie part avec la requete : c'est elle qui permet
         // au serveur de dire quels restaurants sont hors zone. Absente, le
         // catalogue s'affiche comme avant.
-        url: commune ? `${Route.list_restaurant}?town=${encodeURIComponent(commune)}` : Route.list_restaurant,
-        queryKey: `query-list-restaurant-${commune ?? "sans-commune"}`,
+        if (commune) parametres.push(`town=${encodeURIComponent(commune)}`);
+        if (terme) parametres.push(`search=${encodeURIComponent(terme)}`);
+
+        return parametres.length
+            ? `${Route.list_restaurant}?${parametres.join("&")}`
+            : Route.list_restaurant;
+    }, [commune, terme]);
+
+    const {data, isLoading} = useReferentialData({
+        url,
+        queryKey: `query-list-restaurant-${commune ?? "sans-commune"}-${terme}`,
+        // La liste precedente reste affichee pendant la frappe : sans cela la
+        // grille clignote vers son squelette a chaque lettre.
+        placeholderData: (precedent) => precedent,
     });
 
     return (
@@ -46,7 +72,12 @@ export default function PageRestaurants() {
                 <BanniereRestaurants nombre={data?.data?.length} />
 
                 <Suspense>
-                    <Restaurants data={data ?? []} isLoading={isLoading} />
+                    <Restaurants
+                        data={data ?? []}
+                        isLoading={isLoading}
+                        recherche={recherche}
+                        onRecherche={setRecherche}
+                    />
                 </Suspense>
             </div>
 
