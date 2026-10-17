@@ -47,7 +47,7 @@ export default function VueAPayer({booking, minutes, ton, ecoule}: Props) {
                 ce moment-là il choisit encore, il ne consulte pas. */}
             <section className="overflow-hidden rounded-card bg-surface shadow-card">
                 <div className="relative h-44 w-full sm:h-60">
-                    <PhotoVehicule src={booking.vehicle?.image} alt="" tailleIcone={40} />
+                    <PhotoVehicule src={booking.vehicle?.image} alt="" />
                 </div>
 
                 <div className="flex flex-col gap-2.5 p-4">

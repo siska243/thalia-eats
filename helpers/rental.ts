@@ -98,15 +98,69 @@ export const creneauRental = (startsAt: Date, hours: number) => ({
  */
 export type ModeTarifaire = "hourly" | "daily";
 
-/** Un vehicule sans tarif journalier ne se loue qu'a l'heure. */
-export const proposeLaJournee = (vehicule?: {daily_rate?: number | null} | null): boolean =>
-    typeof vehicule?.daily_rate === "number" && vehicule.daily_rate > 0;
+export const HEURES_PAR_JOUR = 24;
+
+/**
+ * La journee est-elle proposee ?
+ *
+ * Le serveur le DIT : le mode se coche en administration, et ne se deduit
+ * plus de la presence d'un tarif. Un vehicule qu'on ne veut plus louer a la
+ * journee garde son tarif — il sert encore a l'affichage — sans pour autant
+ * le proposer.
+ *
+ * Le repli sur le tarif ne vaut que pour une reponse d'un serveur qui ne
+ * connait pas encore le champ : la page se comporte alors comme avant.
+ */
+export const proposeLaJournee = (
+    vehicule?: {daily_rate?: number | null; allows_daily?: boolean} | null,
+): boolean =>
+    vehicule?.allows_daily !== undefined
+        ? vehicule.allows_daily
+        : typeof vehicule?.daily_rate === "number" && vehicule.daily_rate > 0;
+
+/** Jumelle de la precedente, pour l'heure. */
+export const proposeLHeure = (
+    vehicule?: {hourly_rate?: number | null; allows_hourly?: boolean} | null,
+): boolean =>
+    vehicule?.allows_hourly !== undefined
+        ? vehicule.allows_hourly
+        : typeof vehicule?.hourly_rate === "number" && vehicule.hourly_rate > 0;
+
+/**
+ * La duree minimale annoncee au client, en heures.
+ *
+ * La plus CONTRAIGNANTE du vehicule et du type de course : le serveur
+ * refusera la plus stricte, et annoncer la plus douce ferait composer une
+ * demande vouee au refus.
+ *
+ * Zero quand rien n'impose de minimum : la page n'affiche alors aucune
+ * contrainte, plutot qu'une contrainte qui n'existe pas.
+ */
+export const minimumAnnonce = (
+    vehicule?: {minimum_hours?: number | null} | null,
+    type?: {minimum_hours?: number | null} | null,
+): number => Math.max(vehicule?.minimum_hours ?? 0, type?.minimum_hours ?? 0);
+
+/**
+ * Le minimum, dit au client.
+ *
+ * En JOURNEES des qu'il en couvre une : « 2 jours minimum » se comprend,
+ * « 48 heures minimum » se calcule. `null` quand rien n'est impose — une
+ * ligne « aucun minimum » occuperait la place pour ne rien dire.
+ */
+export const minimumLisible = (heures: number): string | null => {
+    if (heures >= HEURES_PAR_JOUR) {
+        const jours = Math.round(heures / HEURES_PAR_JOUR);
+
+        return `${jours} jour${jours > 1 ? "s" : ""} minimum`;
+    }
+
+    return heures > 0 ? `${heures} heure${heures > 1 ? "s" : ""} minimum` : null;
+};
 
 /** Le mode lu d'un parametre d'URL. Inconnu ou absent, c'est l'heure. */
 export const modeDepuisParam = (valeur?: string | null): ModeTarifaire =>
     valeur === "daily" ? "daily" : "hourly";
-
-export const HEURES_PAR_JOUR = 24;
 
 /**
  * Les bornes d'une duree, et le delai de prevenance.
@@ -167,6 +221,7 @@ export const heuresPourMode = (
     mode: ModeTarifaire,
     heures: number,
     bornes: BornesDuree = BORNES_PAR_DEFAUT,
+    modePrecedent?: ModeTarifaire,
 ): number => {
     const {min, max} = bornesDuMode(mode, bornes);
 
@@ -176,7 +231,24 @@ export const heuresPourMode = (
         return borner(jours, min, max) * HEURES_PAR_JOUR;
     }
 
-    return borner(heures, min, max);
+    /*
+     * On vient de la journee : le nombre affiche etait un nombre de JOURS, et
+     * c'est lui qu'on garde — deux journees deviennent deux heures.
+     *
+     * Le total en heures etait replafonne au maximum horaire, si bien que
+     * 1 jour, 2 jours et 3 jours donnaient TOUS « 23 heures » : un nombre que
+     * le client n'avait jamais tape, et le meme quelle que soit sa demande.
+     * Une duree en jours ne tient pas en heures, et toute conversion de la
+     * duree reelle rend le meme resultat pour des demandes differentes.
+     *
+     * Sans mode precedent, un multiple de 24 trahit le mode journee : l'heure
+     * ne depasse jamais 23.
+     */
+    const venaitDeLaJournee = modePrecedent
+        ? modePrecedent === "daily"
+        : heures >= HEURES_PAR_JOUR && heures % HEURES_PAR_JOUR === 0;
+
+    return borner(venaitDeLaJournee ? heures / HEURES_PAR_JOUR : heures, min, max);
 };
 
 /**
@@ -360,6 +432,28 @@ export const departLePlusTot = (
     maintenant: number = Date.now(),
 ): Date => new Date(maintenant + Math.max(0, bornes.lead_time_minutes) * 60000);
 
+/**
+ * Ce depart est-il trop proche pour etre reserve ?
+ *
+ * Le proprietaire, le 17 octobre : « on ne peut pas commander a la meme
+ * heure, le minimum c'est 1 h avant. Il est 00h07, je ne peux pas commander
+ * a 00h07 : le minimum c'est 01h07. Donc tenir compte heure ET jour. On ne
+ * peut commander qu'au futur. »
+ *
+ * Compare des INSTANTS, pas des dates : un garde qui ne regarderait que le
+ * jour laisserait passer 00h07, puisque le jour est bien aujourd'hui. C'est
+ * exactement ce que l'attribut `min` d'un champ `time` ne sait pas faire —
+ * il ignore la date qui l'accompagne.
+ *
+ * La question se repose a chaque instant : un creneau compose a 23h50 pour
+ * 00h30 devient trop proche en restant a l'ecran.
+ */
+export const departTropProche = (
+    depart: Date,
+    bornes: BornesDuree = BORNES_PAR_DEFAUT,
+    maintenant: number = Date.now(),
+): boolean => depart.getTime() < departLePlusTot(bornes, maintenant).getTime();
+
 /** Paliers de places proposes au filtre. « 7+ » couvre les minibus. */
 export const PALIERS_PLACES = [2, 4, 5, 7];
 
@@ -489,13 +583,17 @@ export const pageSuivante = (meta?: Partial<MetaPagination> | null): number | un
  * Aucun calcul ici : les montants viennent du serveur et ne font que passer.
  */
 export interface MontantsRental {
+    /** La course seule, avant toute option. */
+    base_price?: number | null;
+    /** Le parking, quand le type le propose et que le client l'a coche. */
+    parking_fee?: number | null;
     total?: number | null;
     deposit?: number | null;
     balance?: number | null;
 }
 
 export interface LignePrix {
-    cle: "total" | "deposit" | "balance";
+    cle: "base" | "parking" | "total" | "deposit" | "balance";
     libelle: string;
     montant?: number | null;
 }
@@ -515,7 +613,30 @@ export const lignesDuPrix = (
 ) => {
     const close = accent === "total";
 
+    /*
+     * Le parking entre dans le TOTAL, et donc dans l'acompte : le client en
+     * paie sa part en ligne. Le laisser invisible, c'est lui facturer sans le
+     * dire — « si le prix du parking est paye dans le total general on doit le
+     * voir, et c'est super important ».
+     *
+     * Les deux lignes de detail n'apparaissent QUE s'il y a un parking a
+     * facturer. Sans option, la course seule vaut le total, et une ligne qui
+     * repete le total en-dessous se lit comme une double facturation.
+     */
+    const parking = montants?.parking_fee ?? 0;
+    const detaille = parking > 0;
+
     const toutes: LignePrix[] = [
+        ...(detaille
+            ? [
+                  {
+                      cle: "base" as const,
+                      libelle: "Course",
+                      montant: montants?.base_price,
+                  },
+                  {cle: "parking" as const, libelle: "Parking", montant: parking},
+              ]
+            : []),
         {cle: "total", libelle: "Total de la course", montant: montants?.total},
         {
             cle: "deposit",

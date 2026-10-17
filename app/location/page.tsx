@@ -4,9 +4,10 @@ import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import {FaMagnifyingGlass} from "react-icons/fa6";
 
-import {useNomsCommerciaux, useVehicleList} from "@/hooks/useRental";
+import {useNomsCommerciaux, useRentalConfig, useTypesCourse, useVehicleList} from "@/hooks/useRental";
 import EmptyState from "@/components/ui/EmptyState";
 import CarteVehicule from "@/components/rental/CarteVehicule";
+import BanniereLocation from "@/components/rental/BanniereLocation";
 import FiltresVehicules from "@/components/rental/FiltresVehicules";
 
 /**
@@ -56,25 +57,27 @@ export default function PageCatalogue() {
         places,
         setPlaces,
         placesCounts,
+        filtres,
+        setFiltres,
         hasActiveFilter,
         resetFilters,
     } = useVehicleList(term);
+
+    /*
+     * Les choix offerts par les filtres viennent du serveur : communes
+     * desservies et types de course s'ouvrent et se ferment en
+     * administration, et les ecrire ici demanderait une livraison a chaque
+     * changement.
+     */
+    const {data: configRental} = useRentalConfig();
+    const typesCourse = useTypesCourse();
 
     const enRecherche = term.length > 0;
 
     return (
         <div className="min-h-svh bg-surface-sunken pt-[calc(var(--header-h)+24px)]">
             <div className="mx-auto max-w-[1400px] px-4 pb-16 sm:px-5">
-                <header className="mb-5">
-                    <p className="text-caption text-ink-muted">Avec chauffeur · {noms.rental}</p>
-                    <h1 className="text-display font-extrabold text-secondaryColor">
-                        Louer une voiture
-                    </h1>
-                    <p className="mt-2 max-w-2xl text-body text-ink-muted">
-                        Choisissez votre voiture, puis votre créneau sur la fiche. Un acompte
-                        retient le véhicule, le solde se règle en espèces au chauffeur.
-                    </p>
-                </header>
+                <BanniereLocation nom={noms.rental} nombre={sourceCount} />
 
                 <label className="relative mb-4 block">
                     <span className="sr-only">Rechercher une marque ou un modèle</span>
@@ -103,6 +106,10 @@ export default function PageCatalogue() {
                         onSelectPlaces={setPlaces}
                         actif={hasActiveFilter}
                         onReset={resetFilters}
+                        filtres={filtres}
+                        onFiltres={setFiltres}
+                        communes={configRental?.towns ?? []}
+                        typesCourse={typesCourse}
                     />
                 </div>
 

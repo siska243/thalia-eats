@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-query";
 
 import {FetchData} from "@/helpers/FetchData";
-import {RouteRental} from "@/helpers/Route";
+import {FiltresCatalogue, RouteRental} from "@/helpers/Route";
 import {
     BORNES_PAR_DEFAUT,
     BornesDuree,
@@ -21,7 +21,7 @@ import {
     ModeTarifaire,
     pageSuivante,
 } from "@/helpers/rental";
-import {RentalBookingType, RentalSuiviType, RentalVehicleType} from "@/types/rental";
+import {RentalBookingType, RentalSuiviType, RentalVehicleType, TypeCourse} from "@/types/rental";
 
 const CATALOGUE_KEY = "rental:vehicles";
 const BOOKINGS_KEY = "rental:bookings";
@@ -45,6 +45,8 @@ const BOOKINGS_KEY = "rental:bookings";
  * Elle se lit sans compte, comme le catalogue, et change rarement : une heure
  * de fraicheur evite de la redemander a chaque fiche ouverte.
  */
+export type {TypeCourse} from "@/types/rental";
+
 export interface RentalConfig {
     brand_food?: string;
     brand_rental?: string;
@@ -52,6 +54,7 @@ export interface RentalConfig {
     out_of_zone_message?: string;
     towns?: {id: number; slug: string; title: string}[];
     duree?: Partial<BornesDuree>;
+    course_types?: TypeCourse[];
 }
 
 export const useRentalConfig = () =>
@@ -64,6 +67,15 @@ export const useRentalConfig = () =>
         },
         staleTime: 60 * 60 * 1000,
     });
+
+/**
+ * Les types de course proposes.
+ *
+ * Vide tant que la configuration n'est pas arrivee, ou si le referentiel n'en
+ * contient aucun : l'ecran n'affiche alors rien de nouveau et la reservation
+ * part sans type, comme avant.
+ */
+export const useTypesCourse = (): TypeCourse[] => useRentalConfig().data?.course_types ?? [];
 
 /** Les bornes en vigueur, repli compris : un seul endroit les derive. */
 export const useBornesDuree = (): BornesDuree => {
@@ -108,11 +120,18 @@ export const useRentalVehicle = (
     debut?: string,
     fin?: string,
     mode: ModeTarifaire = "hourly",
+    courseTypeId?: number,
+    parking?: boolean,
 ) =>
     useQuery({
-        queryKey: ["rental:vehicle", slug, debut, fin, mode],
+        // Le type et le parking entrent dans la cle pour la meme raison que le
+        // mode : ils changent le prix, et sans eux la fiche servirait le devis
+        // du type precedent.
+        queryKey: ["rental:vehicle", slug, debut, fin, mode, courseTypeId, parking],
         queryFn: async () => {
-            const reponse = await FetchData.getData(RouteRental.vehicle(slug!, debut, fin, mode));
+            const reponse = await FetchData.getData(
+                RouteRental.vehicle(slug!, debut, fin, mode, courseTypeId, parking),
+            );
 
             return contenuRental<RentalVehicleType>(reponse);
         },
@@ -169,6 +188,17 @@ export interface NouvelleReservation {
      */
     pickup_town_id?: number;
     dropoff_location?: string | null;
+    /**
+     * Le type de course, son commentaire et l'option parking.
+     *
+     * Les trois sont facultatifs : sans type, le serveur chiffre et accepte
+     * exactement comme avant. Le commentaire devient obligatoire quand LE TYPE
+     * le demande — et c'est le serveur qui le refuse, l'ecran ne fait que
+     * l'eviter au client.
+     */
+    course_type_id?: number;
+    course_note?: string;
+    parking?: boolean;
 }
 
 export const useRentalActions = () => {
@@ -305,11 +335,19 @@ export const useVehicleList = (term: string) => {
     /** Nombre de places minimum, ou null pour tous. */
     const [places, setPlaces] = useState<number | null>(null);
 
+    /*
+     * Ces filtres-la partent au SERVEUR : ils entrent donc dans la cle de
+     * requete, sans quoi changer de commune rendrait la page deja en cache.
+     * Les trois au-dessus restent locaux — ils trient et masquent ce qui est
+     * deja descendu, sans rien redemander.
+     */
+    const [filtres, setFiltres] = useState<FiltresCatalogue>({});
+
     const query = useInfiniteQuery({
-        queryKey: [CATALOGUE_KEY, term],
+        queryKey: [CATALOGUE_KEY, term, filtres],
         queryFn: async ({pageParam}) => {
             const reponse = await FetchData.getData(
-                RouteRental.catalogue(term || undefined, pageParam),
+                RouteRental.catalogue(term || undefined, pageParam, filtres),
             );
 
             // Les erreurs axios sont retournees : `contenuRental` les leve,
@@ -350,12 +388,17 @@ export const useVehicleList = (term: string) => {
     const pages = query.data?.pages ?? [];
     const total = pages[pages.length - 1]?.meta?.total ?? source.length;
 
-    const hasActiveFilter = dispoOnly || places !== null || sortPrice;
+    const filtreServeurPose = Boolean(
+        filtres.cityId || filtres.townIds?.length || filtres.courseTypeId || filtres.proposes,
+    );
+
+    const hasActiveFilter = dispoOnly || places !== null || sortPrice || filtreServeurPose;
 
     const resetFilters = useCallback(() => {
         setDispoOnly(false);
         setPlaces(null);
         setSortPrice(false);
+        setFiltres({});
     }, []);
 
     return {
@@ -377,6 +420,8 @@ export const useVehicleList = (term: string) => {
         places,
         setPlaces,
         placesCounts,
+        filtres,
+        setFiltres,
         hasActiveFilter,
         resetFilters,
     };

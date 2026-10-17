@@ -9,6 +9,8 @@
  * Les types du chauffeur ne sont pas repris : il n'a pas d'ecran web.
  */
 
+import {ModeTarifaire} from "@/helpers/rental";
+
 export type RentalCurrencyType = {
     id?: number;
     title?: string;
@@ -27,11 +29,42 @@ export type RentalQuoteType = {
     /** Les unites facturees, entamees comprises. */
     billed_units?: number;
     duration_hours: number;
+    /**
+     * Le detail du total, pour que la page puisse dire d'ou vient le montant.
+     *
+     * Le parking entre dans le TOTAL, donc dans l'acompte : le client en paie
+     * sa part en ligne. Sans ces deux champs, il la paierait sans la voir.
+     *
+     * Nuls sur les reservations d'avant les types de course : la page
+     * n'affiche alors aucun detail, comme avant.
+     */
+    base_price?: number | null;
+    parking_fee?: number | null;
     total: number;
     deposit: number;
     balance: number;
     currency?: RentalCurrencyType | null;
 };
+
+/**
+ * Un type de course, tel que le serveur le decrit.
+ *
+ * **L'ecran ne connait AUCUN code.** Il lit les regles portees par la ligne —
+ * duree minimale, mode impose, commentaire exige, option parking — et s'y
+ * conforme. C'est la condition pour qu'un quatrieme type cree en
+ * administration apparaisse ici sans qu'on relivre le site.
+ */
+export interface TypeCourse {
+    id: number;
+    code: string;
+    title: string;
+    description?: string | null;
+    minimum_hours?: number | null;
+    forced_mode?: ModeTarifaire | null;
+    note_required: boolean;
+    parking_option: boolean;
+    parking_hourly_fee: number;
+}
 
 export type RentalVehicleType = {
     uid: string;
@@ -50,6 +83,34 @@ export type RentalVehicleType = {
      * qu'un prix invente.
      */
     daily_rate?: number | null;
+    /**
+     * Le tarif qui S'APPLIQUE a la course demandee.
+     *
+     * Les deux champs au-dessus restent le prix habituel du vehicule ; ceux-ci
+     * tiennent compte du type choisi, et retombent dessus quand le type n'a
+     * pas de tarif propre.
+     */
+    applied_rates?: {hourly?: number | null; daily?: number | null};
+    /**
+     * Les types de course que CE vehicule propose.
+     *
+     * Ceux dont le tarif a ete saisi sur sa fiche, et eux seuls. Vide — le cas
+     * de tout le parc existant — l'ecran ne propose aucun type.
+     */
+    course_types?: TypeCourse[];
+    /**
+     * Ce que ce vehicule propose, et ce qu'il impose.
+     *
+     * Les modes sont COCHES en administration : ils ne se deduisent plus de la
+     * presence d'un tarif. `minimum_hours` reste nul quand le vehicule
+     * n'impose rien — la page ne doit pas annoncer une contrainte qui
+     * n'existe pas. `deposit_percentage`, lui, est toujours rempli : c'est
+     * celui qui sera preleve, et le client doit savoir ce qu'il paie en ligne.
+     */
+    allows_hourly?: boolean;
+    allows_daily?: boolean;
+    minimum_hours?: number | null;
+    deposit_percentage?: number;
     currency?: RentalCurrencyType | null;
     /** Present au catalogue seulement : le prix du creneau demande. */
     quote?: RentalQuoteType | null;
@@ -61,6 +122,18 @@ export type RentalVehicleType = {
      * qu'il sera peut-etre libre demain.
      */
     available?: boolean;
+    /** La ville ou ce vehicule travaille. Nulle : il accepte toutes les villes. */
+    city?: {title: string; slug: string} | null;
+    /**
+     * Ce vehicule peut-il prendre la course demandee ?
+     *
+     * Calcule par le SERVEUR a partir de la commune de prise en charge : sa
+     * ville, et les communes d'ou il sort. Vrai quand on ne sait pas.
+     *
+     * Le catalogue reste MONDIAL : le vehicule d'ailleurs est rendu et grise,
+     * exactement comme celui qui est en course.
+     */
+    reservable?: boolean;
 };
 
 export type RentalChauffeurType = {
@@ -104,6 +177,9 @@ export type RentalBookingType = {
     dropoff_lng?: number | null;
 
     hourly_rate: number;
+    /** Le detail du total, comme sur le devis : la course, puis le parking. */
+    base_price?: number | null;
+    parking_fee?: number | null;
     total: number;
     deposit: number;
     balance: number;

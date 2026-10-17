@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
+import CarteConsentie from "@/components/commons/CarteConsentie";
 import { GoogleMap, Marker, useLoadScript, DirectionsRenderer } from "@react-google-maps/api";
 import useReferentialData from "@/hooks/useQueryTanStack";
 import {Route} from "@/helpers/Route";
@@ -30,7 +31,7 @@ type CommandeSuivieType = {
     user_delivery_complet_adress?: string;
 };
 
-export default function TrackingPage({currentOrder}: {currentOrder?: CommandeSuivieType | null}) {
+function CarteLivraison({currentOrder}: {currentOrder?: CommandeSuivieType | null}) {
 
     const {data} = useReferentialData<TrackType>({
         url: Route.get_track_uid(currentOrder?.uid ?? ""),
@@ -154,5 +155,20 @@ export default function TrackingPage({currentOrder}: {currentOrder?: CommandeSui
 
             )}
         </div>
+    );
+}
+
+/**
+ * La carte de suivi d'une livraison, sous consentement.
+ *
+ * Le composant interne n'est MONTÉ qu'avec l'accord : non monté, il
+ * n'appelle pas `useLoadScript`, et le script de Google n'est pas chargé.
+ * Le cacher par du CSS l'aurait chargé quand même.
+ */
+export default function TrackingPage(props: {currentOrder?: CommandeSuivieType | null}) {
+    return (
+        <CarteConsentie>
+            <CarteLivraison {...props} />
+        </CarteConsentie>
     );
 }

@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "postbuild": "next-sitemap"
   },
   "dependencies": {
@@ -50,6 +52,7 @@
     "eslint-config-next": "^16.3.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "5.7.2"
+    "typescript": "5.7.2",
+    "vitest": "^3.2.4"
   }
 }

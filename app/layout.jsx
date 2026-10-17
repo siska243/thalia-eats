@@ -33,8 +33,13 @@ export const metadata = {
 };
 
 export default function RootLayout({children}) {
+    /*
+     * Le site est entierement en francais. `lang="en"` faisait lire chaque
+     * page par un synthetiseur vocal anglais, et trompait les moteurs sur la
+     * langue du contenu.
+     */
     return (
-        <html lang="en">
+        <html lang="fr">
         <link rel="icon" href="/favicon.ico"/>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
         <link rel="manifest" href="/site.webmanifest"/>

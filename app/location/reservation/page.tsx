@@ -98,7 +98,36 @@ const TunnelReservation = () => {
      */
     const mode = modeDepuisParam(params.get("mode"));
 
-    const {data: vehicle} = useRentalVehicle(slug, debut, fin, mode);
+    /*
+     * Le type de course choisi sur la fiche, retrouvé dans le référentiel.
+     *
+     * Seul son IDENTIFIANT voyage : ses règles viennent de la configuration,
+     * une seule source. Les recopier dans l'URL aurait figé un commentaire
+     * exigé ou un tarif de parking au moment du clic.
+     */
+    /*
+     * L'IDENTIFIANT vient de l'URL, les REGLES du vehicule charge.
+     *
+     * L'identifiant doit etre connu avant la requete — c'est lui qui fait
+     * chiffrer la course — tandis que la duree minimale, le mode impose et
+     * l'option parking vivent sur la ligne du referentiel que le vehicule
+     * rapporte. Une seule source pour les regles.
+     */
+    const typeCourseId = Number(params.get("course_type_id")) || undefined;
+    const parking = params.get("parking") === "1";
+    const [commentaire, setCommentaire] = useState("");
+
+    const {data: vehicle} = useRentalVehicle(
+        slug,
+        debut,
+        fin,
+        mode,
+        typeCourseId,
+        parking,
+    );
+
+    const typeCourse =
+        (vehicle?.course_types ?? []).find((type) => type.id === typeCourseId) ?? null;
     const {reserver, payerAcompte} = useRentalActions();
 
     const {data: configRental} = useRentalConfig();
@@ -258,6 +287,20 @@ const TunnelReservation = () => {
             return;
         }
 
+        /*
+         * Le commentaire exigé par LE TYPE, demandé ici.
+         *
+         * C'est la ligne du référentiel qui l'exige, pas un code écrit ici :
+         * un quatrième type qui le demande sera traité sans relivraison. Le
+         * serveur refuse de toute façon — on évite seulement au client d'aller
+         * jusqu'au paiement pour l'apprendre.
+         */
+        if (!reglementSeul && typeCourse?.note_required && !commentaire.trim()) {
+            setErreur(`Précisez votre course « ${typeCourse.title} » avant de continuer.`);
+
+            return;
+        }
+
         setErreur(null);
         // `ChoixPaiement` nomme ses deux boutons « carte » et « mobile », la
         // passerelle attend « cart » : le libelle de l'ecran et le litteral du
@@ -302,6 +345,11 @@ const TunnelReservation = () => {
                     // La commune, quand on la connaît : c'est elle que le
                     // serveur confronte à la zone desservie.
                     pickup_town_id: zone.etat === "desservie" ? zone.townId : undefined,
+                    // Le type, son commentaire et l'option parking. Absents,
+                    // le serveur chiffre et accepte exactement comme avant.
+                    course_type_id: typeCourse?.id,
+                    course_note: commentaire.trim() || undefined,
+                    parking: parking || undefined,
                 });
             }
 
@@ -376,7 +424,7 @@ const TunnelReservation = () => {
                 {vehiculeAffiche ? (
                     <div className="mb-5 flex items-center gap-3 rounded-card border border-surface-border bg-surface p-3">
                         <span className="relative h-16 w-24 shrink-0 overflow-hidden rounded-control bg-surface-sunken">
-                            <PhotoVehicule src={vehiculeAffiche.image} alt="" tailleIcone={22} />
+                            <PhotoVehicule src={vehiculeAffiche.image} alt="" />
                         </span>
 
                         <div className="min-w-0">
@@ -386,7 +434,7 @@ const TunnelReservation = () => {
                             <p className="flex flex-wrap items-center gap-x-3 text-caption text-ink-muted">
                                 {vehiculeAffiche.seats ? (
                                     <span className="flex items-center gap-1">
-                                        <FaUsers aria-hidden /> {vehiculeAffiche.seats} places
+                                        <FaUsers aria-hidden /> {vehiculeAffiche.seats} personnes
                                     </span>
                                 ) : null}
                                 <span>
@@ -493,6 +541,24 @@ const TunnelReservation = () => {
                                 }
                             />
                         </div>
+
+                        {/*
+                          * Le commentaire, quand le type le demande. Il vit
+                          * avec l'adresse : c'est là que le client décrit sa
+                          * course, pas au moment de payer.
+                          */}
+                        {typeCourse?.note_required ? (
+                            <ChampTexte
+                                label={`Précisions sur votre course « ${typeCourse.title} »`}
+                                requis
+                                placeholder="Destination, numéro de vol, heure d'arrivée…"
+                                aide={typeCourse.description ?? undefined}
+                                value={commentaire}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    setCommentaire(e.target.value)
+                                }
+                            />
+                        ) : null}
 
                         {zone.etat === "hors-zone" ? (
                             <HorsZone

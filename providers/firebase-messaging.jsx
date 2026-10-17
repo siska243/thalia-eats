@@ -7,6 +7,7 @@ import {messaging} from "@/lib/firebase";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
+import {useConsentement} from "@/providers/consentement-provider";
 
 /**
  * Notifications Firebase, et redirection sur retour de paiement.
@@ -31,7 +32,28 @@ import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
 const FirebaseMessaging = () => {
     const router = useRouter();
 
+    /*
+     * LES NOTIFICATIONS ATTENDENT LE OUI (T132).
+     *
+     * Ce composant enregistre un service worker chez Google et demande un
+     * jeton rattache au navigateur : c'est un tiers, et il ne doit rien
+     * faire avant que le visiteur l'ait autorise.
+     *
+     * CE QUE LE REFUS COUTE, verifie et non suppose : ce composant porte
+     * aussi la redirection au retour de paiement, declenchee par un message
+     * push. Elle ne part donc plus pour qui refuse.
+     *
+     * Ce n'est pas une regression : `PaymentChecker` interroge le serveur
+     * toutes les cinq secondes sur le meme numero de commande et redirige de
+     * son cote, sans Firebase. Le push ne faisait qu'arriver un peu plus
+     * tot.
+     */
+    const {autorise} = useConsentement();
+    const notificationsAutorisees = autorise("notifications");
+
     useEffect(() => {
+        if (!notificationsAutorisees) return;
+
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/firebase-messaging-sw.js").catch(() => {
                 // L'enregistrement echoue en navigation privee et sur http :
@@ -81,7 +103,7 @@ const FirebaseMessaging = () => {
 
             router.push(destinations[String(avis?.status?.code)] ?? "/payement/cancel");
         });
-    }, [router]);
+    }, [notificationsAutorisees, router]);
 
     return null;
 };

@@ -2,7 +2,9 @@ import React from "react";
 import Link from "next/link";
 import {FaCalendarDays, FaLock, FaUsers} from "react-icons/fa6";
 
+import {etatVehicule} from "@/helpers/etatVehicule";
 import {formatPrix} from "@/helpers/openingHours";
+import {proposeLaJournee} from "@/helpers/rental";
 import {RentalVehicleType} from "@/types/rental";
 import PhotoVehicule from "@/components/rental/PhotoVehicule";
 
@@ -24,10 +26,18 @@ import PhotoVehicule from "@/components/rental/PhotoVehicule";
  * choisies, et c'est le serveur qui le calcule.
  */
 export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
-    const libre = vehicle.available !== false;
+    // La regle vit dans `etatVehicule`, une seule fois, et le mobile lit la
+    // meme : les deux clients doivent dire la meme chose du meme vehicule.
+    const {libre, libelle} = etatVehicule(vehicle);
     const devise = vehicle.currency?.code;
 
-    const journalier = vehicle.daily_rate
+    /*
+     * Le tarif journalier n'est annonce que si la journee est PROPOSEE.
+     * La presence du tarif ne suffit plus : un vehicule qu'on ne veut plus
+     * louer a la journee garde son prix, et afficher un prix qu'on ne peut
+     * pas reserver est pire que de ne rien dire.
+     */
+    const journalier = proposeLaJournee(vehicle)
         ? `${formatPrix(vehicle.daily_rate, devise)} / jour`
         : "À l'heure";
 
@@ -37,7 +47,7 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
             className="flex items-center gap-3.5 rounded-card bg-surface p-3 shadow-card transition-shadow duration-150 hover:shadow-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:p-4"
         >
             <span className="relative h-[84px] w-[104px] shrink-0 overflow-hidden rounded-control bg-surface-sunken sm:h-[104px] sm:w-[140px]">
-                <PhotoVehicule src={vehicle.image} alt="" tailleIcone={28} />
+                <PhotoVehicule src={vehicle.image} alt="" />
 
                 {!libre ? (
                     <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-ink-inverse">
@@ -69,7 +79,7 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
                                 : "bg-surface-sunken text-ink-muted"
                         }`}
                     >
-                        {libre ? "Libre" : "En course"}
+                        {libelle}
                     </span>
                 </span>
 
@@ -82,7 +92,8 @@ export default function CarteVehicule({vehicle}: {vehicle: RentalVehicleType}) {
                 <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-caption text-ink-muted">
                     {vehicle.seats ? (
                         <span className="flex items-center gap-1">
-                            <FaUsers aria-hidden /> {vehicle.seats} places
+                            <FaUsers aria-hidden /> {vehicle.seats} personne
+                        {(vehicle.seats ?? 0) > 1 ? "s" : ""}
                         </span>
                     ) : null}
 

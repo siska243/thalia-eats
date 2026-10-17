@@ -2,13 +2,12 @@
 
 import React, {useState} from "react";
 import Image from "next/image";
-import {FaCar} from "react-icons/fa6";
+
+import voitureParDefaut from "@/public/assets/thalia-trans.jpg";
 
 interface Props {
     src?: string | null;
     alt?: string;
-    /** Taille de l'icône de repli, en pixels. */
-    tailleIcone?: number;
 }
 
 /**
@@ -19,17 +18,28 @@ interface Props {
  * image cassée, le navigateur affiche alors son texte alternatif en travers de
  * la carte — c'est le défaut déjà corrigé sur les plats.
  *
- * Le repli est une silhouette de voiture et non l'assiette de `ImagePlat` :
- * sur un catalogue de location, une photo de plat se lit comme une erreur.
+ * Le repli est la voiture de la marque et non l'assiette de `ImagePlat` : sur
+ * un catalogue de location, une photo de plat se lit comme une erreur.
+ *
+ * Depuis le 16 octobre c'est la photo fournie par le proprietaire, et non plus
+ * un pictogramme gris : un vehicule sans photo reste une offre, et c'est ce
+ * que le substitut doit montrer. Elle est livree en tuile CARREE, exactement
+ * au meme format que celle de Thalia Eats, et se rend donc comme une vraie
+ * photo de vehicule.
  */
-export default function PhotoVehicule({src, alt = "", tailleIcone = 26}: Props) {
+export default function PhotoVehicule({src, alt = ""}: Props) {
     const [cassee, setCassee] = useState(false);
 
     if (!src || cassee) {
         return (
-            <span className="flex h-full w-full items-center justify-center bg-surface-sunken text-ink-subtle">
-                <FaCar size={tailleIcone} aria-hidden />
-            </span>
+            <Image
+                src={voitureParDefaut}
+                alt=""
+                aria-hidden
+                fill
+                sizes="(max-width: 640px) 40vw, 240px"
+                className="object-cover"
+            />
         );
     }
 

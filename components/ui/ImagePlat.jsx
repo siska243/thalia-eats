@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import Image from "next/image";
-import imageParDefaut from "@/public/assets/images/food.png";
+import imageParDefaut from "@/public/assets/thalia-eats.jpg";
 
 /**
  * Une image de plat ou de restaurant, avec repli.
@@ -15,6 +15,11 @@ import imageParDefaut from "@/public/assets/images/food.png";
  * Les URL d'images viennent du backend, et toutes ne repondent pas : anciens
  * fichiers supprimes, ou schema `https` sur un backend local en HTTP. Une
  * image manquante ne doit pas defigurer la carte.
+ *
+ * Le repli est la photo fournie par le proprietaire le 16 octobre. Elle
+ * remplace food.png, qui pesait 1,7 Mo pour une vignette : la nouvelle fait
+ * 105 Ko, recadree au carre sur l'assiette parce qu'un plan large ne montre
+ * plus rien d'identifiable a la taille d'une vignette.
  */
 export default function ImagePlat({src, alt = "", className = "", repli = imageParDefaut, ...props}) {
     const [cassee, setCassee] = useState(false);

@@ -47,6 +47,16 @@ export type ProductType = {
     "picture": string,
     "is_promotional": number | boolean,
     "is_in_forward": number | boolean,
+    /**
+     * Le stock restant, quand le plat est suivi.
+     *
+     * `null` veut dire « non suivi » : ni compteur a afficher, ni limite a
+     * opposer. C'est l'etat de tout le catalogue d'aujourd'hui, et l'ecran
+     * doit alors se comporter exactement comme avant.
+     */
+    "stock_disponible"?: number | null,
+    /** Calcule par le SERVEUR, jamais ici : la regle ne vit qu'a un endroit. */
+    "epuise"?: boolean,
     "restaurant": RestaurantType
 }
 
@@ -63,7 +73,13 @@ export type RestaurantType = {
     "whatsapp": string,
     "location": null,
     "commune": CommuneType,
-    "image": string
+    "image": string,
+    /** Distance entre le restaurant et l'adresse de livraison. Null si inconnue. */
+    "distance_km"?: number | null,
+    /** Faux quand le restaurant est hors du rayon autorisé. Vrai par défaut. */
+    "livrable"?: boolean,
+    /** La phrase du serveur. Jamais recopiée ici. */
+    "portee_message"?: string | null
 }
 export type OpenType = {
     "day": string,

@@ -54,6 +54,46 @@ const useCart = () => {
          * pas encore : un appel direct a l'API passe toujours. C'est le ticket
          * cote backend qui fermera reellement la porte.
          */
+        /*
+         * Hors zone de livraison : rien n'entre dans le panier.
+         *
+         * Pose au meme endroit et pour la meme raison que le controle
+         * d'ouverture juste en dessous : tous les chemins d'ajout passent
+         * par cette fonction. Le client remplissait un panier que le
+         * paiement allait refuser — une promesse tenue trop tard.
+         *
+         * `livrable` est faux uniquement si le serveur l'a dit. Absent, on
+         * laisse passer : le refus reel vit de toute facon sur le serveur,
+         * au devis comme a la commande.
+         */
+        if (product?.restaurant?.livrable === false) {
+            notification(
+                product.restaurant.portee_message ??
+                    `${product?.restaurant?.name ?? "Ce restaurant"} est trop loin de votre adresse de livraison.`,
+            )
+
+            return
+        }
+
+        /*
+         * Plat epuise : rien n'entre dans le panier non plus.
+         *
+         * Au meme endroit que les deux autres refus, et pour la meme raison :
+         * tous les chemins d'ajout passent par cette fonction. `epuise` est
+         * calcule par le SERVEUR, jamais recopie ici - deux clients qui
+         * recalculent la meme regle finissent par dire le contraire l'un de
+         * l'autre, et c'est deja arrive sur les horaires d'ouverture.
+         *
+         * Absent, on laisse passer : un plat dont le stock n'est pas suivi,
+         * c'est-a-dire tout le catalogue d'aujourd'hui, ne doit rien voir
+         * changer.
+         */
+        if (product?.epuise === true) {
+            notification(`${product?.title ?? "Ce plat"} n'est plus disponible pour le moment.`)
+
+            return
+        }
+
         const ouverture = etatOuverture(product?.restaurant?.opens)
 
         if (!ouverture.ouvert) {

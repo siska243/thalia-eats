@@ -1,9 +1,16 @@
 "use client";
 
 import Image from "next/image";
+
+import photoVoiture from "@/public/assets/thalia-trans-large.jpg";
 import Link from "next/link";
-import fondImage from "@/public/assets/images/homeEat.png";
-import {FaCar, FaChevronRight} from "react-icons/fa6";
+/*
+ * La photo fournie par le proprietaire, exportee en 2000x820 depuis son
+ * original de 6240x4160. La tuile carree de 640 sert aux vignettes ; etiree
+ * derriere un titre en pleine largeur, elle aurait ete floue.
+ */
+import fondImage from "@/public/assets/thalia-eats-large.jpg";
+import {FaChevronRight} from "react-icons/fa6";
 import {formatPrix} from "@/helpers/openingHours";
 import {useNomsCommerciaux} from "@/hooks/useRental";
 
@@ -145,10 +152,6 @@ export default function Hero({previews = []}) {
 
                         <span className="relative flex flex-col gap-5">
                             <span className="flex items-center gap-3">
-                                <span className="flex h-11 w-11 items-center justify-center rounded-pill bg-brand-500 text-ink-inverse">
-                                    <FaCar size={20} aria-hidden />
-                                </span>
-
                                 <span className="flex flex-col">
                                     <span className="text-caption uppercase tracking-wide text-brand-300">
                                         {noms.rental}
@@ -157,6 +160,31 @@ export default function Hero({previews = []}) {
                                         Une voiture avec chauffeur
                                     </span>
                                 </span>
+                            </span>
+
+                            {/*
+                              * La VOITURE, en photo et en grand.
+                              *
+                              * Elle a d'abord remplace le pictogramme FaCar
+                              * dans sa pastille de 44 px : le proprietaire a
+                              * continue de lire une icone, et il avait
+                              * raison — a cette taille une photo n'est plus
+                              * qu'une tache. Elle prend donc toute la
+                              * largeur de la carte.
+                              *
+                              * Cadrage dedie en 960x420, taille dans la
+                              * hauteur du detourage : la tuile carree aurait
+                              * laisse deux bandes de gris vide.
+                              */}
+                            <span className="relative block h-32 w-full overflow-hidden rounded-card sm:h-36">
+                                <Image
+                                    src={photoVoiture}
+                                    alt=""
+                                    aria-hidden
+                                    fill
+                                    sizes="(max-width: 1024px) 100vw, 360px"
+                                    className="object-cover"
+                                />
                             </span>
 
                             <span className="text-body leading-6 text-white/80">

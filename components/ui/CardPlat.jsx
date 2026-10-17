@@ -27,6 +27,17 @@ export default function CardPlat({product, className = ""}) {
     const horaire = etatOuverture(product?.restaurant?.opens);
     const ouvert = horaire.ouvert;
 
+    /*
+     * Deux motifs distincts de refus, et la carte doit dire LEQUEL : le plat
+     * est epuise, ou le restaurant est ferme. Revenir demain ne sert a rien si
+     * le restaurant rouvre a 18h.
+     *
+     * `epuise` vient du SERVEUR et n'est jamais recalcule ici. Absent -
+     * c'est-a-dire tout le catalogue d'aujourd'hui - rien ne change.
+     */
+    const epuise = product?.epuise === true;
+    const commandable = ouvert && !epuise;
+
     return (
         <article
             className={`group flex h-full flex-col overflow-hidden rounded-card bg-surface shadow-card transition-shadow duration-200 hover:shadow-raised ${className}`}
@@ -37,10 +48,18 @@ export default function CardPlat({product, className = ""}) {
                     alt={product?.title ?? ""}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-200 motion-safe:group-hover:scale-105"
+                    className={`object-cover transition-transform duration-200 motion-safe:group-hover:scale-105 ${
+                        epuise ? "opacity-40" : ""
+                    }`}
                 />
 
-                {enPromotion ? (
+                {/* Epuise prime sur la promotion : une remise sur un plat
+                    qu'on ne peut pas commander n'est qu'une fausse promesse. */}
+                {epuise ? (
+                    <span className="absolute inset-0 flex items-center justify-center bg-surface/70 text-caption font-bold uppercase text-danger">
+                        Épuisé
+                    </span>
+                ) : enPromotion ? (
                     <span className="absolute left-3 top-3 rounded-pill bg-danger px-2.5 py-1 text-caption font-bold text-white">
                         Promo
                     </span>
@@ -79,15 +98,23 @@ export default function CardPlat({product, className = ""}) {
                     <button
                         type="button"
                         onClick={() => handleAddProductCart(product)}
-                        disabled={!ouvert}
+                        disabled={!commandable}
                         aria-label={
-                            ouvert
+                            commandable
                                 ? `Ajouter ${product?.title ?? "ce plat"} au panier`
-                                : `${product?.restaurant?.name ?? "Ce restaurant"} est fermé`
+                                : epuise
+                                  ? `${product?.title ?? "Ce plat"} est épuisé`
+                                  : `${product?.restaurant?.name ?? "Ce restaurant"} est fermé`
                         }
-                        title={ouvert ? undefined : libelleFermeture(horaire)}
+                        title={
+                            commandable
+                                ? undefined
+                                : epuise
+                                  ? "Plat épuisé"
+                                  : libelleFermeture(horaire)
+                        }
                         className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-pill transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${
-                            ouvert
+                            commandable
                                 ? "bg-brand-500 text-ink-inverse hover:bg-brand-600"
                                 : "cursor-not-allowed bg-surface-sunken text-ink-subtle"
                         }`}
