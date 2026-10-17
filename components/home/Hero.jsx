@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+
+import VignetteUnivers from "@/components/commons/VignetteUnivers";
 import Link from "next/link";
 import fondImage from "@/public/assets/images/homeEat.png";
-import {FaCar, FaChevronRight} from "react-icons/fa6";
+import {FaChevronRight} from "react-icons/fa6";
 import {formatPrix} from "@/helpers/openingHours";
 import {useNomsCommerciaux} from "@/hooks/useRental";
 
@@ -145,9 +147,14 @@ export default function Hero({previews = []}) {
 
                         <span className="relative flex flex-col gap-5">
                             <span className="flex items-center gap-3">
-                                <span className="flex h-11 w-11 items-center justify-center rounded-pill bg-brand-500 text-ink-inverse">
-                                    <FaCar size={20} aria-hidden />
-                                </span>
+                                {/*
+                                  * La photo de la marque, et non un
+                                  * pictogramme : c'est ce que le mobile
+                                  * montre au meme endroit depuis T109, et
+                                  * le web etait reste au FaCar dans sa
+                                  * pastille orange.
+                                  */}
+                                <VignetteUnivers univers="trans" taille={44} />
 
                                 <span className="flex flex-col">
                                     <span className="text-caption uppercase tracking-wide text-brand-300">
