@@ -32,6 +32,17 @@ export default function PageConnexion() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
+    /*
+     * LE SECOND FACTEUR SE SAISIT ICI, pas sur une page a part.
+     *
+     * Toute la redirection — y compris le `?retour=` qui ramene Thalia Trans
+     * a sa voiture deja choisie — vit dans cette page. Une seconde page
+     * aurait voulu dire la recopier, et un client aurait fini sur l'accueil
+     * apres avoir rempli tout son parcours.
+     */
+    const [defi, setDefi] = useState(null);
+    const [code, setCode] = useState("");
+
     const {refetch} = useGetCurrentUser();
     const dispatch = useDispatch();
     const router = useRouter();
@@ -51,15 +62,22 @@ export default function PageConnexion() {
                 return;
             }
 
+            /*
+             * Le compte a un second facteur : aucune session n'est ouverte,
+             * et le serveur n'a envoye aucun jeton. La page passe a l'etape
+             * du code.
+             */
+            if (response?.double_authentification_requise) {
+                setDefi({defi: response.defi, facteurs: response.facteurs ?? []});
+                return;
+            }
+
             if (!response?.token) {
                 Notify("Connexion impossible pour le moment", "error");
                 return;
             }
 
-            await setToken(response.token);
-            await refetch();
-            dispatch(fetchAccountData());
-            Notify("Connexion réussie", "success");
+            await terminerConnexion(response);
 
             // Le jeton est pose dans un cookie serveur : les pages rendues
             // cote serveur doivent le relire. `refresh()` les regenere sans
@@ -77,15 +95,113 @@ export default function PageConnexion() {
              * ferait de ce parametre une redirection ouverte, de quoi deposer
              * un client fraichement connecte sur un site tiers.
              */
-            const retour = new URLSearchParams(window.location.search).get("retour");
-            const destination = retour?.startsWith("/") && !retour.startsWith("//") ? retour : "/";
-
-            router.replace(destination);
-            router.refresh();
         } finally {
             setLoading(false);
         }
     };
+
+    /**
+     * Ce qui suit un jeton obtenu, quel que soit le chemin.
+     *
+     * Ecrit une fois : la connexion simple et celle a deux facteurs
+     * aboutissent au meme endroit.
+     */
+    async function terminerConnexion(response) {
+        await setToken(response.token);
+        await refetch();
+        dispatch(fetchAccountData());
+        Notify("Connexion réussie", "success");
+
+        // Le jeton est pose dans un cookie serveur : les pages rendues
+        // cote serveur doivent le relire. `refresh()` les regenere sans
+        // recharger l'application — `window.location.href` reconstruisait
+        // tout depuis zero, panier Redux et cache TanStack Query compris.
+        const retour = new URLSearchParams(window.location.search).get("retour");
+        const destination = retour?.startsWith("/") && !retour.startsWith("//") ? retour : "/";
+
+        router.replace(destination);
+        router.refresh();
+    }
+
+    const verifierLeCode = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await FetchData.sendData(Route.login_double_authentification, {
+                defi: defi.defi,
+                code: code.trim(),
+            });
+
+            if (response?.name === "AxiosError") {
+                Notify(
+                    response.response?.data?.message ?? "Ce code ne correspond pas",
+                    "error"
+                );
+                return;
+            }
+
+            await terminerConnexion(response);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /*
+     * L'etape du code. Le mot de passe n'est pas redemande : il est deja
+     * verifie, et le reafficher inviterait a le ressaisir alors que ce
+     * n'est pas lui qui manque.
+     */
+    if (defi) {
+        const parCourriel = defi.facteurs.includes("courriel");
+
+        return (
+            <CarteAuth
+                titre="Vérification"
+                sousTitre={
+                    parCourriel
+                        ? "Saisissez le code à six chiffres que nous venons d’envoyer à votre adresse."
+                        : "Saisissez le code affiché par votre application d’authentification."
+                }
+                bas={
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setDefi(null);
+                            setCode("");
+                        }}
+                        className="font-semibold text-brand-600 underline-offset-4 hover:underline"
+                    >
+                        Revenir à la connexion
+                    </button>
+                }
+            >
+                <form className="flex flex-col gap-5" onSubmit={verifierLeCode}>
+                    <ChampTexte
+                        label="Code de vérification"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        placeholder={parCourriel ? "000000" : "123456"}
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        /* Le code de secours sauve un téléphone perdu. Le
+                           taire enfermerait dehors ceux à qui il sert. */
+                        aide="Vous pouvez aussi saisir l’un de vos codes de secours."
+                        requis
+                        required
+                    />
+
+                    <button
+                        type="submit"
+                        disabled={loading || code.trim().length === 0}
+                        className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
+                    >
+                        {loading ? <Spinner /> : "Vérifier"}
+                    </button>
+                </form>
+            </CarteAuth>
+        );
+    }
 
     return (
         <CarteAuth

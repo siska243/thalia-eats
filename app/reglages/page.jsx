@@ -2,6 +2,7 @@ import AssistantsConnectes from "@/components/account/AssistantsConnectes";
 import EditCompte from "@/components/account/EditCompte";
 import Information from "@/components/account/Informations";
 import CarnetDuCompte from "@/components/account/CarnetDuCompte";
+import DoubleAuthentification from "@/components/account/DoubleAuthentification";
 
 /** Le compte : les informations, l'adresse, le mot de passe, les assistants. */
 export default function PageReglages() {
@@ -25,6 +26,10 @@ export default function PageReglages() {
                 <EditCompte />
 
                 <CarnetDuCompte />
+
+                {/* A cote du mot de passe : c'est la meme question — qui
+                    peut entrer dans ce compte. */}
+                <DoubleAuthentification />
 
                 <AssistantsConnectes />
             </div>
