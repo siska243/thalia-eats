@@ -142,10 +142,9 @@ export default function Hero({previews = []}) {
                       * colle. Le degrade orange tenu tres bas donne la couleur
                       * de marque sans voler l'oeil au titre.
                       */}
-                    <div className="flex w-full shrink-0 flex-col gap-4 lg:w-[360px]">
                     <Link
                         href="/location"
-                        className="group relative w-full overflow-hidden rounded-[28px] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md transition-colors duration-200 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
+                        className="group relative w-full shrink-0 overflow-hidden rounded-[28px] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md transition-colors duration-200 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 lg:w-[360px]"
                     >
                         <span
                             className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-brand-500/30 to-transparent"
@@ -216,65 +215,6 @@ export default function Hero({previews = []}) {
                             </span>
                         </span>
                     </Link>
-
-                    {/*
-                      * LA MEME TUILE, COTE REPAS.
-                      *
-                      * Le proprietaire : « voir la photo cote voiture,
-                      * reproduire la meme chose cote plat ». Thalia Trans
-                      * avait sa photo en grand ; les plats n'avaient que des
-                      * vignettes de 48 px — exactement le defaut qu'il avait
-                      * deja refuse pour la voiture, « a cette taille une
-                      * photo n'est plus qu'une tache ».
-                      *
-                      * La photo est celle du PREMIER PLAT a la une, pas un
-                      * visuel de marque : ce sont les photos qu'il a
-                      * televersees qu'il veut voir, et elles changent avec le
-                      * catalogue. `ImagePlat` tient le repli si l'URL ne
-                      * repond pas.
-                      */}
-                    <Link
-                        href="/restaurant"
-                        className="group relative w-full overflow-hidden rounded-[28px] bg-white/10 p-6 ring-1 ring-white/25 backdrop-blur-md transition-colors duration-200 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
-                    >
-                        <span
-                            className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-brand-500/30 to-transparent"
-                            aria-hidden
-                        />
-
-                        <span className="relative flex flex-col gap-5">
-                            <span className="flex flex-col">
-                                <span className="text-caption uppercase tracking-wide text-brand-300">
-                                    {noms.food}
-                                </span>
-                                <span className="text-title font-bold leading-tight text-white">
-                                    Un repas livré chez vous
-                                </span>
-                            </span>
-
-                            <span className="relative block h-32 w-full overflow-hidden rounded-card bg-white/10 sm:h-36">
-                                <ImagePlat
-                                    src={plats[0]?.picture}
-                                    alt=""
-                                    aria-hidden
-                                    fill
-                                    sizes="(max-width: 1024px) 100vw, 360px"
-                                    className="object-cover"
-                                />
-                            </span>
-
-                            <span className="text-body leading-6 text-white/80">
-                                Les restaurants de votre commune, livrés par nos soins. Vous payez
-                                par mobile money, nous suivons la course pour vous.
-                            </span>
-
-                            <span className="inline-flex min-h-11 items-center gap-2 self-start rounded-pill bg-white px-6 text-body font-bold text-secondaryColor transition-transform duration-150 group-hover:translate-x-0.5">
-                                Commander un repas
-                                <FaChevronRight size={13} aria-hidden />
-                            </span>
-                        </span>
-                    </Link>
-                    </div>
                     </div>
 
                     {plats.length ? (
