@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import vignetteTrans from "@/public/assets/thalia-trans.jpg";
+import photoVoiture from "@/public/assets/thalia-trans-large.jpg";
 
 interface Props {
     /** Le nom commercial, qui vient des réglages et jamais d'ici. */
@@ -18,10 +18,10 @@ interface Props {
  * dans /restaurant ».
  *
  * LA VOITURE N'EST PAS EN FOND, contrairement à la bande des restaurants.
- * C'est un détourage sur gris clair, en 640 sur 640 : étirée derrière un
- * titre blanc, elle serait floue et son fond mangerait le texte. Elle est
- * donc posée en tuile sur la couleur de marque, à la taille où un détourage
- * se lit.
+ * C'est un détourage sur gris clair : étirée derrière un titre blanc, son
+ * fond mangerait le texte. Elle est donc posée à côté, sur la couleur de
+ * marque, dans son cadrage large de 960 sur 420 — le même que le hero, taillé
+ * dans la hauteur du détourage pour ne pas laisser deux bandes de gris vide.
  */
 export default function BanniereLocation({nom, nombre}: Props) {
     return (
@@ -49,13 +49,13 @@ export default function BanniereLocation({nom, nombre}: Props) {
                 </div>
 
                 <Image
-                    src={vignetteTrans}
+                    src={photoVoiture}
                     alt=""
                     aria-hidden
-                    width={200}
-                    height={200}
+                    width={960}
+                    height={420}
                     priority
-                    className="h-28 w-28 shrink-0 rounded-card object-cover sm:h-44 sm:w-44"
+                    className="h-32 w-full shrink-0 rounded-card object-cover sm:h-40 sm:w-80"
                 />
             </div>
         </div>

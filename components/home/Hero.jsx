@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import VignetteUnivers from "@/components/commons/VignetteUnivers";
+import photoVoiture from "@/public/assets/thalia-trans-large.jpg";
 import Link from "next/link";
 /*
  * La photo fournie par le proprietaire, exportee en 2000x820 depuis son
@@ -152,15 +152,6 @@ export default function Hero({previews = []}) {
 
                         <span className="relative flex flex-col gap-5">
                             <span className="flex items-center gap-3">
-                                {/*
-                                  * La photo de la marque, et non un
-                                  * pictogramme : c'est ce que le mobile
-                                  * montre au meme endroit depuis T109, et
-                                  * le web etait reste au FaCar dans sa
-                                  * pastille orange.
-                                  */}
-                                <VignetteUnivers univers="trans" taille={44} />
-
                                 <span className="flex flex-col">
                                     <span className="text-caption uppercase tracking-wide text-brand-300">
                                         {noms.rental}
@@ -169,6 +160,31 @@ export default function Hero({previews = []}) {
                                         Une voiture avec chauffeur
                                     </span>
                                 </span>
+                            </span>
+
+                            {/*
+                              * La VOITURE, en photo et en grand.
+                              *
+                              * Elle a d'abord remplace le pictogramme FaCar
+                              * dans sa pastille de 44 px : le proprietaire a
+                              * continue de lire une icone, et il avait
+                              * raison — a cette taille une photo n'est plus
+                              * qu'une tache. Elle prend donc toute la
+                              * largeur de la carte.
+                              *
+                              * Cadrage dedie en 960x420, taille dans la
+                              * hauteur du detourage : la tuile carree aurait
+                              * laisse deux bandes de gris vide.
+                              */}
+                            <span className="relative block h-32 w-full overflow-hidden rounded-card sm:h-36">
+                                <Image
+                                    src={photoVoiture}
+                                    alt=""
+                                    aria-hidden
+                                    fill
+                                    sizes="(max-width: 1024px) 100vw, 360px"
+                                    className="object-cover"
+                                />
                             </span>
 
                             <span className="text-body leading-6 text-white/80">
