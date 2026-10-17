@@ -7,6 +7,7 @@ import {FaMagnifyingGlass} from "react-icons/fa6";
 import {useNomsCommerciaux, useRentalConfig, useTypesCourse, useVehicleList} from "@/hooks/useRental";
 import EmptyState from "@/components/ui/EmptyState";
 import CarteVehicule from "@/components/rental/CarteVehicule";
+import BanniereLocation from "@/components/rental/BanniereLocation";
 import FiltresVehicules from "@/components/rental/FiltresVehicules";
 
 /**
@@ -76,16 +77,7 @@ export default function PageCatalogue() {
     return (
         <div className="min-h-svh bg-surface-sunken pt-[calc(var(--header-h)+24px)]">
             <div className="mx-auto max-w-[1400px] px-4 pb-16 sm:px-5">
-                <header className="mb-5">
-                    <p className="text-caption text-ink-muted">Avec chauffeur · {noms.rental}</p>
-                    <h1 className="text-display font-extrabold text-secondaryColor">
-                        Louer une voiture
-                    </h1>
-                    <p className="mt-2 max-w-2xl text-body text-ink-muted">
-                        Choisissez votre voiture, puis votre créneau sur la fiche. Un acompte
-                        retient le véhicule, le solde se règle en espèces au chauffeur.
-                    </p>
-                </header>
+                <BanniereLocation nom={noms.rental} nombre={sourceCount} />
 
                 <label className="relative mb-4 block">
                     <span className="sr-only">Rechercher une marque ou un modèle</span>

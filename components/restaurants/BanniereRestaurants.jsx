@@ -1,5 +1,5 @@
 import Image from "next/image";
-import fondImage from "@/public/assets/images/foodsImg.png";
+import fondImage from "@/public/assets/thalia-eats-large.jpg";
 
 /**
  * L'en-tete de la liste.
@@ -12,6 +12,10 @@ import fondImage from "@/public/assets/images/foodsImg.png";
  *
  * Elle montrait aussi le logo Thalia en grand, sur un fond fait du meme logo.
  * Une photo de nourriture dit mieux ce qu'on vient chercher.
+ *
+ * Depuis le 17 octobre c'est la photo du proprietaire — « je ne vois pas la
+ * photo que je t'ai envoyee » : elle n'etait jusque-la qu'un substitut, donc
+ * invisible des qu'un plat avait sa propre image.
  */
 export default function BanniereRestaurants({nombre}) {
     return (

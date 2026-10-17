@@ -4,7 +4,12 @@ import Image from "next/image";
 
 import VignetteUnivers from "@/components/commons/VignetteUnivers";
 import Link from "next/link";
-import fondImage from "@/public/assets/images/homeEat.png";
+/*
+ * La photo fournie par le proprietaire, exportee en 2000x820 depuis son
+ * original de 6240x4160. La tuile carree de 640 sert aux vignettes ; etiree
+ * derriere un titre en pleine largeur, elle aurait ete floue.
+ */
+import fondImage from "@/public/assets/thalia-eats-large.jpg";
 import {FaChevronRight} from "react-icons/fa6";
 import {formatPrix} from "@/helpers/openingHours";
 import {useNomsCommerciaux} from "@/hooks/useRental";
