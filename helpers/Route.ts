@@ -23,6 +23,30 @@ class Route
     static assistants=`${this.user}/assistants`
     static assistant_delete=(uid:string):string=>`${this.user}/assistants/${uid}`
   
+    /*
+     * La confirmation d'adresse, apres l'inscription.
+     *
+     * Les deux routes existaient depuis l'origine cote serveur et n'etaient
+     * appelees que par le mobile : le site inscrivait puis renvoyait vers la
+     * connexion, sans jamais demander le code. Depuis T146 l'adresse doit
+     * etre confirmee, et le site avait donc un cul-de-sac.
+     */
+    static activation = "activation-account"
+    static resend_activation = "resend-activation"
+
+    /*
+     * La seconde etape de la connexion, pour les comptes qui ont active la
+     * double authentification.
+     */
+    static login_double_authentification = "login/double-authentification"
+
+    /* La double authentification, reglee depuis le compte. */
+    static double_authentification = `${this.me}/double-authentification`
+    static double_auth_preparer = `${this.me}/double-authentification/application/preparer`
+    static double_auth_activer = `${this.me}/double-authentification/application/activer`
+    static double_auth_desactiver = `${this.me}/double-authentification/application/desactiver`
+    static double_auth_courriel = `${this.me}/double-authentification/courriel`
+
     static logout = "auth/logout"
     // mise à jour des informations de l'utilisateur
     /**

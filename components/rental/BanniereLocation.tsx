@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 
 import photoVoiture from "@/public/assets/thalia-trans-large.jpg";
+import {useAcompte} from "@/hooks/useRental";
 
 interface Props {
     /** Le nom commercial, qui vient des réglages et jamais d'ici. */
@@ -24,6 +27,8 @@ interface Props {
  * dans la hauteur du détourage pour ne pas laisser deux bandes de gris vide.
  */
 export default function BanniereLocation({nom, nombre}: Props) {
+    const {acompte, solde} = useAcompte();
+
     return (
         <div className="relative mb-5 overflow-hidden rounded-card bg-secondaryColor">
             <span
@@ -44,7 +49,15 @@ export default function BanniereLocation({nom, nombre}: Props) {
                     <p className="max-w-md text-body leading-7 text-white/80">
                         {nombre
                             ? `${nombre} véhicules avec chauffeur, à l’heure ou à la journée.`
-                            : "À l’heure ou à la journée. Un acompte retient le véhicule, le solde se règle au chauffeur."}
+                            : "Des véhicules avec chauffeur, à l’heure ou à la journée."}
+                    </p>
+
+                    {/* Ce qu'on engage en réservant, chiffré. Le taux vient
+                        des réglages : l'écrire ici le rendrait faux le jour
+                        où le propriétaire le change. */}
+                    <p className="text-body font-semibold text-white">
+                        Paiement&nbsp;: {acompte}&nbsp;% à la réservation, {solde}&nbsp;% à la fin
+                        de la course.
                     </p>
                 </div>
 

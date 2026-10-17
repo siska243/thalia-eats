@@ -414,7 +414,7 @@ const TunnelReservation = () => {
                     <p className="mt-2 text-body text-ink-muted">
                         {etape === 0
                             ? "Le chauffeur vient vous chercher à cette adresse."
-                            : "L’acompte retient le véhicule, le solde se règle au chauffeur."}
+                            : "L’acompte retient le véhicule, le reste se règle au chauffeur à la fin de la course."}
                     </p>
                 </header>
 

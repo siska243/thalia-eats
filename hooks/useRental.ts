@@ -52,6 +52,7 @@ export interface RentalConfig {
     brand_rental?: string;
     whatsapp_number?: string;
     out_of_zone_message?: string;
+    deposit_percentage?: number;
     towns?: {id: number; slug: string; title: string}[];
     duree?: Partial<BornesDuree>;
     course_types?: TypeCourse[];
@@ -92,6 +93,26 @@ export const useBornesDuree = (): BornesDuree => {
  * que rien ne s'affiche vide le temps que la configuration arrive.
  */
 export const NOMS_PAR_DEFAUT = {food: "Thalia Eats", rental: "Thalia Trans"};
+
+/**
+ * La part payée à la réservation, et le solde qui s'en déduit.
+ *
+ * Décalque de `useAcompte` du mobile. Le taux vient de l'administration : il
+ * était écrit en dur, et annonçait un chiffre quand le réglage en disait un
+ * autre. Le repli vaut 20 %, la règle commerciale courante, pour que la
+ * phrase reste juste tant que la configuration n'a pas répondu.
+ *
+ * Le solde n'est jamais une seconde valeur à tenir d'accord : il se déduit.
+ */
+export const ACOMPTE_PAR_DEFAUT = 20;
+
+export const useAcompte = (): {acompte: number; solde: number} => {
+    const {data} = useRentalConfig();
+    const brut = data?.deposit_percentage;
+    const acompte = typeof brut === "number" && brut > 0 ? brut : ACOMPTE_PAR_DEFAUT;
+
+    return {acompte, solde: 100 - acompte};
+};
 
 export const useNomsCommerciaux = () => {
     const {data} = useRentalConfig();
