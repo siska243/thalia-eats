@@ -129,7 +129,27 @@ export default function Footer() {
                         toute seule, et personne ne pense a la corriger. */}
                     <p>Thalia © {new Date().getFullYear()}, tous droits réservés.</p>
 
-                    <p>Kinshasa, République démocratique du Congo</p>
+                    <p className="flex flex-wrap items-center justify-center gap-x-1.5">
+                        <span>Kinshasa, République démocratique du Congo</span>
+                        <span aria-hidden className="hidden sm:inline">
+                            ·
+                        </span>
+                        {/* La signature de l'auteur, a sa demande. En lien
+                            externe : `noopener` et `noreferrer` parce que
+                            `target="_blank"` donne sinon a la page ouverte
+                            une poignee sur celle-ci. */}
+                        <span>
+                            Conçu et développé par{" "}
+                            <a
+                                href="http://emmanuel.sims-opportunity.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-semibold text-white underline-offset-4 hover:underline"
+                            >
+                                Emmanuel Simisi
+                            </a>
+                        </span>
+                    </p>
                 </div>
             </div>
         </footer>
