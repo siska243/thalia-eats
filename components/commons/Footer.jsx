@@ -53,9 +53,12 @@ export default function Footer() {
                     </h2>
 
                     <ul className="flex flex-col gap-3">
+                        {/* « Conditions d'utilisation » pointait vers la
+                            politique de confidentialite : un lien mort depuis
+                            l'ouverture, et deux entrees pour une seule page. */}
                         <li>
                             <Link
-                                href="/privacy"
+                                href="/cgu"
                                 className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
                             >
                                 Conditions d&apos;utilisation
@@ -67,6 +70,22 @@ export default function Footer() {
                                 className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
                             >
                                 Politique de confidentialité
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                href="/cookies"
+                                className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                Cookies
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
+                                href="/mentions-legales"
+                                className="text-caption text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                            >
+                                Mentions légales
                             </Link>
                         </li>
                         <li>

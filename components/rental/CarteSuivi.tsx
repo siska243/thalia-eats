@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import CarteConsentie from "@/components/commons/CarteConsentie";
 import {GoogleMap, Marker, useLoadScript} from "@react-google-maps/api";
 import {FaRoute} from "react-icons/fa6";
 
@@ -35,7 +36,7 @@ interface Props {
  * la carte se manipule déjà sur place, elle ne vole aucun geste de défilement,
  * et un second écran n'apporterait rien.
  */
-export default function CarteSuivi({uid, status}: Props) {
+function CarteSuiviGoogle({uid, status}: Props) {
     const enCourse = status === "in_progress";
 
     const {data: suivi} = useRentalSuivi(uid, true, enCourse);
@@ -116,5 +117,20 @@ export default function CarteSuivi({uid, status}: Props) {
                 ) : null}
             </div>
         </section>
+    );
+}
+
+/**
+ * La carte de suivi d'une course, sous consentement.
+ *
+ * Même garde que la carte de livraison : le composant interne n'est monté
+ * qu'avec l'accord, donc le script de Google n'est chargé qu'à ce
+ * moment-là.
+ */
+export default function CarteSuivi(props: Props) {
+    return (
+        <CarteConsentie hauteur="h-80">
+            <CarteSuiviGoogle {...props} />
+        </CarteConsentie>
     );
 }
