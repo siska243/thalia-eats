@@ -368,6 +368,7 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                 minimumHeures={minimumHeures}
                                 acompte={vehicle.deposit_percentage}
                                 montantAcompte={vehicle.quote?.deposit}
+                                montantSolde={vehicle.quote?.balance}
                                 devise={devise}
                             />
                         </div>

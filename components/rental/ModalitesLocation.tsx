@@ -11,6 +11,12 @@ interface Props {
     acompte?: number;
     /** L'acompte en monnaie, quand le total est connu. */
     montantAcompte?: number | null;
+    /**
+     * Le solde en monnaie. Il vient du serveur (`quote.balance`) et n'est
+     * JAMAIS calcule ici : un montant deduit dans le navigateur est un
+     * montant qui finit par diverger de celui qu'on facture.
+     */
+    montantSolde?: number | null;
     devise?: string;
 }
 
@@ -30,6 +36,7 @@ export default function ModalitesLocation({
     minimumHeures,
     acompte,
     montantAcompte,
+    montantSolde,
     devise,
 }: Props) {
     const minimum = minimumLisible(minimumHeures);
@@ -48,7 +55,11 @@ export default function ModalitesLocation({
                 <p className="flex items-center gap-2 text-caption text-ink-muted">
                     <FaWallet aria-hidden />
                     {montantAcompte
-                        ? `${acompte} % à la réservation, soit ${formatPrix(montantAcompte, devise)}. Les ${100 - acompte} % restants à la fin de la course, au chauffeur.`
+                        ? `${acompte} % à la réservation, soit ${formatPrix(montantAcompte, devise)}. ${
+                              montantSolde
+                                  ? `Les ${100 - acompte} % restants, soit ${formatPrix(montantSolde, devise)}, à la fin de la course, au chauffeur.`
+                                  : `Les ${100 - acompte} % restants à la fin de la course, au chauffeur.`
+                          }`
                         : `${acompte} % à la réservation, les ${100 - acompte} % restants à la fin de la course, au chauffeur.`}
                 </p>
             ) : null}
