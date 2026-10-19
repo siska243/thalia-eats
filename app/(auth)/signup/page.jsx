@@ -4,7 +4,7 @@ import {useState} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import CarteAuth from "@/components/auth/CarteAuth";
-import Turnstile from "@/components/auth/Turnstile";
+import Turnstile, {DEFI_ACTIF} from "@/components/auth/Turnstile";
 import ChampTexte from "@/components/auth/ChampTexte";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
@@ -173,9 +173,18 @@ export default function PageInscription() {
 
                 <Turnstile onJeton={setJetonAntiRobot} />
 
+                {/*
+                  * Tant que le défi n'est pas passé, on n'envoie pas.
+                  *
+                  * Le formulaire partait sans jeton quand le widget échouait,
+                  * et le client recevait « Vérification impossible » sans
+                  * avoir jamais vu de bouton bloqué. `DEFI_ACTIF` garde le
+                  * bouton vivant sur un site sans clé, où aucun jeton
+                  * n'arrivera jamais.
+                  */}
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || (DEFI_ACTIF && !jetonAntiRobot)}
                     className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
                 >
                     {loading ? <Spinner /> : "Créer mon compte"}

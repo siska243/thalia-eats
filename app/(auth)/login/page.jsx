@@ -6,6 +6,7 @@ import {useRouter} from "next/navigation";
 import {useDispatch} from "react-redux";
 import CarteAuth from "@/components/auth/CarteAuth";
 import ChampTexte from "@/components/auth/ChampTexte";
+import Turnstile, {DEFI_ACTIF} from "@/components/auth/Turnstile";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
@@ -40,6 +41,8 @@ export default function PageConnexion() {
      * aurait voulu dire la recopier, et un client aurait fini sur l'accueil
      * apres avoir rempli tout son parcours.
      */
+    const [jetonAntiRobot, setJetonAntiRobot] = useState(null);
+    const [reinitDefi, setReinitDefi] = useState(0);
     const [defi, setDefi] = useState(null);
     const [code, setCode] = useState("");
 
@@ -52,13 +55,28 @@ export default function PageConnexion() {
         setLoading(true);
 
         try {
-            const response = await FetchData.sendData(Route.login, {email, password});
+            const identifiants = {email, password};
+
+            // Absent quand le défi n'est pas configuré : le serveur ne le
+            // réclame que si sa propre clé est posée.
+            if (jetonAntiRobot) identifiants.turnstile_token = jetonAntiRobot;
+
+            const response = await FetchData.sendData(Route.login, identifiants);
 
             if (response?.name === "AxiosError") {
                 Notify(
                     response.response?.data?.message ?? "Email ou mot de passe incorrect",
                     "error"
                 );
+
+                /*
+                 * Un jeton Cloudflare ne sert qu'une fois. Sans ce rappel, la
+                 * seconde tentative partait avec un jeton déjà consommé et se
+                 * faisait refuser pour une raison que le client ne pouvait
+                 * pas deviner — sur la page où l'on se trompe le plus.
+                 */
+                setReinitDefi((rang) => rang + 1);
+
                 return;
             }
 
@@ -239,9 +257,14 @@ export default function PageConnexion() {
                     required
                 />
 
+                <Turnstile onJeton={setJetonAntiRobot} reinit={reinitDefi} />
+
+                {/* Tant que le défi n'est pas passé, on n'envoie pas.
+                    `DEFI_ACTIF` garde le bouton vivant sur un site sans clé,
+                    où aucun jeton n'arriverait jamais. */}
                 <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || (DEFI_ACTIF && !jetonAntiRobot)}
                     className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
                 >
                     {loading ? <Spinner /> : "Se connecter"}
