@@ -24,6 +24,9 @@ import {
     useRentalVehicle,
 } from "@/hooks/useRental";
 import ChampTexte from "@/components/auth/ChampTexte";
+import CarnetAdresses from "@/components/ordering/CarnetAdresses";
+import useAdresses from "@/hooks/useAdresses";
+import type {AdresseEnregistree} from "@/types/adresse";
 import PhoneNumber from "@/components/forms/phone-number";
 import {pourLaSaisie, pourLeCompte} from "@/helpers/telephone";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
@@ -181,6 +184,48 @@ const TunnelReservation = () => {
     const [avenue, setAvenue] = useState("");
     const [numero, setNumero] = useState("");
     const [repere, setRepere] = useState("");
+
+    /*
+     * Le carnet d'adresses, comme au moment de commander un repas.
+     *
+     * Le site faisait ressaisir l'adresse a chaque course alors que le serveur
+     * la gardait et que l'application la proposait : meme client, meme compte,
+     * deux experiences. Le carnet est le MEME composant que le parcours repas,
+     * et la meme lecture — une seconde liste d'adresses aurait fini par en
+     * montrer une autre.
+     *
+     * Il n'est lu que pour un client connecte : la route exige un jeton.
+     */
+    const carnet = useAdresses(!!user);
+    const [choisie, setChoisie] = useState<string | null>(null);
+
+    /*
+     * Choisir REMPLIT les champs au lieu de les remplacer.
+     *
+     * C'est ce que fait deja `ConfirmAdress` cote repas : le client voit
+     * l'adresse reprise, peut corriger un repere qui a change, et le texte
+     * envoye au serveur reste compose a un seul endroit, plus bas.
+     */
+    const choisirDuCarnet = (adresse: AdresseEnregistree) => {
+        setChoisie(adresse.slug);
+        setCommuneSlug(adresse.town?.slug ?? "");
+        setAvenue(adresse.street ?? "");
+        setNumero(adresse.number_street ?? "");
+        setRepere(adresse.reference ?? "");
+        setErreur(null);
+    };
+
+    const supprimerDuCarnet = async (adresse: AdresseEnregistree) => {
+        try {
+            await carnet.supprimer.mutateAsync(adresse.slug);
+
+            if (choisie === adresse.slug) setChoisie(null);
+        } catch (e) {
+            // Une suppression silencieusement ratee laisse croire qu'elle a eu
+            // lieu, et l'adresse revient au rechargement.
+            setErreur((e as Error).message);
+        }
+    };
 
     const commune = referentiel?.town?.find((item) => item.slug === communeSlug);
 
@@ -458,6 +503,28 @@ const TunnelReservation = () => {
                             </span>
                             sont obligatoires.
                         </p>
+
+                        {/* Le carnet en tete : on y revient pour reprendre une
+                            adresse connue bien plus souvent que pour en saisir
+                            une neuve. Meme disposition que cote repas. */}
+                        {user && carnet.adresses.length ? (
+                            <div className="flex flex-col gap-4">
+                                <CarnetAdresses
+                                    adresses={carnet.adresses}
+                                    choisie={choisie}
+                                    onChoisir={choisirDuCarnet}
+                                    onSupprimer={supprimerDuCarnet}
+                                />
+
+                                <div className="flex items-center gap-3">
+                                    <span className="h-px flex-1 bg-surface-border" />
+                                    <span className="text-caption text-ink-subtle">
+                                        ou saisir une nouvelle adresse
+                                    </span>
+                                    <span className="h-px flex-1 bg-surface-border" />
+                                </div>
+                            </div>
+                        ) : null}
 
                         <div className="grid gap-5 sm:grid-cols-2">
                             {/*
