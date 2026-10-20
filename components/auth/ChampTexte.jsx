@@ -33,11 +33,32 @@ export default function ChampTexte({
     const id = useId();
     const [visible, setVisible] = useState(false);
 
+    /*
+     * `required` VAUT `requis`.
+     *
+     * Le proprietaire, le 20 octobre : « pourquoi dans connexion tu mets
+     * identifiant (facultatif) et mot de passe facultatif et pourtant c'est
+     * obligatoire », puis « lors de l'inscription tu mets tout facultatif ».
+     *
+     * Les ecrans ecrivaient `required`, le nom HTML, la ou le composant
+     * attendait `requis`. L'attribut partait bien sur le champ — il traverse
+     * `...props`, qui est etale APRES `required={requis}` et l'ecrase — mais
+     * le libelle, lui, lisait `requis`, reste faux, et annoncait
+     * « (facultatif) » sur un champ que le navigateur refusait de laisser
+     * vide. La connexion, l'inscription, le mot de passe, les adresses : une
+     * vingtaine de champs disaient le contraire de ce qu'ils exigeaient.
+     *
+     * Corrige ICI plutot qu'aux vingt endroits : le vingt-et-unieme appelant
+     * ecrira `required` lui aussi, parce que c'est le nom qu'on connait. Un
+     * composant qui accepte les deux ne peut pas etre pris en defaut.
+     */
+    const obligatoire = requis || Boolean(props.required);
+
     return (
         <div className={`flex flex-col ${className}`}>
             <label htmlFor={id} className="mb-2 text-caption font-semibold text-ink">
                 {label}
-                {requis ? (
+                {obligatoire ? (
                     <span className="text-danger" aria-hidden>
                         {" *"}
                     </span>
@@ -50,8 +71,8 @@ export default function ChampTexte({
                 <input
                     id={id}
                     type={motDePasse ? (visible ? "text" : "password") : type}
-                    required={requis}
-                    aria-required={requis}
+                    required={obligatoire}
+                    aria-required={obligatoire}
                     className={`w-full rounded-control border border-surface-border bg-surface px-4 py-3 text-body text-ink outline-none transition-colors duration-150 placeholder:text-ink-subtle focus:border-brand-500 ${
                         motDePasse ? "pr-12" : ""
                     }`}

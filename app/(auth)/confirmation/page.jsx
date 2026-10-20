@@ -5,6 +5,7 @@ import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
 import CarteAuth from "@/components/auth/CarteAuth";
 import ChampTexte from "@/components/auth/ChampTexte";
+import Turnstile, {DEFI_ACTIF} from "@/components/auth/Turnstile";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
@@ -25,6 +26,8 @@ function Confirmation() {
     const [envoi, setEnvoi] = useState(false);
     const [renvoi, setRenvoi] = useState(false);
     const [attente, setAttente] = useState(0);
+    const [jetonAntiRobot, setJetonAntiRobot] = useState(null);
+    const [reinitDefi, setReinitDefi] = useState(0);
 
     // Le compte à rebours du renvoi. Sans lui, le bouton invite à cliquer
     // dix fois et le serveur régénère un code à chaque fois — celui que le
@@ -67,15 +70,30 @@ function Confirmation() {
         setRenvoi(true);
 
         try {
-            const reponse = await FetchData.sendData(Route.resend_activation, {email});
+            const demande = {email};
+
+            // Absent quand le défi n'est pas configuré : le serveur ne le
+            // réclame que si sa propre clé est posée.
+            if (jetonAntiRobot) demande.turnstile_token = jetonAntiRobot;
+
+            const reponse = await FetchData.sendData(Route.resend_activation, demande);
 
             if (reponse?.name === "AxiosError") {
                 Notify(
                     reponse.response?.data?.message ?? "Impossible d’envoyer le code",
                     "error",
                 );
+
+                // Un jeton Cloudflare ne sert qu'une fois : sans ce rappel,
+                // le second essai repartirait avec un jeton consommé.
+                setReinitDefi((rang) => rang + 1);
+
                 return;
             }
+
+            // Le renvoi a réussi : le jeton est consommé, et le prochain
+            // renvoi en demandera un neuf.
+            setReinitDefi((rang) => rang + 1);
 
             /*
              * Le message ne dit pas si l'adresse existe.
@@ -147,10 +165,20 @@ function Confirmation() {
                     {envoi ? <Spinner /> : "Confirmer mon adresse"}
                 </button>
 
+                {/*
+                  * Le défi protège le RENVOI, pas la confirmation : renvoyer
+                  * fabrique un code neuf, et c'est ce que vise une machine.
+                  * Le délai de 60 s est posé ici, dans l'écran ; il ne vaut
+                  * rien contre un appel direct à la route.
+                  */}
+                <Turnstile onJeton={setJetonAntiRobot} reinit={reinitDefi} />
+
                 <button
                     type="button"
                     onClick={renvoyer}
-                    disabled={renvoi || attente > 0 || !email}
+                    disabled={
+                        renvoi || attente > 0 || !email || (DEFI_ACTIF && !jetonAntiRobot)
+                    }
                     className="text-caption font-semibold text-brand-600 underline-offset-4 transition-opacity duration-150 hover:underline disabled:opacity-50 disabled:no-underline"
                 >
                     {attente > 0
