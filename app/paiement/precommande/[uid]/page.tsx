@@ -12,6 +12,7 @@ import ListInfoUser from "@/components/ordering/ListInfoUser";
 import ModalMobileMoney from "@/components/ordering/ModalMobileMoney";
 import EcranPaiement from "@/components/payement/EcranPaiement";
 import PhoneNumber from "@/components/forms/phone-number";
+import {estValide} from "@/helpers/telephone";
 import Loader from "@/components/Loader/Loader";
 import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
@@ -209,6 +210,15 @@ const PaiementPrecommande = () => {
             return "Indiquez le numéro que le livreur appellera.";
         }
 
+        /*
+         * Et il doit se composer. C'est le SEUL numéro que le livreur aura :
+         * la personne qui commande n'est pas celle qui réceptionne, et ne sera
+         * pas forcément joignable pour corriger une faute de frappe.
+         */
+        if (!estValide(telephoneDestinataire)) {
+            return "Ce numéro de téléphone n’est pas valide. Exemple : 0810000000.";
+        }
+
         return null;
     };
 
@@ -325,6 +335,13 @@ const PaiementPrecommande = () => {
 
     const soumettreMobileMoney = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Le numéro à débiter, distinct de celui du destinataire.
+        if (!phone || !estValide(phone)) {
+            Notify("Ce numéro de téléphone n’est pas valide. Exemple : 0810000000", "error");
+            return;
+        }
+
         payer({method: "mobile", phone}, "mobile");
     };
 

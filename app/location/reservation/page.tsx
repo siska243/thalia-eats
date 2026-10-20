@@ -25,7 +25,7 @@ import {
 } from "@/hooks/useRental";
 import ChampTexte from "@/components/auth/ChampTexte";
 import PhoneNumber from "@/components/forms/phone-number";
-import {pourLaSaisie, pourLeCompte} from "@/helpers/telephone";
+import {estValide, pourLaSaisie, pourLeCompte} from "@/helpers/telephone";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {FetchData} from "@/helpers/FetchData";
 import ChoixPaiement from "@/components/ordering/ChoixPaiement";
@@ -235,6 +235,17 @@ const TunnelReservation = () => {
             return;
         }
 
+        /*
+         * Et il doit se composer. Ce numéro-là est écrit sur le COMPTE plus
+         * bas : un numéro faux ne gâchait pas seulement cette course, il
+         * restait sur le compte et revenait pré-rempli à la suivante.
+         */
+        if (!estValide(telephoneRetenu)) {
+            setErreur("Ce numéro de téléphone n’est pas valide. Exemple : 0810000000.");
+
+            return;
+        }
+
         if (!communeSlug || !avenue.trim() || !repere.trim()) {
             setErreur("Indiquez la commune, l’avenue et un repère où le chauffeur doit vous prendre.");
 
@@ -283,6 +294,18 @@ const TunnelReservation = () => {
          */
         if (!reglementSeul && !vehicle?.uid) {
             setErreur("Le véhicule n’a pas fini de charger. Réessayez dans un instant.");
+
+            return;
+        }
+
+        /*
+         * Le numéro À DÉBITER, qui n'est pas forcément celui du contact. Il
+         * n'était vérifié nulle part côté site : la passerelle le refusait, et
+         * le client ne pouvait pas deviner lequel des deux numéros posait
+         * problème.
+         */
+        if (method === "mobile" && !estValide(phone)) {
+            setErreur("Le numéro à débiter n’est pas valide. Exemple : 0810000000.");
 
             return;
         }
