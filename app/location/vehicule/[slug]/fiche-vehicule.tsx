@@ -204,6 +204,16 @@ export default function FicheVehicule({slug}: {slug: string}) {
     const courante = etapes[Math.min(etape, etapes.length - 1)];
     const derniere = etape >= etapes.length - 1;
 
+    /*
+     * Le type n'est plus facultatif quand le vehicule en propose.
+     *
+     * C'est lui qui porte le tarif applique : avancer sans l'avoir choisi
+     * afficherait un prix qui n'est pas celui de la course. Le serveur refuse
+     * desormais la reservation sans lui ; l'ecran evite au client d'aller
+     * jusqu'au paiement pour l'apprendre.
+     */
+    const typeManquant = courante === "course" && !typeChoisi;
+
     const titres: Record<(typeof etapes)[number], {titre: string; detail: string}> = {
         course: {
             titre: "Quelle course ?",
@@ -548,10 +558,12 @@ export default function FicheVehicule({slug}: {slug: string}) {
                                     onClick={
                                         derniere ? reserver : () => setEtape((rang) => rang + 1)
                                     }
-                                    disabled={derniere && (!libre || tropProche)}
+                                    disabled={typeManquant || (derniere && (!libre || tropProche))}
                                     className="inline-flex min-h-12 flex-1 items-center justify-center rounded-pill bg-brand-500 px-6 text-body font-semibold text-ink-inverse transition-colors duration-150 hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    {!derniere
+                                    {typeManquant
+                                        ? "Choisissez le type de course"
+                                        : !derniere
                                         ? "Continuer"
                                         : tropProche
                                           ? "Départ trop proche"
