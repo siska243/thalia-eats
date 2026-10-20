@@ -4,9 +4,10 @@ import Script from "next/script";
 import {useCallback, useEffect, useId, useRef, useState} from "react";
 
 /**
- * Le défi anti-robot de Cloudflare, sur le formulaire d'inscription.
+ * Le défi anti-robot de Cloudflare, sur les formulaires d'authentification.
  *
- * Posé après deux inscriptions manifestement automatisées le 17 octobre.
+ * Posé après deux inscriptions manifestement automatisées le 17 octobre,
+ * étendu depuis à la connexion et au renvoi du code de confirmation.
  *
  * IL NE PROTÈGE RIEN À LUI SEUL : c'est le serveur qui vérifie le jeton, et
  * c'est là que la mesure existe. Ce composant ne fait que l'obtenir.
@@ -23,7 +24,26 @@ import {useCallback, useEffect, useId, useRef, useState} from "react";
  */
 const CLE_SITE = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-export default function Turnstile({onJeton}) {
+/**
+ * Le défi est-il réellement posé ?
+ *
+ * Les écrans en ont besoin pour décider s'ils bloquent leur bouton tant que
+ * le jeton manque. Sans cette distinction, un site sans clé aurait un bouton
+ * définitivement inerte : le widget ne s'affiche pas, donc aucun jeton
+ * n'arrive jamais, et le formulaire deviendrait impossible à envoyer.
+ *
+ * Lu ici, à côté de la clé, et pas recalculé dans chaque écran.
+ */
+export const DEFI_ACTIF = Boolean(CLE_SITE);
+
+/**
+ * @param onJeton  reçoit le jeton, ou `null` quand il n'y en a plus.
+ * @param reinit   compteur à incrémenter pour redemander un défi. Un jeton
+ *                 Cloudflare ne sert QU'UNE FOIS : après un échec de
+ *                 connexion, le réutiliser se fait refuser, et le client
+ *                 resterait bloqué sur un formulaire qui semble correct.
+ */
+export default function Turnstile({onJeton, reinit = 0}) {
     const conteneur = useRef(null);
     const widget = useRef(null);
     const [pret, setPret] = useState(false);
@@ -50,6 +70,17 @@ export default function Turnstile({onJeton}) {
     useEffect(() => {
         if (pret) rendre();
     }, [pret, rendre]);
+
+    useEffect(() => {
+        if (!reinit || widget.current === null || !window.turnstile) return;
+
+        window.turnstile.reset(widget.current);
+        onJeton?.(null);
+        // `onJeton` volontairement absent des dépendances : il est recréé à
+        // chaque rendu du parent, et le suivre redemanderait un défi en
+        // boucle. Seul le compteur doit déclencher la réinitialisation.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reinit]);
 
     useEffect(
         () => () => {
