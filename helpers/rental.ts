@@ -739,3 +739,94 @@ export const zonePriseEnCharge = (
 
     return trouvee ? {etat: "desservie", townId: trouvee.id} : {etat: "hors-zone"};
 };
+
+/**
+ * Un filtre actif, tel qu'il s'affiche en pastille sous l'entonnoir.
+ *
+ * `cle` est ce que l'écran rend à l'action qui l'éteint ; `libelle` est ce que
+ * le client lit.
+ */
+export type FiltreActif = {
+    cle: "dispo" | "tri" | "places" | "ville" | "communes" | "type" | "propose";
+    libelle: string;
+};
+
+/** Ce que chaque mode de location s'appelle à l'écran. */
+export const LIBELLES_PROPOSE: Record<"hourly" | "daily", string> = {
+    hourly: "Pour une course",
+    daily: "Par jour",
+};
+
+/**
+ * La liste des filtres actuellement posés.
+ *
+ * Elle sert à deux choses d'un coup, et c'est volontaire : le NOMBRE affiché
+ * sur l'entonnoir, et les PASTILLES qui permettent d'en retirer un sans
+ * rouvrir la fenêtre. Deux calculs séparés finiraient par se contredire — un
+ * compteur qui dit trois au-dessus de deux pastilles.
+ *
+ * UN ÉLÉMENT PAR FILTRE, jamais par valeur. Trois communes cochées font une
+ * seule entrée, « 3 communes » : ce sont bien trois valeurs, mais un seul
+ * critère, et la croix de la pastille le retire en entier.
+ *
+ * Un identifiant qui ne correspond à rien du référentiel ne produit RIEN : une
+ * pastille sans libellé serait pire que pas de pastille du tout.
+ */
+export const listerFiltresActifs = (
+    etat: {
+        dispoOnly?: boolean;
+        sortPrice?: boolean;
+        places?: number | null;
+        filtres?: {
+            cityId?: number | null;
+            townIds?: number[];
+            courseTypeId?: number | null;
+            proposes?: "hourly" | "daily" | null;
+        };
+    },
+    referentiel: {
+        communes?: {id: number; title: string}[];
+        typesCourse?: {id: number; title: string}[];
+        villes?: {id: number; title: string}[];
+    } = {},
+): FiltreActif[] => {
+    const actifs: FiltreActif[] = [];
+    const filtres = etat.filtres ?? {};
+
+    if (etat.dispoOnly) actifs.push({cle: "dispo", libelle: "Libres maintenant"});
+    if (etat.sortPrice) actifs.push({cle: "tri", libelle: "Moins cher d’abord"});
+
+    if (etat.places != null) {
+        actifs.push({cle: "places", libelle: `${etat.places} personnes et plus`});
+    }
+
+    if (filtres.proposes) {
+        actifs.push({cle: "propose", libelle: LIBELLES_PROPOSE[filtres.proposes]});
+    }
+
+    if (filtres.courseTypeId) {
+        const type = referentiel.typesCourse?.find((item) => item.id === filtres.courseTypeId);
+
+        if (type) actifs.push({cle: "type", libelle: type.title});
+    }
+
+    if (filtres.cityId) {
+        const ville = referentiel.villes?.find((item) => item.id === filtres.cityId);
+
+        if (ville) actifs.push({cle: "ville", libelle: ville.title});
+    }
+
+    const communes = filtres.townIds ?? [];
+
+    if (communes.length === 1) {
+        // Une seule : on la nomme. « 1 commune » obligerait à rouvrir la
+        // fenêtre pour savoir laquelle.
+        const commune = referentiel.communes?.find((item) => item.id === communes[0]);
+
+        if (commune) actifs.push({cle: "communes", libelle: commune.title});
+    } else if (communes.length > 1) {
+        actifs.push({cle: "communes", libelle: `${communes.length} communes`});
+    }
+
+    return actifs;
+};

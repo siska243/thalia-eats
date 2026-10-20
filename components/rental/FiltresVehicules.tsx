@@ -2,12 +2,21 @@
 
 import React, {useEffect, useRef, useState} from "react";
 import {FaChevronDown} from "react-icons/fa6";
+import {XMarkIcon} from "@heroicons/react/20/solid";
+import {ActionIcon, Modal, Title} from "rizzui";
 
 import {FiltresCatalogue} from "@/helpers/Route";
-import {PALIERS_PLACES} from "@/helpers/rental";
+import {LIBELLES_PROPOSE, PALIERS_PLACES} from "@/helpers/rental";
 import {TypeCourse} from "@/types/rental";
 
 interface Props {
+    /*
+     * La fenêtre est-elle ouverte ? Le composant EST la fenêtre, il n'est pas
+     * emballé dans une autre : c'est la forme qu'a déjà la feuille de filtres
+     * du mobile, qui prend `visible` / `onDismiss`.
+     */
+    ouvert: boolean;
+    onFermer: () => void;
     dispoOnly: boolean;
     onToggleDispo: () => void;
     sortPrice: boolean;
@@ -181,6 +190,8 @@ const SelectCommunes = ({
  * cliquer deux fois pour cocher une case.
  */
 export default function FiltresVehicules({
+    ouvert,
+    onFermer,
     dispoOnly,
     onToggleDispo,
     sortPrice,
@@ -207,14 +218,30 @@ export default function FiltresVehicules({
         });
 
     return (
-        <div className="flex flex-col gap-4 rounded-card bg-surface p-4 shadow-card">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <Champ label="Se loue" htmlFor="filtre-propose">
+        <Modal isOpen={ouvert} onClose={onFermer} containerClassName="bg-white">
+            <div className="flex flex-col gap-4 px-6 pb-8 pt-6 sm:px-7">
+                <div className="flex items-center justify-between gap-3">
+                    <Title as="h3" className="!text-title !font-bold">
+                        Filtrer
+                    </Title>
+
+                    <ActionIcon size="sm" variant="text" onClick={onFermer} aria-label="Fermer">
+                        <XMarkIcon className="h-auto w-6" />
+                    </ActionIcon>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                <Champ label="Louer" htmlFor="filtre-propose">
                     {/*
-                      * « Se loue » interroge ce que le véhicule PROPOSE, pas
+                      * « Louer » interroge ce que le véhicule PROPOSE, pas
                       * comment il est chiffré : un véhicule sans tarif
                       * journalier reste affiché à l'heure, il ne doit pas
-                      * pour autant disparaître du filtre « à l'heure ».
+                      * pour autant disparaître du filtre « pour une course ».
+                      *
+                      * Les libellés viennent de `LIBELLES_PROPOSE`, partagé
+                      * avec les pastilles : le même mode ne peut pas se dire
+                      * d'une façon dans la liste et d'une autre sur la
+                      * pastille qui le retire.
                       */}
                     <select
                         id="filtre-propose"
@@ -227,9 +254,9 @@ export default function FiltresVehicules({
                             })
                         }
                     >
-                        <option value="">À l’heure ou à la journée</option>
-                        <option value="hourly">À l’heure</option>
-                        <option value="daily">À la journée</option>
+                        <option value="">Peu importe</option>
+                        <option value="hourly">{LIBELLES_PROPOSE.hourly}</option>
+                        <option value="daily">{LIBELLES_PROPOSE.daily}</option>
                     </select>
                 </Champ>
 
@@ -316,16 +343,23 @@ export default function FiltresVehicules({
                     Moins cher d’abord
                 </label>
 
+            </div>
+
+                {/*
+                  * « Tout afficher » en pied de fenêtre et pleine largeur,
+                  * comme le bouton de la feuille mobile. Il n'apparaît que
+                  * s'il y a quelque chose à effacer.
+                  */}
                 {actif ? (
                     <button
                         type="button"
                         onClick={onReset}
-                        className="ml-auto min-h-11 text-caption font-semibold text-brand-600 underline-offset-4 hover:underline"
+                        className="min-h-11 w-full rounded-control bg-surface-sunken text-caption font-semibold text-ink transition-colors duration-150 hover:bg-surface-border"
                     >
                         Tout afficher
                     </button>
                 ) : null}
             </div>
-        </div>
+        </Modal>
     );
 }
