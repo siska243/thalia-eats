@@ -5,6 +5,7 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import CarteAuth from "@/components/auth/CarteAuth";
 import Turnstile from "@/components/auth/Turnstile";
+import {estValide} from "@/helpers/telephone";
 import ChampTexte from "@/components/auth/ChampTexte";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
@@ -55,6 +56,16 @@ export default function PageInscription() {
 
         if (champs.password !== champs.confirmPassword) {
             Notify("Les deux mots de passe ne correspondent pas", "info");
+            return;
+        }
+
+        /*
+         * Le numéro n'était vérifié nulle part : `required` en HTML ne dit que
+         * « non vide ». Le serveur le refuse désormais, et l'écran évite au
+         * client d'envoyer tout le formulaire pour l'apprendre.
+         */
+        if (!estValide(champs.phone)) {
+            Notify("Ce numéro de téléphone n’est pas valide. Exemple : 0810000000", "info");
             return;
         }
 

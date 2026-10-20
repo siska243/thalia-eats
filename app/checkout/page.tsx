@@ -8,6 +8,7 @@ import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
 import {clearLocalStorageOrdering} from "@/helpers/localstorage-data";
+import {estValide} from "@/helpers/telephone";
 
 const Page = () => (
     <Suspense>
@@ -110,6 +111,17 @@ const CheckoutPage = () => {
 
         if (!commande) {
             Notify("Votre panier n'a pas pu être lu, recommencez la commande", "error");
+            return;
+        }
+
+        /*
+         * Le numéro à débiter ne passait par AUCUN contrôle, pas même non
+         * vide côté JS : seul le `required` du champ HTML jouait. La passerelle
+         * refusait ensuite, et le client lisait « paiement impossible » sans
+         * savoir que c'était son numéro.
+         */
+        if (!phone || !estValide(phone)) {
+            Notify("Ce numéro de téléphone n’est pas valide. Exemple : 0810000000", "error");
             return;
         }
 

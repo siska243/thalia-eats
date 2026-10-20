@@ -8,6 +8,7 @@ import ChampTexte from "@/components/auth/ChampTexte";
 import Button from "@/components/ui/Button";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
+import {estValide} from "@/helpers/telephone";
 
 export type TypePartenaire = "restaurant" | "livreur";
 
@@ -74,6 +75,16 @@ export default function FormulairePartenaire({type, titre, accroche, promesse, c
 
         if (manquant) {
             setErreur(`Renseignez « ${manquant.label} » pour que nous puissions vous rappeler.`);
+            return;
+        }
+
+        /*
+         * « Pour que nous puissions vous rappeler » : encore faut-il que le
+         * numéro se compose. Une demande de partenariat avec un numéro faux
+         * est une demande perdue, et personne ne s'en aperçoit.
+         */
+        if (!estValide(valeurs.telephone)) {
+            setErreur("Ce numéro de téléphone n’est pas valide. Exemple : 0810000000.");
             return;
         }
 
