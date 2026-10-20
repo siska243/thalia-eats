@@ -42,3 +42,6 @@ next-env.d.ts
 # Generes par next-sitemap au postbuild, a chaque build.
 public/sitemap.xml
 public/sitemap-0.xml
+
+# Registre de tickets, local au poste (meme convention que les deux autres depots)
+.siska/
