@@ -4,7 +4,6 @@ import { FetchData } from "@/helpers/FetchData";
 import { Route } from "@/helpers/Route";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
 import React, { useState } from "react";
 import {removeToken} from "@/server/manageToken";
 import Notify from "@/components/toastify/Notify";
@@ -12,32 +11,39 @@ import Notify from "@/components/toastify/Notify";
 export default function Settings({ isSettingOpen, isMobile }) {
   const [loading, setLoading] = useState(false);
   const { user } = useGetCurrentUser();
-  const router = useRouter();
 
   const handlerLogout = async () => {
-    if (user) {
-      try {
-        setLoading(true);
-        const response = await FetchData.sendData(Route.logout)
+    if (!user) return;
 
-        if (response.success) {
-          await removeToken()
-          // Meme raison qu'a la connexion : le cookie de session vit cote
-          // serveur, `refresh()` fait relire l'etat deconnecte aux pages
-          // rendues la-bas sans recharger toute l'application.
-          router.replace('/');
-          router.refresh();
-        } else {
-          Notify("Déconnexion impossible, réessayez", "error");
-        }
-      } catch {
-        Notify("Déconnexion impossible, réessayez", "error");
-      } finally {
-        setLoading(false);
+    setLoading(true);
+
+    try {
+      const response = await FetchData.sendData(Route.logout)
+
+      if (!response?.success) {
+        // Le jeton est peut-etre deja invalide cote serveur. On ferme la
+        // session locale quand meme : sans ca le client reste enferme dans
+        // une session qu'aucun clic ne peut plus terminer.
+        Notify("Session fermée ici, le serveur n'a pas confirmé", "error");
       }
-
+    } catch {
+      Notify("Session fermée ici, le serveur n'a pas confirmé", "error");
     }
 
+    await removeToken()
+
+    // Rechargement complet, et non `router.replace()` + `router.refresh()`.
+    // Les cookies de session vivent cote serveur, mais le compte est AUSSI
+    // en memoire du navigateur : cache TanStack Query (`query-check-account`)
+    // et magasin Redux (slice `account`, panier). Une navigation cliente ne
+    // vide ni l'un ni l'autre, l'en-tete continuait donc d'afficher
+    // l'utilisateur connecte apres une deconnexion pourtant reussie.
+    //
+    // La regle Next ci-dessous conseille `useRouter().push()` : suivre ce
+    // conseil ICI est precisement ce qui a casse la deconnexion. C'est le
+    // seul endroit de l'application ou le rechargement est voulu.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = '/';
   }
   if (isMobile) {
     return (<div
