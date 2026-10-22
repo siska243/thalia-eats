@@ -47,7 +47,27 @@ class Route
     static double_auth_desactiver = `${this.me}/double-authentification/application/desactiver`
     static double_auth_courriel = `${this.me}/double-authentification/courriel`
 
-    static logout = "auth/logout"
+    /*
+     * `logout`, et non `auth/logout`.
+     *
+     * Les deux existent cote serveur, et ce ne sont pas les memes :
+     *
+     *   api/logout       Api\AuthController@logout, la notre. Supprime le
+     *                    SEUL jeton courant.
+     *   api/auth/logout  celle du paquet rupadana/filament-api-service, qui
+     *                    fait `Auth::user()->tokens()->delete()` — TOUS les
+     *                    jetons du compte.
+     *
+     * Le web tapait la seconde : se deconnecter du site fermait aussi la
+     * session du telephone, sur un autre appareil, sans rien demander a
+     * personne. Le mobile, lui, appelle deja la bonne.
+     *
+     * Consequence sur la reponse : la route du paquet renvoyait
+     * `{success: true}`, un champ que `ApiResponse` ne produit jamais. Le
+     * code qui lisait `response.success` doit tester l'erreur axios, comme
+     * partout ailleurs dans cette application.
+     */
+    static logout = "logout"
     // mise à jour des informations de l'utilisateur
     /**
      * Les informations du compte : nom, prenom, telephone.

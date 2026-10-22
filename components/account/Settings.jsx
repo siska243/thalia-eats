@@ -20,7 +20,12 @@ export default function Settings({ isSettingOpen, isMobile }) {
     try {
       const response = await FetchData.sendData(Route.logout)
 
-      if (!response?.success) {
+      // `response.success` n'existe pas : ce champ venait de la route du
+      // paquet rupadana, que ce code appelait par erreur. Notre endpoint
+      // repond par l'enveloppe ApiResponse, et FetchData RETOURNE l'erreur
+      // axios au lieu de la lever — c'est elle qu'on teste, comme partout
+      // ailleurs dans cette application.
+      if (response?.name === "AxiosError") {
         // Le jeton est peut-etre deja invalide cote serveur. On ferme la
         // session locale quand meme : sans ca le client reste enferme dans
         // une session qu'aucun clic ne peut plus terminer.
