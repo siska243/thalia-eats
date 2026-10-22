@@ -64,6 +64,26 @@ export default function PageConnexion() {
             const response = await FetchData.sendData(Route.login, identifiants);
 
             if (response?.name === "AxiosError") {
+                /*
+                 * L'ADRESSE N'A JAMAIS ETE CONFIRMEE.
+                 *
+                 * Le mot de passe est bon, le serveur refuse quand meme et le
+                 * dit par ce code machine. Sans cette redirection, le client
+                 * lit « confirmez votre adresse » sans savoir ou le faire :
+                 * seul /signup menait jusqu'ici a l'ecran de confirmation, et
+                 * le code recu a l'inscription vaut trente minutes. Celui qui
+                 * revient le lendemain doit en redemander un, et cet ecran est
+                 * le seul endroit qui le permet.
+                 *
+                 * L'adresse est passee dans l'URL pour qu'il ne la resaisisse
+                 * pas : c'est a elle que le code part.
+                 */
+                if (response.response?.data?.error === "adresse_non_confirmee") {
+                    Notify(response.response.data.message, "error");
+                    router.push(`/confirmation?email=${encodeURIComponent(email)}`);
+                    return;
+                }
+
                 Notify(
                     response.response?.data?.message ?? "Email ou mot de passe incorrect",
                     "error"
