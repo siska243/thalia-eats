@@ -708,12 +708,26 @@ const TunnelReservation = () => {
                         ) : null}
 
                         {erreur ? (
-                            <p
+                            <div
                                 role="alert"
-                                className="rounded-control bg-danger-surface px-4 py-3 text-caption font-semibold text-danger"
+                                className="flex flex-col gap-2 rounded-control bg-danger-surface px-4 py-3 text-caption font-semibold text-danger"
                             >
-                                {erreur}
-                            </p>
+                                <p>{erreur}</p>
+
+                                {/*
+                                  * Un refus nomme souvent une autre course :
+                                  * une reservation laissee impayee empeche
+                                  * d'en prendre une nouvelle. Le message le
+                                  * disait sans dire ou aller, et le client
+                                  * n'avait plus qu'a chercher.
+                                  */}
+                                <Link
+                                    href="/location/courses"
+                                    className="underline underline-offset-4"
+                                >
+                                    Voir mes courses pour payer ou annuler
+                                </Link>
+                            </div>
                         ) : null}
 
                         <button
@@ -838,12 +852,26 @@ const TunnelReservation = () => {
                         </section>
 
                         {erreur ? (
-                            <p
+                            <div
                                 role="alert"
-                                className="rounded-control bg-danger-surface px-4 py-3 text-caption font-semibold text-danger"
+                                className="flex flex-col gap-2 rounded-control bg-danger-surface px-4 py-3 text-caption font-semibold text-danger"
                             >
-                                {erreur}
-                            </p>
+                                <p>{erreur}</p>
+
+                                {/*
+                                  * Un refus nomme souvent une autre course :
+                                  * une reservation laissee impayee empeche
+                                  * d'en prendre une nouvelle. Le message le
+                                  * disait sans dire ou aller, et le client
+                                  * n'avait plus qu'a chercher.
+                                  */}
+                                <Link
+                                    href="/location/courses"
+                                    className="underline underline-offset-4"
+                                >
+                                    Voir mes courses pour payer ou annuler
+                                </Link>
+                            </div>
                         ) : null}
 
                         <ChoixPaiement
