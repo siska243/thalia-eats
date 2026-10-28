@@ -693,7 +693,7 @@ const TunnelReservation = () => {
                         <section className="flex flex-col gap-3 rounded-card bg-surface p-4 shadow-card sm:p-6">
                             <div className="flex items-start gap-2">
                                 <FaCalendarDays className="mt-1 shrink-0 text-brand-600" aria-hidden />
-                                <div className="min-w-0 flex-1">
+                                                <div className="min-w-0 flex-1">
                                     <p className="text-caption text-ink-muted">Créneau</p>
                                     <p className="text-body text-ink">
                                         {creneauLisible(
@@ -716,6 +716,27 @@ const TunnelReservation = () => {
                                               )}
                                     </p>
                                 </div>
+
+                                {/*
+                                  * Changer l'heure sans tout recommencer.
+                                  *
+                                  * Le creneau se choisit sur la fiche du
+                                  * vehicule, et cet ecran n'y renvoyait pas :
+                                  * un depart devenu trop proche — le serveur
+                                  * exige soixante minutes de prevenance — se
+                                  * refusait a l'infini, et la seule issue
+                                  * affichee etait « Choisir un autre
+                                  * vehicule », qui fait perdre celui qu'on
+                                  * venait de choisir.
+                                  */}
+                                {reglementSeul || !slug ? null : (
+                                    <Link
+                                        href={`/location/vehicule/${encodeURIComponent(slug)}`}
+                                        className="shrink-0 px-2 text-caption font-semibold text-brand-600 underline-offset-4 hover:underline"
+                                    >
+                                        Modifier
+                                    </Link>
+                                )}
                             </div>
 
                             <div className="flex items-start gap-2">
@@ -804,6 +825,15 @@ const TunnelReservation = () => {
                                 >
                                     Revenir à l’adresse
                                 </button>
+                            )}
+
+                            {reglementSeul || !slug ? null : (
+                                <Link
+                                    href={`/location/vehicule/${encodeURIComponent(slug)}`}
+                                    className="min-h-11 text-caption font-semibold text-ink-muted underline-offset-4 hover:underline"
+                                >
+                                    Changer le créneau
+                                </Link>
                             )}
 
                             <Link
