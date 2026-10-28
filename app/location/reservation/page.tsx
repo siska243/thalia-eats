@@ -3,7 +3,7 @@
 import React, {Suspense, useMemo, useState} from "react";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
-import {FaCalendarDays, FaCheck, FaLocationDot, FaUsers} from "react-icons/fa6";
+import {FaCalendarDays, FaCheck, FaChevronLeft, FaLocationDot, FaUsers} from "react-icons/fa6";
 
 import {
     creneauLisible,
@@ -486,6 +486,24 @@ const TunnelReservation = () => {
         <div className="min-h-svh bg-surface-sunken pt-[calc(var(--header-h)+24px)]">
             <div className="mx-auto max-w-4xl px-4 pb-16 sm:px-5">
                 <header className="mb-5">
+                    {/*
+                      * Le retour en tete, et visible.
+                      *
+                      * Il n'existait qu'en bas de page, en petit texte
+                      * souligne sous les moyens de paiement : le client qui
+                      * cherchait a corriger son adresse ou son creneau ne le
+                      * voyait pas, et croyait l'ecran sans issue.
+                      */}
+                    {etape === 0 || reglementSeul ? null : (
+                        <button
+                            type="button"
+                            onClick={() => setEtape(0)}
+                            className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-pill border border-surface-border px-4 text-caption font-semibold text-ink transition-colors duration-150 hover:bg-surface"
+                        >
+                            <FaChevronLeft aria-hidden /> Retour à l’adresse
+                        </button>
+                    )}
+
                     <p className="text-caption text-ink-muted">
                         Étape {etape + 1} sur 2 · {noms.rental}
                     </p>
