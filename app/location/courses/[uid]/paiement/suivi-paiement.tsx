@@ -6,6 +6,8 @@ import {BiLoader} from "react-icons/bi";
 import {FaCircleCheck, FaCircleXmark} from "react-icons/fa6";
 
 import EcranPaiement from "@/components/payement/EcranPaiement";
+import useExpiration from "@/hooks/useExpiration";
+import {compteARebours} from "@/helpers/expiration";
 import {useRentalBooking} from "@/hooks/useRental";
 
 /**
@@ -31,6 +33,20 @@ const Corps = ({uid}: {uid: string}) => {
 
     const {data: booking} = useRentalBooking(uid, true);
 
+    /*
+     * L'attente a une fin.
+     *
+     * Une demande mobile money que le client ne valide jamais ne declenche
+     * aucun webhook : la page restait alors en « en attente » indefiniment,
+     * sans rien dire et sans issue — c'est ce qui a ete signale apres cinq
+     * minutes et un rechargement.
+     *
+     * L'echeance de la reservation fait foi : passee, il n'y a plus rien a
+     * attendre, et l'ecran le dit au lieu de faire tourner son indicateur.
+     */
+    const {minutes, ecoule} = useExpiration(booking?.expires_at);
+    const rebours = compteARebours(minutes);
+
     const course = `/location/courses/${encodeURIComponent(uid)}`;
     const reprendre = `/location/reservation?uid=${encodeURIComponent(uid)}`;
 
@@ -46,6 +62,21 @@ const Corps = ({uid}: {uid: string}) => {
             router.replace(course);
         }
     }, [booking, course, router]);
+
+    if (ecoule && (!booking || booking.status === "pending_payment")) {
+        return (
+            <EcranPaiement
+                ton="echec"
+                icone={<FaCircleXmark className="h-9 w-9" />}
+                titre="Paiement non confirmé"
+                message="Nous n’avons reçu aucune confirmation dans le délai imparti, et rien n’a été débité. Vous pouvez relancer le paiement."
+                actions={[
+                    {href: reprendre, label: "Recommencer le paiement"},
+                    {href: course, label: "Voir ma course"},
+                ]}
+            />
+        );
+    }
 
     if (issue === "refus" || issue === "annule") {
         return (
@@ -84,9 +115,10 @@ const Corps = ({uid}: {uid: string}) => {
             icone={<BiLoader className="h-9 w-9 animate-spin-slow" />}
             titre="Paiement en attente"
             message={
-                issue === "succes"
+                (issue === "succes"
                     ? "Paiement accepté par votre banque. Nous attendons la confirmation de l’opérateur : cette page se met à jour toute seule, ne la fermez pas."
-                    : "Validez le paiement depuis le message reçu sur votre téléphone. Cette page se met à jour toute seule, ne la fermez pas."
+                    : "Validez le paiement depuis le message reçu sur votre téléphone, en composant votre code. Cette page se met à jour toute seule, ne la fermez pas.") +
+                (rebours ? ` Il reste ${rebours}.` : "")
             }
             actions={[
                 {href: reprendre, label: "Le paiement n’aboutit pas ? Recommencer"},
