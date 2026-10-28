@@ -427,7 +427,14 @@ const TunnelReservation = () => {
                 return;
             }
 
-            const suivi = `${window.location.origin}/location/courses/${encodeURIComponent(booking.uid)}`;
+            /*
+             * L'ecran d'attente du paiement, et non la fiche de la course :
+             * la fiche remontre `VueAPayer` tant que l'acompte n'est pas
+             * recu, c'est-a-dire l'ecran de reglement qu'on vient de
+             * quitter. Le client croyait etre revenu en arriere sans savoir
+             * si son paiement etait passe.
+             */
+            const suivi = `${window.location.origin}/location/courses/${encodeURIComponent(booking.uid)}/paiement`;
 
             const resultat = await payerAcompte.mutateAsync({
                 uid: booking.uid,
@@ -449,9 +456,9 @@ const TunnelReservation = () => {
                  * navigateur, et lui évite d'attendre une confirmation qui ne
                  * viendra jamais.
                  */
-                success_url: `${suivi}?paiement=succes`,
-                error_url: `${suivi}?paiement=refus`,
-                cancel_url: `${suivi}?paiement=annule`,
+                success_url: `${suivi}?issue=succes`,
+                error_url: `${suivi}?issue=refus`,
+                cancel_url: `${suivi}?issue=annule`,
             });
 
             if (method === "cart") {
@@ -475,7 +482,7 @@ const TunnelReservation = () => {
              * qu'il avait quelque chose à valider.
              */
             setModalOuverte(false);
-            router.push(`${suivi.replace(window.location.origin, "")}?paiement=engage`);
+            router.push(`${suivi.replace(window.location.origin, "")}?issue=engage`);
         } catch (e) {
             setErreur((e as Error).message);
         } finally {
