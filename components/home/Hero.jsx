@@ -109,7 +109,7 @@ export default function Hero({previews = []}) {
                             >
                                 {noms.rental}
                             </Link>{" "}
-                            vous trouve une voiture avec chauffeur, à l&apos;heure ou à la journée.
+                            vous trouve une voiture avec chauffeur, au quotidien.
                         </p>
 
                         <div className="mt-9 flex flex-wrap gap-3">
