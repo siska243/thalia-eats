@@ -42,14 +42,16 @@ export default function Checkout() {
      * minimum », et c'est aussi le repli tant que la reponse n'est pas la :
      * on ne bloque pas une commande sur une supposition.
      *
-     * La comparaison porte sur le SOUS-TOTAL des plats, comme cote serveur.
-     * Compter la livraison et le service ferait franchir la barre a un
-     * panier qui ne l'atteint pas, et l'ecran dirait oui la ou l'API dit non.
+     * La comparaison porte sur le TOTAL GENERAL, livraison et service
+     * compris, comme cote serveur depuis l'arbitrage du 28 octobre : « non
+     * pas sous-total mais le total general ». Le total vient du chiffrage du
+     * SERVEUR, deja recu avec l'adresse confirmee — pas d'une somme
+     * recalculee ici, qui pourrait differer de celle qui fait foi.
      */
     const montantMinimum = Number(defaut?.reglages?.montant_minimum_commande ?? 0) || 0;
-    const sousTotal = calcul_price(cart ?? []);
+    const total = Number(order?.data?.total_price ?? calcul_price(cart ?? [])) || 0;
     const devise = order?.data?.pricing?.currency?.code ?? cart?.[0]?.currency?.code;
-    const sousLeMinimum = montantMinimum > 0 && sousTotal < montantMinimum;
+    const sousLeMinimum = montantMinimum > 0 && total < montantMinimum;
 
     const handlerCheckPayement = () => {
         if (!order?.data || sousLeMinimum) return;
@@ -89,7 +91,7 @@ export default function Checkout() {
         return (
             <div className="p-5">
                 <p className="rounded-control bg-warning-surface px-4 py-3 text-caption font-semibold text-warning">
-                    {`Commande à partir de ${formatPrix(montantMinimum, devise)} de plats. Il vous manque ${formatPrix(montantMinimum - sousTotal, devise)} pour continuer.`}
+                    {`Commande à partir de ${formatPrix(montantMinimum, devise)}, livraison comprise. Il vous manque ${formatPrix(montantMinimum - total, devise)} pour continuer.`}
                 </p>
             </div>
         );
