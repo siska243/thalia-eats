@@ -8,7 +8,7 @@ import {FaCircleCheck, FaCircleXmark} from "react-icons/fa6";
 import EcranPaiement from "@/components/payement/EcranPaiement";
 import useExpiration from "@/hooks/useExpiration";
 import {compteARebours} from "@/helpers/expiration";
-import {useRentalBooking} from "@/hooks/useRental";
+import {useRentalBooking, useRentalDepositStatus} from "@/hooks/useRental";
 
 /**
  * Le retour d'un paiement d'acompte, location.
@@ -31,7 +31,21 @@ const Corps = ({uid}: {uid: string}) => {
     const router = useRouter();
     const issue = useSearchParams().get("issue");
 
-    const {data: booking} = useRentalBooking(uid, true);
+    /*
+     * Deux sources, une seule verite.
+     *
+     * La premiere relit la reservation ; la seconde demande son verdict a la
+     * passerelle et le fait trancher cote serveur. Sans elle, une
+     * confirmation perdue en route — webhook non recu — laissait l'ecran
+     * tourner sur une reservation que FlexPay savait deja reglee.
+     *
+     * La plus fraiche des deux l'emporte : `statut` est lu sur la reponse de
+     * la passerelle des qu'elle en rend une.
+     */
+    const {data: lue} = useRentalBooking(uid, true);
+    const {data: verifiee} = useRentalDepositStatus(uid, true);
+
+    const booking = verifiee ?? lue;
 
     /*
      * L'attente a une fin.

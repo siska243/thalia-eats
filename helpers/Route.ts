@@ -259,6 +259,14 @@ class RouteRental
     static booking_cancel = (uid: string): string => `${this.prefix}/bookings/${uid}/cancel`
     static booking_deposit = (uid: string): string => `${this.prefix}/bookings/${uid}/deposit`
 
+    /*
+     * Ou en est l'acompte, d'apres la passerelle elle-meme. Le webhook reste
+     * le chemin normal ; celui-ci est le recours quand il ne revient pas, et
+     * il confirme la reservation au passage.
+     */
+    static booking_deposit_status = (uid: string): string =>
+        `${this.prefix}/bookings/${uid}/deposit/status`
+
     /**
      * La position du chauffeur et le point de rendez-vous d'une course.
      *

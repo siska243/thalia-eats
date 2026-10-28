@@ -180,6 +180,30 @@ export const useRentalBookings = (enabled = true) =>
  * qu'en relisant. Le sondage s'arrete de lui-meme des que le statut n'est plus
  * `pending_payment`.
  */
+/**
+ * L'etat de l'acompte, demande a la passerelle.
+ *
+ * Le webhook ne revient pas toujours : une instance de developpement n'est
+ * pas joignable, un reseau le perd. L'ecran d'attente restait alors a tourner
+ * sur une reservation que FlexPay savait deja reglee, ou deja perdue.
+ *
+ * Le serveur interroge FlexPay, confronte reference et montant, puis confirme
+ * ou echoue — la meme regle que le webhook, par l'autre porte. Le sondage
+ * s'arrete de lui-meme des que le statut n'est plus `pending_payment`.
+ */
+export const useRentalDepositStatus = (uid?: string, poll = false) =>
+    useQuery({
+        queryKey: [BOOKINGS_KEY, uid, 'deposit-status'],
+        queryFn: async () => {
+            const reponse = await FetchData.getData(RouteRental.booking_deposit_status(uid!));
+
+            return contenuRental<RentalBookingType>(reponse);
+        },
+        enabled: !!uid && poll,
+        refetchInterval: (query) =>
+            query.state.data?.status === "pending_payment" ? 5000 : false,
+    });
+
 export const useRentalBooking = (uid?: string, poll = false) =>
     useQuery({
         queryKey: [BOOKINGS_KEY, uid],
