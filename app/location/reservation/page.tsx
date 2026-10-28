@@ -494,7 +494,25 @@ const TunnelReservation = () => {
                       * cherchait a corriger son adresse ou son creneau ne le
                       * voyait pas, et croyait l'ecran sans issue.
                       */}
-                    {etape === 0 || reglementSeul ? null : (
+                    {reglementSeul ? null : etape === 0 ? (
+                        /*
+                         * A la PREMIERE etape, revenir veut dire changer le
+                         * creneau : il est fige dans l'URL de cet ecran, et
+                         * se choisit sur la fiche du vehicule. Sans ce lien,
+                         * un depart devenu trop proche — soixante minutes de
+                         * prevenance exigees par le serveur — n'avait aucune
+                         * issue : le bouton Continuer refusait, et rien a
+                         * l'ecran ne menait ailleurs.
+                         */
+                        slug ? (
+                            <Link
+                                href={`/location/vehicule/${encodeURIComponent(slug)}`}
+                                className="mb-3 inline-flex min-h-11 items-center gap-2 rounded-pill border border-surface-border px-4 text-caption font-semibold text-ink transition-colors duration-150 hover:bg-surface"
+                            >
+                                <FaChevronLeft aria-hidden /> Changer le créneau
+                            </Link>
+                        ) : null
+                    ) : (
                         <button
                             type="button"
                             onClick={() => setEtape(0)}
