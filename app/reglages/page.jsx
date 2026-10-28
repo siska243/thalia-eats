@@ -1,4 +1,5 @@
 import AssistantsConnectes from "@/components/account/AssistantsConnectes";
+import SupprimerMonCompte from "@/components/account/SupprimerMonCompte";
 import EditCompte from "@/components/account/EditCompte";
 import Information from "@/components/account/Informations";
 import CarnetDuCompte from "@/components/account/CarnetDuCompte";
@@ -32,6 +33,10 @@ export default function PageReglages() {
                 <DoubleAuthentification />
 
                 <AssistantsConnectes />
+
+                {/* En dernier, et seul de sa couleur : rien d'autre sur cette
+                    page n'est irreversible. */}
+                <SupprimerMonCompte />
             </div>
         </div>
     );

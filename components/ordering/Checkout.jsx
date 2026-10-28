@@ -6,6 +6,9 @@ import {useSelector} from "react-redux";
 import {FaCircleArrowRight} from "react-icons/fa6";
 import Spinner from "@/components/Loader/Spinner";
 import {API_BASE_URL} from "@/helpers/FetchData";
+import {calcul_price} from "@/helpers/calculePrice";
+import {formatPrix} from "@/helpers/openingHours";
+import useDefaultData from "@/hooks/useCommandeData";
 
 /**
  * Le passage au paiement.
@@ -29,11 +32,27 @@ import {API_BASE_URL} from "@/helpers/FetchData";
  */
 export default function Checkout() {
     const [loading, setLoading] = useState(false);
-    const {order} = useSelector((state) => state.shop);
+    const {order, cart} = useSelector((state) => state.shop);
+    const {data: defaut} = useDefaultData();
     const router = useRouter();
 
+    /*
+     * Le panier minimum, decide en administration et servi par /default
+     * sous `reglages.montant_minimum_commande`. Zero signifie « aucun
+     * minimum », et c'est aussi le repli tant que la reponse n'est pas la :
+     * on ne bloque pas une commande sur une supposition.
+     *
+     * La comparaison porte sur le SOUS-TOTAL des plats, comme cote serveur.
+     * Compter la livraison et le service ferait franchir la barre a un
+     * panier qui ne l'atteint pas, et l'ecran dirait oui la ou l'API dit non.
+     */
+    const montantMinimum = Number(defaut?.reglages?.montant_minimum_commande ?? 0) || 0;
+    const sousTotal = calcul_price(cart ?? []);
+    const devise = order?.data?.pricing?.currency?.code ?? cart?.[0]?.currency?.code;
+    const sousLeMinimum = montantMinimum > 0 && sousTotal < montantMinimum;
+
     const handlerCheckPayement = () => {
-        if (!order?.data) return;
+        if (!order?.data || sousLeMinimum) return;
 
         setLoading(true);
 
@@ -56,6 +75,21 @@ export default function Checkout() {
             <div className="p-5">
                 <p className="rounded-control bg-warning-surface px-4 py-3 text-caption font-semibold text-warning">
                     Confirmez votre adresse de livraison pour continuer.
+                </p>
+            </div>
+        );
+    }
+
+    /*
+     * Le blocage se pose ICI, apres l'adresse confirmee et le prix calcule :
+     * c'est le moment ou le client s'engage. Le panier, lui, se contente de
+     * prevenir.
+     */
+    if (sousLeMinimum) {
+        return (
+            <div className="p-5">
+                <p className="rounded-control bg-warning-surface px-4 py-3 text-caption font-semibold text-warning">
+                    {`Commande à partir de ${formatPrix(montantMinimum, devise)} de plats. Il vous manque ${formatPrix(montantMinimum - sousTotal, devise)} pour continuer.`}
                 </p>
             </div>
         );
