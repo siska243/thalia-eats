@@ -433,11 +433,25 @@ const TunnelReservation = () => {
                 uid: booking.uid,
                 method,
                 phone: method === "mobile" ? (phone ?? "").replace(/\s+/g, "") : "",
-                // La passerelle carte dépose le client sur ces adresses : sans
-                // elles, il atterrit sur l'accueil du site et non sur sa course.
-                success_url: suivi,
-                error_url: suivi,
-                cancel_url: suivi,
+                /*
+                 * La passerelle carte dépose le client sur ces adresses : sans
+                 * elles, il atterrit sur l'accueil du site et non sur sa course.
+                 *
+                 * Les trois diffèrent, et c'est tout l'enjeu : elles étaient
+                 * identiques, si bien que la page d'arrivée ne pouvait pas
+                 * distinguer un acompte accepté d'une carte refusée. Un client
+                 * dont la carte n'était pas approvisionnée revenait sur une
+                 * page muette, exactement comme s'il avait payé — « on ne sait
+                 * pas si c'était payé ou non ».
+                 *
+                 * Le marqueur ne fait pas foi : c'est le webhook qui tranche.
+                 * Il dit seulement à la page ce que la passerelle a répondu au
+                 * navigateur, et lui évite d'attendre une confirmation qui ne
+                 * viendra jamais.
+                 */
+                success_url: `${suivi}?paiement=succes`,
+                error_url: `${suivi}?paiement=refus`,
+                cancel_url: `${suivi}?paiement=annule`,
             });
 
             if (method === "cart") {

@@ -68,9 +68,32 @@ const Corps = ({uid}: {uid: string}) => {
      * relire toutes les cinq secondes une course consultée au hasard n'avance
      * personne.
      */
-    const paiementEngage = params.get("paiement") === "engage";
+    const retourPaiement = params.get("paiement");
+    const paiementEngage = retourPaiement === "engage";
 
-    const {data: booking, isLoading, refetch} = useRentalBooking(uid, paiementEngage);
+    /*
+     * Ce que la passerelle a repondu au navigateur, en carte.
+     *
+     * Les trois adresses de retour etaient identiques : la page ne pouvait
+     * pas distinguer un acompte accepte d'une carte refusee, et un client
+     * dont la carte n'etait pas approvisionnee revenait sur une page muette,
+     * exactement comme s'il avait paye.
+     *
+     * Ce marqueur ne fait pas foi — seul le webhook tranche, et le statut
+     * affiche plus bas reste la verite. Il sert a dire tout de suite ce qui
+     * vient de se passer, au lieu de laisser attendre une confirmation qui
+     * ne viendra jamais.
+     */
+    const issueCarte =
+        retourPaiement === "succes" || retourPaiement === "refus" || retourPaiement === "annule"
+            ? retourPaiement
+            : null;
+
+    // En retour de carte acceptee, l'acompte n'est pas encore enregistre :
+    // le webhook arrive de serveur a serveur, quelques secondes plus tard.
+    const sondage = paiementEngage || issueCarte === "succes";
+
+    const {data: booking, isLoading, refetch} = useRentalBooking(uid, sondage);
     const {annuler} = useRentalActions();
 
     const [confirmeAnnulation, setConfirmeAnnulation] = useState(false);
@@ -162,6 +185,44 @@ const Corps = ({uid}: {uid: string}) => {
                     >
                         Une demande de paiement vient de partir sur votre téléphone. Validez-la
                         pour retenir le véhicule : cette page se met à jour toute seule.
+                    </p>
+                ) : null}
+
+                {/*
+                  * Le retour de la carte, dit en clair.
+                  *
+                  * Un acompte deja enregistre l'emporte sur le marqueur : si
+                  * le webhook est arrive pendant le retour du client, le
+                  * statut dit « confirme » et il n'y a plus rien a annoncer.
+                  */}
+                {issueCarte === "succes" && booking.status === "pending_payment" ? (
+                    <p
+                        role="status"
+                        className="mb-4 rounded-card bg-brand-50 px-4 py-3 text-body text-brand-700"
+                    >
+                        Paiement accepté par votre banque. Nous attendons la confirmation de
+                        l’opérateur : cette page se met à jour toute seule.
+                    </p>
+                ) : null}
+
+                {issueCarte === "refus" ? (
+                    <p
+                        role="alert"
+                        className="mb-4 rounded-card bg-danger-surface px-4 py-3 text-body font-semibold text-danger"
+                    >
+                        Votre paiement a été refusé, rien n’a été débité. Vérifiez le solde ou les
+                        plafonds de votre carte, puis réessayez : le véhicule reste réservé
+                        jusqu’à l’échéance ci-dessous.
+                    </p>
+                ) : null}
+
+                {issueCarte === "annule" ? (
+                    <p
+                        role="status"
+                        className="mb-4 rounded-card bg-warning-surface px-4 py-3 text-body font-semibold text-warning"
+                    >
+                        Paiement abandonné, rien n’a été débité. Vous pouvez réessayer tant que le
+                        créneau n’est pas repris.
                     </p>
                 ) : null}
 
