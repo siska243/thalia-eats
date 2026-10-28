@@ -28,9 +28,8 @@ import CarnetAdresses from "@/components/ordering/CarnetAdresses";
 import useAdresses from "@/hooks/useAdresses";
 import type {AdresseEnregistree} from "@/types/adresse";
 import PhoneNumber from "@/components/forms/phone-number";
-import {estValide, pourLaSaisie, pourLeCompte} from "@/helpers/telephone";
+import {estValide, pourLaSaisie} from "@/helpers/telephone";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
-import {FetchData} from "@/helpers/FetchData";
 import ChoixPaiement from "@/components/ordering/ChoixPaiement";
 import ModalMobileMoney from "@/components/ordering/ModalMobileMoney";
 import HorsZone from "@/components/rental/HorsZone";
@@ -377,30 +376,23 @@ const TunnelReservation = () => {
 
         try {
             /*
-             * Le numero change est ecrit sur le COMPTE, pas sur la
-             * reservation : c'est celui-la que le chauffeur lira. L'echec
-             * n'arrete pas la reservation — perdre une course parce qu'un
-             * numero n'a pas pu etre enregistre serait absurde — mais il se
-             * dit, sinon le client croirait avoir corrige son numero.
+             * Le numero saisi ici appartient a la COURSE, pas au compte.
+             *
+             * L'ecran le posait sur le compte du client avant de payer. Deux
+             * consequences : un client qui payait depuis le telephone d'un
+             * proche voyait le numero de ce proche devenir le sien, et
+             * surtout l'appel echouait sur les comptes dont le nom de famille
+             * faisait moins de trois lettres — l'endpoint de profil exige
+             * `name`, `last_name` et `email`, que ce parcours n'a aucune
+             * raison de changer. Le client lisait « Votre numero n'a pas pu
+             * etre enregistre » au moment de payer, avec un numero pourtant
+             * valide.
+             *
+             * Le numero part desormais avec l'acompte, et le serveur le
+             * conserve sur le paiement de la reservation (`booking_payments`).
+             * C'est celui qui est debite, et celui qui reste attache a cette
+             * course-la.
              */
-            if (user && telephoneRetenu && telephoneRetenu !== telephoneDuCompte) {
-                const reponse = await FetchData.sendData(Route.update_user, {
-                    email: user.email,
-                    name: user.name,
-                    last_name: user.last_name,
-                    // Reconverti au format local : le mobile analyse le numero
-                    // du compte en supposant ce format, et l'international le
-                    // lui rendrait illisible.
-                    phone: pourLeCompte(telephoneRetenu),
-                });
-
-                if (reponse?.name === "AxiosError") {
-                    setErreur(
-                        "Votre numéro n'a pas pu être enregistré sur votre compte. La réservation continue.",
-                    );
-                }
-            }
-
             let booking = reservation;
 
             if (!reglementSeul) {
