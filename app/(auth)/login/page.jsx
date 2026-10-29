@@ -6,11 +6,13 @@ import {useRouter} from "next/navigation";
 import {useDispatch} from "react-redux";
 import CarteAuth from "@/components/auth/CarteAuth";
 import ChampTexte from "@/components/auth/ChampTexte";
+import PhoneNumber from "@/components/forms/phone-number";
 import Turnstile, {DEFI_ACTIF} from "@/components/auth/Turnstile";
 import Spinner from "@/components/Loader/Spinner";
 import Notify from "@/components/toastify/Notify";
 import {FetchData} from "@/helpers/FetchData";
 import {Route} from "@/helpers/Route";
+import {estValide, pourLeCompte} from "@/helpers/telephone";
 import {setToken} from "@/server/manageToken";
 import useGetCurrentUser from "@/hooks/useGetCurrentUser";
 import {fetchAccountData} from "@/store/reducers/account";
@@ -29,8 +31,25 @@ import {fetchAccountData} from "@/store/reducers/account";
  * existe.
  */
 export default function PageConnexion() {
+    /*
+     * DEUX ETAPES : on se nomme, puis on prouve que c'est bien soi.
+     *
+     * Le champ s'appelait deja « Identifiant » et disait accepter « votre
+     * email ou numero de telephone » — mais il partait dans `email`, et le
+     * serveur ne connaissait que l'adresse. Un numero y etait donc refuse
+     * sans que rien n'explique pourquoi.
+     *
+     * Le decoupage existe pour que la premiere etape pose une question a
+     * laquelle on peut repondre de deux facons, sans afficher les deux
+     * champs a la fois.
+     */
+    const [etape, setEtape] = useState("identifiant");
+    const [canal, setCanal] = useState("email");
+
     const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
+    const [erreurIdentifiant, setErreurIdentifiant] = useState(null);
     const [loading, setLoading] = useState(false);
 
     /*
@@ -55,7 +74,18 @@ export default function PageConnexion() {
         setLoading(true);
 
         try {
-            const identifiants = {email, password};
+            /*
+             * UN SEUL CHAMP D'IDENTIFIANT PART. Envoyer les deux laisserait
+             * le serveur choisir, et c'est le client qui a choisi.
+             *
+             * `pourLeCompte` rend le format local, celui que les comptes
+             * stockent — la conversion vit dans `helpers/telephone`, une
+             * seule fois, et pas dans cette page.
+             */
+            const identifiants =
+                canal === "telephone"
+                    ? {phone: pourLeCompte(phone), password}
+                    : {email, password};
 
             // Absent quand le défi n'est pas configuré : le serveur ne le
             // réclame que si sa propre clé est posée.
@@ -80,7 +110,20 @@ export default function PageConnexion() {
                  */
                 if (response.response?.data?.error === "adresse_non_confirmee") {
                     Notify(response.response.data.message, "error");
-                    router.push(`/confirmation?email=${encodeURIComponent(email)}`);
+
+                    /*
+                     * Connecte par telephone, on n'a pas l'adresse — et la
+                     * page de confirmation ne sait pas travailler sans elle.
+                     * On s'en tient alors au message du serveur plutot que
+                     * d'envoyer sur un formulaire au champ vide.
+                     */
+                    if (email) {
+                        router.push(`/confirmation?email=${encodeURIComponent(email)}`);
+                        return;
+                    }
+
+                    setReinitDefi((rang) => rang + 1);
+
                     return;
                 }
 
@@ -241,53 +284,170 @@ export default function PageConnexion() {
         );
     }
 
+    const bas = (
+        <>
+            Vous n&apos;avez pas de compte ?{" "}
+            <Link
+                href="/signup"
+                className="font-semibold text-brand-600 underline-offset-4 hover:underline"
+            >
+                Inscrivez-vous
+            </Link>
+        </>
+    );
+
+    /*
+     * ETAPE 2 : LE MOT DE PASSE.
+     *
+     * L'identifiant est rappele sous le titre, pas reaffiche en champ : il
+     * est deja saisi, et un champ modifiable inviterait a le corriger ici
+     * alors que le retour existe pour ca.
+     *
+     * Le defi anti-robot vit sur cette etape et pas sur la premiere : son
+     * jeton ne sert qu'une fois, et il part avec la connexion.
+     */
+    if (etape === "motDePasse") {
+        return (
+            <CarteAuth
+                titre="Votre mot de passe"
+                sousTitre={canal === "email" ? email : phone}
+                bas={bas}
+            >
+                <form className="flex flex-col gap-5" onSubmit={handlerSubmit}>
+                    <ChampTexte
+                        label="Mot de passe"
+                        motDePasse
+                        placeholder="••••••••"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+
+                    <Turnstile onJeton={setJetonAntiRobot} reinit={reinitDefi} />
+
+                    {/* Tant que le defi n'est pas passe, on n'envoie pas.
+                        `DEFI_ACTIF` garde le bouton vivant sur un site sans
+                        cle, ou aucun jeton n'arriverait jamais. */}
+                    <button
+                        type="submit"
+                        disabled={loading || (DEFI_ACTIF && !jetonAntiRobot)}
+                        className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
+                    >
+                        {loading ? <Spinner /> : "Se connecter"}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setEtape("identifiant");
+                            setPassword("");
+                        }}
+                        className="text-center font-semibold text-brand-600 underline-offset-4 hover:underline"
+                    >
+                        Changer d’identifiant
+                    </button>
+                </form>
+            </CarteAuth>
+        );
+    }
+
+    const continuer = (e) => {
+        e.preventDefault();
+
+        if (canal === "email") {
+            if (!email.trim()) {
+                setErreurIdentifiant("L’adresse email est obligatoire");
+
+                return;
+            }
+        } else if (!phone.trim()) {
+            setErreurIdentifiant("Le numéro de téléphone est obligatoire");
+
+            return;
+        } else if (!estValide(pourLeCompte(phone))) {
+            setErreurIdentifiant(
+                "Ce numéro de téléphone n’est pas valide. Exemple : 0810000000."
+            );
+
+            return;
+        }
+
+        setErreurIdentifiant(null);
+        setEtape("motDePasse");
+    };
+
+    /*
+     * ETAPE 1 : QUI ETES-VOUS.
+     *
+     * L'email d'abord, parce que c'est l'identifiant de tous les comptes
+     * deja crees. Le telephone est a un clic, sous le champ, et non dans un
+     * selecteur a deux onglets : un onglet aurait demande de choisir avant
+     * de comprendre qu'il y avait un choix.
+     */
     return (
         <CarteAuth
             titre="Connexion"
             sousTitre="Retrouvez vos commandes et vos adresses."
-            bas={
-                <>
-                    Vous n&apos;avez pas de compte ?{" "}
-                    <Link
-                        href="/signup"
-                        className="font-semibold text-brand-600 underline-offset-4 hover:underline"
-                    >
-                        Inscrivez-vous
-                    </Link>
-                </>
-            }
+            bas={bas}
         >
-            <form className="flex flex-col gap-5" onSubmit={handlerSubmit}>
-                <ChampTexte
-                    label="Identifiant"
-                    placeholder="Votre email ou numéro de téléphone"
-                    autoComplete="username"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
+            <form className="flex flex-col gap-5" onSubmit={continuer}>
+                {canal === "email" ? (
+                    <ChampTexte
+                        label="Adresse email"
+                        type="email"
+                        placeholder="vous@exemple.com"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => {
+                            setErreurIdentifiant(null);
+                            setEmail(e.target.value);
+                        }}
+                        required
+                    />
+                ) : (
+                    <PhoneNumber
+                        className="w-full"
+                        country="cd"
+                        preferredCountries={["cd"]}
+                        label={
+                            <>
+                                Téléphone
+                                <span className="text-danger" aria-hidden>
+                                    {" *"}
+                                </span>
+                            </>
+                        }
+                        value={phone}
+                        onChange={(valeur) => {
+                            setErreurIdentifiant(null);
+                            setPhone(valeur);
+                        }}
+                        inputProps={{name: "phone", required: true}}
+                    />
+                )}
 
-                <ChampTexte
-                    label="Mot de passe"
-                    motDePasse
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
+                {erreurIdentifiant ? (
+                    <p className="text-caption text-danger" role="alert">
+                        {erreurIdentifiant}
+                    </p>
+                ) : null}
 
-                <Turnstile onJeton={setJetonAntiRobot} reinit={reinitDefi} />
-
-                {/* Tant que le défi n'est pas passé, on n'envoie pas.
-                    `DEFI_ACTIF` garde le bouton vivant sur un site sans clé,
-                    où aucun jeton n'arriverait jamais. */}
                 <button
-                    type="submit"
-                    disabled={loading || (DEFI_ACTIF && !jetonAntiRobot)}
-                    className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60"
+                    type="button"
+                    onClick={() => {
+                        setCanal(canal === "email" ? "telephone" : "email");
+                        setErreurIdentifiant(null);
+                    }}
+                    className="text-center font-semibold text-brand-600 underline-offset-4 hover:underline"
                 >
-                    {loading ? <Spinner /> : "Se connecter"}
+                    {canal === "email"
+                        ? "Se connecter avec mon téléphone"
+                        : "Se connecter avec mon email"}
+                </button>
+
+                <button type="submit" className="mt-2 flex w-full items-center justify-center rounded-pill bg-secondaryColor py-3.5 text-body font-semibold text-white transition-opacity duration-150 hover:opacity-90 disabled:opacity-60">
+                    Continuer
                 </button>
             </form>
         </CarteAuth>
