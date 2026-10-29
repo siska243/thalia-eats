@@ -257,7 +257,7 @@ export default function PageConnexion() {
                     </button>
                 }
             >
-                <form className="flex flex-col gap-5" onSubmit={verifierLeCode}>
+                <form key="code" className="flex flex-col gap-5" onSubmit={verifierLeCode}>
                     <ChampTexte
                         label="Code de vérification"
                         inputMode="numeric"
@@ -313,7 +313,14 @@ export default function PageConnexion() {
                 sousTitre={canal === "email" ? email : phone}
                 bas={bas}
             >
-                <form className="flex flex-col gap-5" onSubmit={handlerSubmit}>
+                {/* `key` par etape : sans elle, React REUTILISE le meme noeud
+                    <form> et le meme <button> d'une etape a l'autre. Le bouton
+                    « Changer d'identifiant » (type="button") devenait alors le
+                    bouton « Continuer » (type="submit") PENDANT que le clic se
+                    propageait encore : le navigateur voyait un bouton d'envoi
+                    et soumettait, `continuer` renvoyait aussitot a l'etape du
+                    mot de passe. On ne voyait qu'un defi anti-robot remonte. */}
+                <form key="motDePasse" className="flex flex-col gap-5" onSubmit={handlerSubmit}>
                     <ChampTexte
                         label="Mot de passe"
                         motDePasse
@@ -391,7 +398,7 @@ export default function PageConnexion() {
             sousTitre="Retrouvez vos commandes et vos adresses."
             bas={bas}
         >
-            <form className="flex flex-col gap-5" onSubmit={continuer}>
+            <form key="identifiant" className="flex flex-col gap-5" onSubmit={continuer}>
                 {canal === "email" ? (
                     <ChampTexte
                         label="Adresse email"
